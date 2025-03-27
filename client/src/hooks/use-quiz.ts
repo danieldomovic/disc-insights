@@ -134,58 +134,41 @@ export function useQuiz() {
     const ratingIdx = optionIndex % ratingOptions.length;
     const rating = ratingOptions[ratingIdx];
     
-    // First, check if this is a change to an existing selection for this row
-    const existingOption = selectedOptions[optionIdx];
+    // Check if this rating is already used somewhere else
+    const ratingLocation = Object.entries(selectedOptions).find(([idx, optIndex]) => {
+      // Skip the current option we're updating
+      if (parseInt(idx) === optionIdx) return false;
+      
+      const rIdx = optIndex % ratingOptions.length;
+      return ratingOptions[rIdx] === rating;
+    });
     
-    // For special ratings (L, M), we need to check if they're already used
-    // and if so, remove them from where they were previously used
-    if ((rating === 'L' || rating === 'M')) {
-      // Find if this rating is used somewhere else
-      const ratingLocation = Object.entries(selectedOptions).find(([idx, optIndex]) => {
-        // Skip the current option we're updating
-        if (parseInt(idx) === optionIdx) return false;
-        
-        const rIdx = optIndex % ratingOptions.length;
-        return ratingOptions[rIdx] === rating;
+    // If this rating is used elsewhere, remove it from there
+    if (ratingLocation) {
+      const [rowIdx] = ratingLocation;
+      const newSelectedOptions = { ...selectedOptions };
+      delete newSelectedOptions[rowIdx]; // Remove the rating from its previous location
+      newSelectedOptions[optionIdx] = optionIndex; // Add it to the new location
+      setSelectedOptions(newSelectedOptions);
+      
+      // Show a toast notifying the user about what happened
+      let message = '';
+      if (rating === 'L') {
+        message = 'Least like me';
+      } else if (rating === 'M') {
+        message = 'Most like me';
+      } else {
+        message = `rating ${rating}`;
+      }
+      
+      toast({
+        title: `Moved "${rating}" to a new row`,
+        description: `You've moved the ${message} selection to a different trait.`
       });
       
-      // If this rating is used elsewhere, remove it from there
-      if (ratingLocation) {
-        const [rowIdx] = ratingLocation;
-        const newSelectedOptions = { ...selectedOptions };
-        delete newSelectedOptions[rowIdx]; // Remove the rating from its previous location
-        newSelectedOptions[optionIdx] = optionIndex; // Add it to the new location
-        setSelectedOptions(newSelectedOptions);
-        
-        // Show a toast notifying the user
-        toast({
-          title: `Moved "${rating}" to a new row`,
-          description: `You've moved the ${rating === 'L' ? 'Least like me' : 'Most like me'} selection to a different trait.`
-        });
-        
-        // Validate and return
-        setTimeout(() => validateSelections(), 0);
-        return;
-      }
-    } else {
-      // For numeric ratings (1-5), check if they're already used
-      const usedRatings = Object.entries(selectedOptions).map(([idx, optIndex]) => {
-        // Skip the current option we're updating
-        if (parseInt(idx) === optionIdx) return null;
-        
-        const rIdx = optIndex % ratingOptions.length;
-        return ratingOptions[rIdx];
-      }).filter(r => r !== null);
-      
-      // Check if this rating is already used by another option
-      if (usedRatings.includes(rating)) {
-        toast({
-          variant: "destructive",
-          title: `You've already selected "${rating}"`,
-          description: "Please choose a different rating for this trait. Each rating can only be used once."
-        });
-        return;
-      }
+      // Validate and return
+      setTimeout(() => validateSelections(), 0);
+      return;
     }
     
     // Update selected options
