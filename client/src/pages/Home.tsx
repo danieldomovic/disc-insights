@@ -48,11 +48,11 @@ export default function Home() {
               <div className="z-10 flex flex-col items-center justify-center">
                 <svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="mb-3">
                   <g transform="translate(20, 0)">
-                    <path d="M30 20 C35 15, 45 15, 50 20 C52 22, 52 25, 50 30 C48 34, 32 34, 30 30 C28 25, 28 22, 30 20Z" fill="#1E3A8A" />
+                    <path d="M30 20 C35 15, 45 15, 50 20 C52 22, 52 25, 50 30 C48 34, 32 34, 30 30 C28 25, 28 22, 30 20Z" fill="#1C77C3" />
                     <circle cx="35" cy="24" r="2" fill="white" />
                     <circle cx="45" cy="24" r="2" fill="white" />
                     <path d="M38 28 L42 28" stroke="white" strokeWidth="1" />
-                    <path d="M30 35 L50 35 L50 70 L30 70 Z" fill="#1E3A8A" />
+                    <path d="M30 35 L50 35 L50 70 L30 70 Z" fill="#1C77C3" />
                     <path d="M20 40 L30 50 L30 70 L20 60 Z" fill="#1C77C3" />
                     <path d="M60 40 L50 50 L50 70 L60 60 Z" fill="#1C77C3" />
                     <path d="M30 70 L35 95 L45 95 L50 70" fill="#374151" />
