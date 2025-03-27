@@ -95,15 +95,15 @@ export default function QuestionCard({
             const selectedOption = getSelectedOptionForTrait(index);
             
             return (
-              <div key={index} className="flex items-center mb-2">
+              <div key={index} className="flex flex-col mb-8">
                 <div 
-                  className="w-full md:w-2/5 p-4 text-white font-medium rounded-l-md"
+                  className="p-4 text-white font-medium rounded-t-md"
                   style={{ backgroundColor: bgColor }}
                 >
                   {option.text}
                 </div>
                 
-                <div className="flex flex-grow justify-between bg-gray-50 rounded-r-md">
+                <div className="flex justify-between bg-gray-50 rounded-b-md py-4">
                   {ratingOptions.map((rating, rIdx) => {
                     // Calculate the actual value index for this option and rating
                     // This creates a unique value for each radio button
@@ -113,7 +113,7 @@ export default function QuestionCard({
                     return (
                       <div 
                         key={rIdx} 
-                        className="flex justify-center items-center px-4 py-2 cursor-pointer"
+                        className="flex-1 flex justify-center items-center py-2 cursor-pointer"
                         onClick={() => onSelectOption(valueIndex)}
                       >
                         <div
