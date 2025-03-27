@@ -30,7 +30,6 @@ export function useQuiz() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
-  const [selectedRatings, setSelectedRatings] = useState<Record<string, boolean>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError>({
     hasL: false,
     hasM: false,
@@ -72,22 +71,23 @@ export function useQuiz() {
   const validateSelections = (): boolean => {
     if (!currentQuestion) return false;
     
-    // Check if all 4 options have been selected (one rating for each row)
-    const selectedOptionsCount = Object.keys(selectedOptions).length;
-    const allOptionsSelected = selectedOptionsCount === currentQuestion.options.length;
+    // Log selected options for debugging
+    console.log("Selected options:", selectedOptions);
     
-    // Check for exactly one L value
-    const hasL = selectedRatings['L'] || false;
-    
-    // Check for exactly one M value
-    const hasM = selectedRatings['M'] || false;
-    
-    // Check that remaining values are numbers (1-5) for exactly 2 rows
-    // First, identify all the ratings used 
+    // Get all the ratings that have been selected
     const usedRatings = Object.entries(selectedOptions).map(([_, optionIndex]) => {
       const ratingIdx = optionIndex % ratingOptions.length;
       return ratingOptions[ratingIdx];
     });
+    console.log("Used ratings:", usedRatings);
+    
+    // Check if all 4 options have been selected (one rating for each row)
+    const selectedOptionsCount = Object.keys(selectedOptions).length;
+    const allOptionsSelected = selectedOptionsCount === currentQuestion.options.length;
+    
+    // Check for exactly one L value and one M value
+    const hasL = usedRatings.includes('L');
+    const hasM = usedRatings.includes('M');
     
     // Count how many numeric (1-5) ratings are used
     const numericRatings = usedRatings.filter(
@@ -105,6 +105,14 @@ export function useQuiz() {
     
     // Check if we have exactly 2 numeric ratings (1-5)
     const hasTwoMiddleValues = numericRatings.length === 2;
+    
+    console.log("Validation result:", {
+      hasL,
+      hasM,
+      hasTwoMiddleValues,
+      allOptionsSelected,
+      hasNoDuplicatedRatings
+    });
     
     // Update validation state
     setValidationErrors({
@@ -126,34 +134,29 @@ export function useQuiz() {
     const ratingIdx = optionIndex % ratingOptions.length;
     const rating = ratingOptions[ratingIdx];
     
-    // Ensure we're not selecting the same rating twice
-    if (selectedRatings[rating] && !selectedOptions[optionIdx]) {
+    // Get all currently used ratings
+    const usedRatings = Object.entries(selectedOptions).map(([idx, optIndex]) => {
+      // Skip the current option we're updating
+      if (parseInt(idx) === optionIdx) return null;
+      
+      const rIdx = optIndex % ratingOptions.length;
+      return ratingOptions[rIdx];
+    }).filter(r => r !== null);
+    
+    // Check if this rating is already used by another option
+    if (usedRatings.includes(rating)) {
       toast({
         variant: "destructive",
         title: `You've already selected "${rating}"`,
-        description: "Please choose a different rating for this trait."
+        description: "Please choose a different rating for this trait. Each rating can only be used once."
       });
       return;
     }
     
-    // Update the selected ratings
-    const newSelectedRatings = { ...selectedRatings };
-    
-    // If there was a previous selection for this option, remove that rating
-    if (selectedOptions[optionIdx] !== undefined) {
-      const prevRatingIdx = selectedOptions[optionIdx] % ratingOptions.length;
-      const prevRating = ratingOptions[prevRatingIdx];
-      delete newSelectedRatings[prevRating];
-    }
-    
-    // Add the new rating
-    newSelectedRatings[rating] = true;
-    
-    // Update selected options
+    // Update selected options directly (we won't track selected ratings separately)
     const newSelectedOptions = { ...selectedOptions };
     newSelectedOptions[optionIdx] = optionIndex;
     
-    setSelectedRatings(newSelectedRatings);
     setSelectedOptions(newSelectedOptions);
     
     // Validate after selection
@@ -169,31 +172,46 @@ export function useQuiz() {
   const goToNextQuestion = () => {
     if (!currentQuestion) return;
     
-    // Validate all selections before proceeding
-    if (!validateSelections()) {
-      // Get all used ratings to check for duplicates
+    // Run validation
+    const validationPassed = validateSelections();
+    
+    // If validation failed, show errors
+    if (!validationPassed) {
+      // Get all used ratings again (validation function already did this but we need it for error messages)
       const usedRatings = Object.entries(selectedOptions).map(([_, optionIndex]) => {
         const ratingIdx = optionIndex % ratingOptions.length;
         return ratingOptions[ratingIdx];
       });
       
+      const hasL = usedRatings.includes('L');
+      const hasM = usedRatings.includes('M');
+      
+      // Count numeric (1-5) ratings
+      const numericRatings = usedRatings.filter(
+        rating => ['1', '2', '3', '4', '5'].includes(rating)
+      );
+      
+      // Count occurrences of each rating
       const ratingCounts: Record<string, number> = {};
       usedRatings.forEach(rating => {
         ratingCounts[rating] = (ratingCounts[rating] || 0) + 1;
       });
       
-      const hasDuplicatedRatings = Object.values(ratingCounts).some(count => count > 1);
+      // Check for duplicates
+      const duplicatedRatings = Object.entries(ratingCounts)
+        .filter(([_, count]) => count > 1)
+        .map(([rating, _]) => rating);
       
-      // Display error toast with specifics
+      // Build error messages
       const errors = [];
-      if (!validationErrors.allOptionsSelected) errors.push("Some questions are not answered");
-      if (!validationErrors.hasL) errors.push("L value not selected");
-      if (!validationErrors.hasM) errors.push("M value not selected");
-      if (!validationErrors.hasTwoMiddleValues) errors.push("You must select two different values (1-5) for the remaining traits");
-      if (hasDuplicatedRatings) {
-        const duplicatedRatings = Object.entries(ratingCounts)
-          .filter(([_, count]) => count > 1)
-          .map(([rating, _]) => rating);
+      const selectedOptionsCount = Object.keys(selectedOptions).length;
+      if (selectedOptionsCount < currentQuestion.options.length) {
+        errors.push("Some questions are not answered");
+      }
+      if (!hasL) errors.push("L value not selected");
+      if (!hasM) errors.push("M value not selected");
+      if (numericRatings.length !== 2) errors.push("You must select two different numeric values (1-5) for the remaining traits");
+      if (duplicatedRatings.length > 0) {
         errors.push(`You have selected "${duplicatedRatings.join(', ')}" value more than once`);
       }
       
@@ -220,7 +238,6 @@ export function useQuiz() {
     
     setAnswers([...answers, ...newAnswers]);
     setSelectedOptions({});
-    setSelectedRatings({});
     setValidationErrors({
       hasL: false,
       hasM: false,
@@ -240,7 +257,6 @@ export function useQuiz() {
     setCurrentQuestionIndex(0);
     setAnswers([]);
     setSelectedOptions({});
-    setSelectedRatings({});
     setValidationErrors({
       hasL: false,
       hasM: false,

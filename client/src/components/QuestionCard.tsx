@@ -30,36 +30,48 @@ export default function QuestionCard({
   // Rating options
   const ratingOptions = ['L', '1', '2', '3', '4', '5', 'M'];
   
-  // Check if there are any validation errors
-  const hasErrors = !(
-    validationErrors.hasL && 
-    validationErrors.hasM && 
-    validationErrors.hasTwoMiddleValues && 
-    validationErrors.allOptionsSelected
-  );
-  
-  // Generate error messages
-  const errorMessages = [];
-  if (!validationErrors.allOptionsSelected) errorMessages.push("Some questions are not answered");
-  if (!validationErrors.hasL) errorMessages.push("L value not selected");
-  if (!validationErrors.hasM) errorMessages.push("M value not selected");
-  if (!validationErrors.hasTwoMiddleValues) errorMessages.push("You must select two different values (1-5) for the remaining traits");
-  
-  // Check for duplicated values
+  // Get all used ratings to generate precise error messages
   const usedRatings = Object.entries(selectedOptions).map(([_, optionIndex]) => {
     const ratingIdx = optionIndex % ratingOptions.length;
     return ratingOptions[ratingIdx];
   });
   
+  // Get count of selected options
+  const selectedOptionsCount = Object.keys(selectedOptions).length;
+  
+  // Check if ratings include L and M
+  const hasL = usedRatings.includes('L');
+  const hasM = usedRatings.includes('M');
+  
+  // Count numeric (1-5) ratings
+  const numericRatings = usedRatings.filter(
+    rating => ['1', '2', '3', '4', '5'].includes(rating)
+  );
+  
+  // Count occurrences of each rating
   const ratingCounts: Record<string, number> = {};
   usedRatings.forEach(rating => {
     ratingCounts[rating] = (ratingCounts[rating] || 0) + 1;
   });
   
+  // Check for duplicates
   const duplicatedRatings = Object.entries(ratingCounts)
     .filter(([_, count]) => count > 1)
     .map(([rating, _]) => rating);
   
+  // Calculate if there are any validation errors based on current selections
+  // This uses our real-time calculations instead of the passed-in validationErrors - ignore the ValidationError prop
+  const isValid = hasL && hasM && numericRatings.length === 2 && selectedOptionsCount === question.options.length && duplicatedRatings.length === 0;
+  const hasErrors = !isValid;
+  
+  // Generate error messages based on current state (not from validation state)
+  const errorMessages = [];
+  if (selectedOptionsCount < question.options.length) {
+    errorMessages.push("Some questions are not answered");
+  }
+  if (!hasL) errorMessages.push("L value not selected");
+  if (!hasM) errorMessages.push("M value not selected");
+  if (numericRatings.length !== 2) errorMessages.push("You must select two different numeric values (1-5) for the remaining traits");
   if (duplicatedRatings.length > 0) {
     errorMessages.push(`You have selected "${duplicatedRatings.join(', ')}" value more than once`);
   }
