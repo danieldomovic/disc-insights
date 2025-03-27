@@ -6,7 +6,8 @@ import { insertQuizResultSchema } from "@shared/schema";
 
 const answerSchema = z.object({
   questionId: z.number(),
-  selectedColor: z.string()
+  selectedColor: z.string(),
+  rating: z.string() // L, 1, 2, 3, 4, 5, or M
 });
 
 const submissionSchema = z.object({
@@ -30,35 +31,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const submission = submissionSchema.parse(req.body);
       
-      // Count colors
-      let fieryRedCount = 0;
-      let sunshineYellowCount = 0;
-      let earthGreenCount = 0;
-      let coolBlueCount = 0;
+      // Initialize color scores
+      let fieryRedScore = 0;
+      let sunshineYellowScore = 0;
+      let earthGreenScore = 0;
+      let coolBlueScore = 0;
       
+      // Calculate scores using the ratings
       submission.answers.forEach(answer => {
+        // Convert rating to numeric value
+        let ratingValue = 0;
+        switch (answer.rating) {
+          case 'L': ratingValue = 1; break;
+          case '1': ratingValue = 2; break;
+          case '2': ratingValue = 3; break;
+          case '3': ratingValue = 4; break;
+          case '4': ratingValue = 5; break;
+          case '5': ratingValue = 6; break;
+          case 'M': ratingValue = 7; break;
+          default: ratingValue = 0;
+        }
+        
+        // Add the weighted score to the appropriate color
         switch (answer.selectedColor) {
           case "fiery-red":
-            fieryRedCount++;
+            fieryRedScore += ratingValue;
             break;
           case "sunshine-yellow":
-            sunshineYellowCount++;
+            sunshineYellowScore += ratingValue;
             break;
           case "earth-green":
-            earthGreenCount++;
+            earthGreenScore += ratingValue;
             break;
           case "cool-blue":
-            coolBlueCount++;
+            coolBlueScore += ratingValue;
             break;
         }
       });
       
+      // Calculate total score
+      const totalScore = fieryRedScore + sunshineYellowScore + earthGreenScore + coolBlueScore;
+      
       // Calculate percentages
-      const total = submission.answers.length;
-      const fieryRedPercentage = Math.round((fieryRedCount / total) * 100);
-      const sunshineYellowPercentage = Math.round((sunshineYellowCount / total) * 100);
-      const earthGreenPercentage = Math.round((earthGreenCount / total) * 100);
-      const coolBluePercentage = Math.round((coolBlueCount / total) * 100);
+      const fieryRedPercentage = Math.round((fieryRedScore / totalScore) * 100);
+      const sunshineYellowPercentage = Math.round((sunshineYellowScore / totalScore) * 100);
+      const earthGreenPercentage = Math.round((earthGreenScore / totalScore) * 100);
+      const coolBluePercentage = Math.round((coolBlueScore / totalScore) * 100);
       
       // Find dominant and secondary colors
       const colorScores = [
@@ -120,7 +138,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.createQuizAnswer({
           resultId: quizResult.id,
           questionId: answer.questionId,
-          selectedColor: answer.selectedColor
+          selectedColor: answer.selectedColor,
+          rating: answer.rating
         });
       }
       

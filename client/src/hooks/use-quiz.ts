@@ -16,14 +16,19 @@ export type QuizQuestion = {
 export type QuizAnswer = {
   questionId: number;
   selectedColor: string;
+  rating: string; // L, 1, 2, 3, 4, 5, or M
 };
 
 export function useQuiz() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
+  const [selectedRatings, setSelectedRatings] = useState<Record<string, boolean>>({});
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Rating options
+  const ratingOptions = ['L', '1', '2', '3', '4', '5', 'M'];
   
   const { data: questions, isLoading: isLoadingQuestions } = useQuery<QuizQuestion[]>({
     queryKey: ["/api/quiz/questions"],
@@ -51,20 +56,58 @@ export function useQuiz() {
   const progress = totalQuestions > 0 ? Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100) : 0;
   
   const selectOption = (optionIndex: number) => {
+    if (!currentQuestion) return;
+    
+    // Calculate which option and rating this corresponds to
+    const optionIdx = Math.floor(optionIndex / ratingOptions.length);
+    const ratingIdx = optionIndex % ratingOptions.length;
+    const rating = ratingOptions[ratingIdx];
+    
+    // Ensure we're not selecting the same rating twice
+    if (selectedRatings[rating] && selectedOptionIndex !== optionIndex) {
+      toast({
+        variant: "default",
+        title: `You've already selected "${rating}"`,
+        description: "Please choose a different rating for this trait."
+      });
+      return;
+    }
+    
+    // Update the selected ratings
+    const newSelectedRatings = { ...selectedRatings };
+    
+    // If there was a previous selection, remove that rating
+    if (selectedOptionIndex !== null) {
+      const prevRatingIdx = selectedOptionIndex % ratingOptions.length;
+      const prevRating = ratingOptions[prevRatingIdx];
+      delete newSelectedRatings[prevRating];
+    }
+    
+    // Add the new rating
+    newSelectedRatings[rating] = true;
+    
+    setSelectedRatings(newSelectedRatings);
     setSelectedOptionIndex(optionIndex);
   };
   
   const goToNextQuestion = () => {
     if (selectedOptionIndex === null || !currentQuestion) return;
     
+    // Extract the option index and rating from the selectedOptionIndex
+    const optionIdx = Math.floor(selectedOptionIndex / ratingOptions.length);
+    const ratingIdx = selectedOptionIndex % ratingOptions.length;
+    const rating = ratingOptions[ratingIdx];
+    
     // Save the answer
     const newAnswer: QuizAnswer = {
       questionId: currentQuestion.id,
-      selectedColor: currentQuestion.options[selectedOptionIndex].color
+      selectedColor: currentQuestion.options[optionIdx].color,
+      rating: rating
     };
     
     setAnswers([...answers, newAnswer]);
     setSelectedOptionIndex(null);
+    setSelectedRatings({});
     
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -78,6 +121,7 @@ export function useQuiz() {
     setCurrentQuestionIndex(0);
     setAnswers([]);
     setSelectedOptionIndex(null);
+    setSelectedRatings({});
     setLocation("/");
   };
   

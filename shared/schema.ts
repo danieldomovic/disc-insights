@@ -64,6 +64,7 @@ export const quizAnswers = pgTable("quiz_answers", {
   resultId: integer("result_id").references(() => quizResults.id),
   questionId: integer("question_id").references(() => quizQuestions.id),
   selectedColor: text("selected_color").notNull(),
+  rating: text("rating").notNull(),
 });
 
 export const insertQuizAnswerSchema = createInsertSchema(quizAnswers).omit({
