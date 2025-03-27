@@ -16,7 +16,7 @@ export default function Home() {
       <div className="w-full bg-gradient-to-b from-slate-50 to-white py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.h1 
-            className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600"
+            className="text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 leading-tight md:leading-snug pb-2"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.7 }}
