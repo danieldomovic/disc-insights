@@ -37,14 +37,14 @@ export default function Quiz() {
   
   if (isLoadingQuestions) {
     return (
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <div className="mb-6">
           <Skeleton className="h-4 w-40 mb-2" />
           <Skeleton className="h-2 w-full rounded-full" />
         </div>
         
         <Card>
-          <CardContent className="p-8">
+          <CardContent className="p-6 sm:p-8">
             <Skeleton className="h-6 w-3/4 mb-6" />
             
             <div className="space-y-4">
@@ -71,7 +71,7 @@ export default function Quiz() {
   
   return (
     <motion.section 
-      className="max-w-3xl mx-auto"
+      className="max-w-3xl mx-auto px-4 sm:px-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
