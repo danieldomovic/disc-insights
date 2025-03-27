@@ -40,10 +40,29 @@ export default function QuestionCard({
   
   // Generate error messages
   const errorMessages = [];
+  if (!validationErrors.allOptionsSelected) errorMessages.push("Some questions are not answered");
   if (!validationErrors.hasL) errorMessages.push("L value not selected");
   if (!validationErrors.hasM) errorMessages.push("M value not selected");
-  if (!validationErrors.hasTwoMiddleValues) errorMessages.push("You must select two different values in between L and M");
-  if (!validationErrors.allOptionsSelected) errorMessages.push("Some questions are not answered");
+  if (!validationErrors.hasTwoMiddleValues) errorMessages.push("You must select two different values (1-5) for the remaining traits");
+  
+  // Check for duplicated values
+  const usedRatings = Object.entries(selectedOptions).map(([_, optionIndex]) => {
+    const ratingIdx = optionIndex % ratingOptions.length;
+    return ratingOptions[ratingIdx];
+  });
+  
+  const ratingCounts: Record<string, number> = {};
+  usedRatings.forEach(rating => {
+    ratingCounts[rating] = (ratingCounts[rating] || 0) + 1;
+  });
+  
+  const duplicatedRatings = Object.entries(ratingCounts)
+    .filter(([_, count]) => count > 1)
+    .map(([rating, _]) => rating);
+  
+  if (duplicatedRatings.length > 0) {
+    errorMessages.push(`You have selected "${duplicatedRatings.join(', ')}" value more than once`);
+  }
   
   return (
     <Card className="w-full">
