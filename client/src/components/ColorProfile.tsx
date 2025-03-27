@@ -1,23 +1,41 @@
 import { colorProfiles, ColorType } from "@/lib/colorProfiles";
 import { Card, CardContent } from "@/components/ui/card";
+import { Flame, Sun, Leaf, Droplets } from "lucide-react";
 
 interface ColorProfileProps {
   color: ColorType;
 }
 
+// Map color types to their corresponding icons
+const colorIcons = {
+  "fiery-red": Flame,
+  "sunshine-yellow": Sun,
+  "earth-green": Leaf,
+  "cool-blue": Droplets
+};
+
 export function ColorProfile({ color }: ColorProfileProps) {
   const profile = colorProfiles[color];
+  const IconComponent = colorIcons[color];
   
   return (
-    <div className="bg-gray-50 rounded-lg p-6">
-      <div className="flex items-center mb-4">
+    <div 
+      className="rounded-xl p-6 transition-all duration-300 hover:shadow-lg"
+      style={{ 
+        backgroundColor: `${profile.bgColor}15`, // Light version of the color with opacity
+        borderLeft: `4px solid ${profile.bgColor}`
+      }}
+    >
+      <div className="flex flex-col items-center text-center mb-4">
         <div 
-          className="w-12 h-12 rounded-full mr-4" 
+          className="w-20 h-20 rounded-2xl mb-4 flex items-center justify-center"
           style={{ backgroundColor: profile.bgColor }}
-        ></div>
-        <h3 className="text-xl font-semibold">{profile.name}</h3>
+        >
+          <IconComponent size={40} color={profile.textColor} />
+        </div>
+        <h3 className="text-2xl font-bold">{profile.name}</h3>
       </div>
-      <p className="text-sm">{profile.description}</p>
+      <p className="text-center">{profile.description}</p>
     </div>
   );
 }
@@ -28,15 +46,18 @@ interface ColorProfileDetailProps {
 
 export function ColorProfileDetail({ color }: ColorProfileDetailProps) {
   const profile = colorProfiles[color];
+  const IconComponent = colorIcons[color];
   
   return (
     <Card>
       <CardContent className="pt-6">
         <div className="flex items-center mb-4">
           <div 
-            className="w-12 h-12 rounded-full mr-4" 
+            className="w-12 h-12 rounded-lg mr-4 flex items-center justify-center" 
             style={{ backgroundColor: profile.bgColor }}
-          ></div>
+          >
+            <IconComponent size={24} color={profile.textColor} />
+          </div>
           <h3 className="text-xl font-semibold">{profile.name}</h3>
         </div>
         
