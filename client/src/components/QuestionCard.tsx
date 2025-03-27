@@ -83,7 +83,7 @@ export default function QuestionCard({
           Please select one M (Most like me), one L (Least like me), and two different values in between.
         </p>
         
-        <div className="space-y-0">
+        <div className="space-y-4">
           {question.options.map((option, index) => {
             const colorMap: Record<string, string> = {
               'fiery-red': '#E23D28',
@@ -95,7 +95,7 @@ export default function QuestionCard({
             const selectedOption = getSelectedOptionForTrait(index);
             
             return (
-              <div key={index} className="flex items-center mb-2">
+              <div key={index} className="flex items-center mb-6">
                 <div 
                   className="w-full md:w-2/5 p-4 text-white font-medium rounded-l-md"
                   style={{ backgroundColor: bgColor }}
