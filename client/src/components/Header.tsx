@@ -1,10 +1,25 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, User, LogIn } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Header() {
   const [location] = useLocation();
-  const showRestartButton = location !== "/";
+  const showRestartButton = location !== "/" && location !== "/profile" && location !== "/auth";
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // Check if user is logged in
+  const { data: user, isLoading } = useQuery({
+    queryKey: ["/api/profile"],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: false,
+    enabled: location !== "/auth", // Don't check on auth page
+  });
+  
+  useEffect(() => {
+    setIsLoggedIn(!!user);
+  }, [user]);
   
   return (
     <header className="bg-white shadow-sm">
@@ -21,7 +36,7 @@ export default function Header() {
             <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#1C77C3] via-[#42A640] to-[#E23D28] text-transparent bg-clip-text">Insights Discovery</h1>
           </div>
         </Link>
-        <nav>
+        <nav className="flex items-center gap-3">
           {showRestartButton && (
             <Link href="/">
               <Button variant="outline" size="sm" className="flex items-center gap-2">
@@ -29,6 +44,24 @@ export default function Header() {
                 Restart Quiz
               </Button>
             </Link>
+          )}
+          
+          {!isLoading && (
+            isLoggedIn ? (
+              <Link href="/profile">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  My Profile
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/auth">
+                <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                  <LogIn className="h-4 w-4" />
+                  Sign In
+                </Button>
+              </Link>
+            )
           )}
         </nav>
       </div>

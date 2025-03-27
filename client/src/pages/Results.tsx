@@ -21,6 +21,13 @@ export default function Results() {
   const [match, params] = useRoute<{ resultId?: string }>("/results/:resultId?");
   const [chartJsLoaded, setChartJsLoaded] = useState(false);
   
+  // Check if user is logged in
+  const { data: user, isLoading: isLoadingUser } = useQuery({
+    queryKey: ["/api/profile"],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: false,
+  });
+  
   // Mock result data for when no resultId is provided
   const mockResult: QuizResultData = {
     id: 0,
@@ -178,12 +185,37 @@ export default function Results() {
             </div>
           </div>
           
-          <div className="mt-6 sm:mt-8 flex justify-center">
-            <Link href="/">
-              <Button className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg transform transition-transform hover:scale-105">
-                Retake Assessment
-              </Button>
-            </Link>
+          <div className="mt-6 sm:mt-8">
+            {!user && (
+              <div className="bg-gray-50 rounded-lg p-4 sm:p-6 border border-gray-200 mb-6">
+                <h3 className="text-lg font-semibold mb-2 text-center">Save Your Results</h3>
+                <p className="text-sm text-center mb-4">
+                  Create a free account to save your results and access them anytime. You can also take the test again later to track changes in your profile.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Link href="/auth">
+                    <Button variant="default" className="px-4 py-2 text-sm rounded-lg shadow-md">
+                      Sign Up / Login
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex justify-center gap-4">
+              {user && (
+                <Link href="/profile">
+                  <Button variant="outline" className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg transform transition-transform hover:scale-105">
+                    View All Results
+                  </Button>
+                </Link>
+              )}
+              <Link href="/">
+                <Button className="px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base rounded-lg shadow-md hover:shadow-lg transform transition-transform hover:scale-105">
+                  Retake Assessment
+                </Button>
+              </Link>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -38,11 +38,18 @@ export default function Home() {
               There are no right or wrong answers – just choose the response that best describes you.
             </p>
             
-            <Link href="/quiz">
-              <Button className="px-8 py-6 text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105">
-                Start Assessment
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/quiz">
+                <Button className="px-8 py-6 text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                  Start Assessment
+                </Button>
+              </Link>
+              <Link href="/auth">
+                <Button variant="outline" className="px-8 py-6 text-lg rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                  Create Account
+                </Button>
+              </Link>
+            </div>
           </div>
         </CardContent>
       </Card>

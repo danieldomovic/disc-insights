@@ -1,10 +1,27 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import session from "express-session";
+import MemoryStore from "memorystore";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Set up session middleware with memory store
+const MemoryStoreSession = MemoryStore(session);
+app.use(session({
+  cookie: { 
+    maxAge: 86400000, // 1 day in milliseconds
+    secure: false 
+  },
+  store: new MemoryStoreSession({
+    checkPeriod: 86400000 // Clear expired sessions every 24h
+  }),
+  resave: false,
+  saveUninitialized: false,
+  secret: "insights-discovery-secret-key"
+}));
 
 app.use((req, res, next) => {
   const start = Date.now();
