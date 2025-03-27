@@ -1,28 +1,49 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { QuizQuestion } from "@/hooks/use-quiz";
+import { QuizQuestion, ValidationError } from "@/hooks/use-quiz";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface QuestionCardProps {
   question: QuizQuestion;
-  selectedOptionIndex: number | null;
+  selectedOptions: Record<number, number>;
+  getSelectedOptionForTrait: (optionIdx: number) => number | undefined;
   onSelectOption: (index: number) => void;
   onNext: () => void;
   isLastQuestion: boolean;
   isSubmitting: boolean;
+  validationErrors: ValidationError;
 }
 
 export default function QuestionCard({ 
   question, 
-  selectedOptionIndex, 
+  selectedOptions,
+  getSelectedOptionForTrait,
   onSelectOption, 
   onNext, 
   isLastQuestion,
-  isSubmitting
+  isSubmitting,
+  validationErrors
 }: QuestionCardProps) {
   // Rating options
   const ratingOptions = ['L', '1', '2', '3', '4', '5', 'M'];
+  
+  // Check if there are any validation errors
+  const hasErrors = !(
+    validationErrors.hasL && 
+    validationErrors.hasM && 
+    validationErrors.hasTwoMiddleValues && 
+    validationErrors.allOptionsSelected
+  );
+  
+  // Generate error messages
+  const errorMessages = [];
+  if (!validationErrors.hasL) errorMessages.push("L value not selected");
+  if (!validationErrors.hasM) errorMessages.push("M value not selected");
+  if (!validationErrors.hasTwoMiddleValues) errorMessages.push("You must select two different values in between L and M");
+  if (!validationErrors.allOptionsSelected) errorMessages.push("Some questions are not answered");
   
   return (
     <Card className="w-full">
@@ -40,6 +61,7 @@ export default function QuestionCard({
               'cool-blue': '#1C77C3'
             };
             const bgColor = colorMap[option.color] || '#1C77C3';
+            const selectedOption = getSelectedOptionForTrait(index);
             
             return (
               <div key={index} className="flex items-center mb-2">
@@ -55,7 +77,7 @@ export default function QuestionCard({
                     // Calculate the actual value index for this option and rating
                     // This creates a unique value for each radio button
                     const valueIndex = index * ratingOptions.length + rIdx;
-                    const isSelected = selectedOptionIndex === valueIndex;
+                    const isSelected = selectedOption === valueIndex;
                     
                     return (
                       <div 
@@ -83,13 +105,29 @@ export default function QuestionCard({
           })}
         </div>
         
+        {/* Error messages */}
+        {hasErrors && Object.keys(selectedOptions).length > 0 && (
+          <div className="mt-6">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                <ul className="mt-2 list-disc list-inside">
+                  {errorMessages.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+        
         <div className="mt-8">
           <Button 
             onClick={onNext}
-            disabled={selectedOptionIndex === null || isSubmitting}
+            disabled={isSubmitting}
             className={cn(
               "w-full md:w-auto px-6 py-3 transition-colors bg-indigo-600 hover:bg-indigo-700",
-              (selectedOptionIndex === null || isSubmitting) && "opacity-50 cursor-not-allowed"
+              isSubmitting && "opacity-50 cursor-not-allowed"
             )}
           >
             {isSubmitting ? "Processing..." : isLastQuestion ? "Submit Answers" : "Next Question"}

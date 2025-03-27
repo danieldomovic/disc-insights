@@ -19,11 +19,24 @@ export type QuizAnswer = {
   rating: string; // L, 1, 2, 3, 4, 5, or M
 };
 
+export type ValidationError = {
+  hasL: boolean;
+  hasM: boolean;
+  hasTwoMiddleValues: boolean;
+  allOptionsSelected: boolean;
+};
+
 export function useQuiz() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
   const [selectedRatings, setSelectedRatings] = useState<Record<string, boolean>>({});
+  const [validationErrors, setValidationErrors] = useState<ValidationError>({
+    hasL: false,
+    hasM: false,
+    hasTwoMiddleValues: false,
+    allOptionsSelected: false
+  });
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   
@@ -55,6 +68,39 @@ export function useQuiz() {
   const totalQuestions = questions?.length || 0;
   const progress = totalQuestions > 0 ? Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100) : 0;
   
+  // Validate the current selections
+  const validateSelections = (): boolean => {
+    if (!currentQuestion) return false;
+    
+    // Check if all 4 options have been selected
+    const selectedOptionsCount = Object.keys(selectedOptions).length;
+    const allOptionsSelected = selectedOptionsCount === currentQuestion.options.length;
+    
+    // Check for L value
+    const hasL = selectedRatings['L'] || false;
+    
+    // Check for M value
+    const hasM = selectedRatings['M'] || false;
+    
+    // Calculate number of middle values (1-5)
+    const middleValueCount = Object.keys(selectedRatings).filter(
+      rating => rating !== 'L' && rating !== 'M'
+    ).length;
+    
+    const hasTwoMiddleValues = middleValueCount >= 2;
+    
+    // Update validation state
+    setValidationErrors({
+      hasL,
+      hasM,
+      hasTwoMiddleValues,
+      allOptionsSelected
+    });
+    
+    // Return whether all validations pass
+    return hasL && hasM && hasTwoMiddleValues && allOptionsSelected;
+  };
+  
   const selectOption = (optionIndex: number) => {
     if (!currentQuestion) return;
     
@@ -64,9 +110,9 @@ export function useQuiz() {
     const rating = ratingOptions[ratingIdx];
     
     // Ensure we're not selecting the same rating twice
-    if (selectedRatings[rating] && selectedOptionIndex !== optionIndex) {
+    if (selectedRatings[rating] && !selectedOptions[optionIdx]) {
       toast({
-        variant: "default",
+        variant: "destructive",
         title: `You've already selected "${rating}"`,
         description: "Please choose a different rating for this trait."
       });
@@ -76,9 +122,9 @@ export function useQuiz() {
     // Update the selected ratings
     const newSelectedRatings = { ...selectedRatings };
     
-    // If there was a previous selection, remove that rating
-    if (selectedOptionIndex !== null) {
-      const prevRatingIdx = selectedOptionIndex % ratingOptions.length;
+    // If there was a previous selection for this option, remove that rating
+    if (selectedOptions[optionIdx] !== undefined) {
+      const prevRatingIdx = selectedOptions[optionIdx] % ratingOptions.length;
       const prevRating = ratingOptions[prevRatingIdx];
       delete newSelectedRatings[prevRating];
     }
@@ -86,42 +132,85 @@ export function useQuiz() {
     // Add the new rating
     newSelectedRatings[rating] = true;
     
+    // Update selected options
+    const newSelectedOptions = { ...selectedOptions };
+    newSelectedOptions[optionIdx] = optionIndex;
+    
     setSelectedRatings(newSelectedRatings);
-    setSelectedOptionIndex(optionIndex);
+    setSelectedOptions(newSelectedOptions);
+    
+    // Validate after selection
+    setTimeout(() => {
+      validateSelections();
+    }, 0);
+  };
+  
+  const getSelectedOptionForTrait = (optionIdx: number): number | undefined => {
+    return selectedOptions[optionIdx];
   };
   
   const goToNextQuestion = () => {
-    if (selectedOptionIndex === null || !currentQuestion) return;
+    if (!currentQuestion) return;
     
-    // Extract the option index and rating from the selectedOptionIndex
-    const optionIdx = Math.floor(selectedOptionIndex / ratingOptions.length);
-    const ratingIdx = selectedOptionIndex % ratingOptions.length;
-    const rating = ratingOptions[ratingIdx];
+    // Validate all selections before proceeding
+    if (!validateSelections()) {
+      // Display error toast with specifics
+      const errors = [];
+      if (!validationErrors.hasL) errors.push("L value not selected");
+      if (!validationErrors.hasM) errors.push("M value not selected");
+      if (!validationErrors.hasTwoMiddleValues) errors.push("You must select two different values in between L and M");
+      if (!validationErrors.allOptionsSelected) errors.push("Some questions are not answered");
+      
+      toast({
+        variant: "destructive",
+        title: "Cannot proceed",
+        description: errors.join(", ")
+      });
+      return;
+    }
     
-    // Save the answer
-    const newAnswer: QuizAnswer = {
-      questionId: currentQuestion.id,
-      selectedColor: currentQuestion.options[optionIdx].color,
-      rating: rating
-    };
+    // Save answers for this question
+    const newAnswers = currentQuestion.options.map((option, idx) => {
+      const optionIndex = selectedOptions[idx];
+      const ratingIdx = optionIndex % ratingOptions.length;
+      const rating = ratingOptions[ratingIdx];
+      
+      return {
+        questionId: currentQuestion.id,
+        selectedColor: option.color,
+        rating: rating
+      };
+    });
     
-    setAnswers([...answers, newAnswer]);
-    setSelectedOptionIndex(null);
+    setAnswers([...answers, ...newAnswers]);
+    setSelectedOptions({});
     setSelectedRatings({});
+    setValidationErrors({
+      hasL: false,
+      hasM: false,
+      hasTwoMiddleValues: false,
+      allOptionsSelected: false
+    });
     
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       // Submit the quiz
-      submitMutation.mutate([...answers, newAnswer]);
+      submitMutation.mutate([...answers, ...newAnswers]);
     }
   };
   
   const restartQuiz = () => {
     setCurrentQuestionIndex(0);
     setAnswers([]);
-    setSelectedOptionIndex(null);
+    setSelectedOptions({});
     setSelectedRatings({});
+    setValidationErrors({
+      hasL: false,
+      hasM: false,
+      hasTwoMiddleValues: false,
+      allOptionsSelected: false
+    });
     setLocation("/");
   };
   
@@ -130,11 +219,13 @@ export function useQuiz() {
     currentQuestionIndex,
     totalQuestions,
     progress,
-    selectedOptionIndex,
+    selectedOptions,
+    getSelectedOptionForTrait,
     selectOption,
     goToNextQuestion,
     restartQuiz,
     isLoadingQuestions,
-    isSubmitting: submitMutation.isPending
+    isSubmitting: submitMutation.isPending,
+    validationErrors
   };
 }

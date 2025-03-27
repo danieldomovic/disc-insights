@@ -13,11 +13,13 @@ export default function Quiz() {
     currentQuestionIndex,
     totalQuestions,
     progress,
-    selectedOptionIndex,
+    selectedOptions,
+    getSelectedOptionForTrait,
     selectOption,
     goToNextQuestion,
     isLoadingQuestions,
-    isSubmitting
+    isSubmitting,
+    validationErrors
   } = useQuiz();
   
   const { toast } = useToast();
@@ -84,11 +86,13 @@ export default function Quiz() {
       
       <QuestionCard 
         question={currentQuestion}
-        selectedOptionIndex={selectedOptionIndex}
+        selectedOptions={selectedOptions}
+        getSelectedOptionForTrait={getSelectedOptionForTrait}
         onSelectOption={selectOption}
         onNext={goToNextQuestion}
         isLastQuestion={currentQuestionIndex === totalQuestions - 1}
         isSubmitting={isSubmitting}
+        validationErrors={validationErrors}
       />
     </motion.section>
   );
