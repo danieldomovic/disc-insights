@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Connection</title>
+</head>
+<body>
+  <h1>Testing Connection to API</h1>
+  <div id="result"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('http://localhost:5000/api/quiz/questions')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('result').innerHTML = 
+            '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        })
+        .catch(error => {
+          document.getElementById('result').innerHTML = 
+            '<p style="color: red;">Error: ' + error.message + '</p>';
+        });
+    });
+  </script>
+</body>
+</html>
