@@ -88,7 +88,11 @@ export class MemStorage implements IStorage {
   
   async createQuizResult(insertResult: InsertQuizResult): Promise<QuizResult> {
     const id = this.resultId++;
-    const result: QuizResult = { ...insertResult, id };
+    const result: QuizResult = { 
+      ...insertResult, 
+      id,
+      userId: insertResult.userId || null 
+    };
     this.quizResults.set(id, result);
     return result;
   }
@@ -99,7 +103,12 @@ export class MemStorage implements IStorage {
   
   async createQuizAnswer(insertAnswer: InsertQuizAnswer): Promise<QuizAnswer> {
     const id = this.answerId++;
-    const answer: QuizAnswer = { ...insertAnswer, id };
+    const answer: QuizAnswer = { 
+      ...insertAnswer, 
+      id,
+      resultId: insertAnswer.resultId || null,
+      questionId: insertAnswer.questionId || null
+    };
     this.quizAnswers.set(id, answer);
     return answer;
   }
@@ -113,16 +122,16 @@ export class MemStorage implements IStorage {
   private initializeQuizQuestions() {
     const questions: InsertQuizQuestion[] = [
       {
-        text: "When making decisions, I typically:",
+        text: "I make decisions by:",
         options: [
-          { text: "Act quickly and decisively", color: "fiery-red" },
-          { text: "Consider all exciting possibilities", color: "sunshine-yellow" },
-          { text: "Think about how it affects everyone involved", color: "earth-green" },
-          { text: "Analyze all information carefully", color: "cool-blue" }
+          { text: "Acting quickly and decisively", color: "fiery-red" },
+          { text: "Considering all exciting possibilities", color: "sunshine-yellow" },
+          { text: "Thinking about how it affects everyone involved", color: "earth-green" },
+          { text: "Analyzing all information carefully", color: "cool-blue" }
         ]
       },
       {
-        text: "In meetings, I am most likely to:",
+        text: "In meetings, I:",
         options: [
           { text: "Get straight to the point", color: "fiery-red" },
           { text: "Generate enthusiasm and new ideas", color: "sunshine-yellow" },
@@ -131,16 +140,16 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "When faced with a problem, my first instinct is to:",
+        text: "My first response to problems is:",
         options: [
-          { text: "Take immediate action to solve it", color: "fiery-red" },
-          { text: "Brainstorm multiple creative solutions", color: "sunshine-yellow" },
-          { text: "Discuss it with others to get their perspective", color: "earth-green" },
-          { text: "Gather all relevant information first", color: "cool-blue" }
+          { text: "Taking immediate action to solve them", color: "fiery-red" },
+          { text: "Brainstorming multiple creative solutions", color: "sunshine-yellow" },
+          { text: "Discussing with others to get their perspective", color: "earth-green" },
+          { text: "Gathering all relevant information first", color: "cool-blue" }
         ]
       },
       {
-        text: "I feel most energized when:",
+        text: "I feel most energized by:",
         options: [
           { text: "Accomplishing tasks and seeing results", color: "fiery-red" },
           { text: "Engaging with others and sharing ideas", color: "sunshine-yellow" },
@@ -149,7 +158,7 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "Under pressure, I tend to:",
+        text: "Under pressure, I:",
         options: [
           { text: "Become more direct and demanding", color: "fiery-red" },
           { text: "Talk more and express my frustrations openly", color: "sunshine-yellow" },
@@ -158,7 +167,7 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "My workspace is usually:",
+        text: "My workspace is:",
         options: [
           { text: "Functional and organized for efficiency", color: "fiery-red" },
           { text: "Vibrant with personal touches and inspiration", color: "sunshine-yellow" },
@@ -167,12 +176,12 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "When communicating, I prefer to:",
+        text: "My communication style is:",
         options: [
-          { text: "Be brief, direct and to the point", color: "fiery-red" },
-          { text: "Be expressive, enthusiastic and engaging", color: "sunshine-yellow" },
-          { text: "Be supportive, thoughtful and considerate", color: "earth-green" },
-          { text: "Be precise, detailed and logical", color: "cool-blue" }
+          { text: "Brief, direct and to the point", color: "fiery-red" },
+          { text: "Expressive, enthusiastic and engaging", color: "sunshine-yellow" },
+          { text: "Supportive, thoughtful and considerate", color: "earth-green" },
+          { text: "Precise, detailed and logical", color: "cool-blue" }
         ]
       },
       {
@@ -221,7 +230,7 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "When learning something new, I prefer to:",
+        text: "My learning style is to:",
         options: [
           { text: "Jump in and learn by doing it", color: "fiery-red" },
           { text: "Explore different approaches with others", color: "sunshine-yellow" },
@@ -230,7 +239,7 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "When faced with change, I typically:",
+        text: "When facing change, I:",
         options: [
           { text: "Take charge and make it happen", color: "fiery-red" },
           { text: "Get excited about new possibilities", color: "sunshine-yellow" },
@@ -284,7 +293,7 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "When planning my day, I usually:",
+        text: "My daily planning approach is to:",
         options: [
           { text: "Focus on key priorities and outcomes", color: "fiery-red" },
           { text: "Leave room for spontaneity and new opportunities", color: "sunshine-yellow" },
@@ -293,21 +302,21 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "I prefer managers who:",
+        text: "My ideal manager is someone who:",
         options: [
-          { text: "Set clear expectations and give direct feedback", color: "fiery-red" },
-          { text: "Are enthusiastic and recognize achievements publicly", color: "sunshine-yellow" },
-          { text: "Are supportive and create a positive environment", color: "earth-green" },
-          { text: "Provide thorough instructions and logical reasoning", color: "cool-blue" }
+          { text: "Sets clear expectations and gives direct feedback", color: "fiery-red" },
+          { text: "Is enthusiastic and recognizes achievements publicly", color: "sunshine-yellow" },
+          { text: "Is supportive and creates a positive environment", color: "earth-green" },
+          { text: "Provides thorough instructions and logical reasoning", color: "cool-blue" }
         ]
       },
       {
-        text: "When explaining something to others, I tend to:",
+        text: "When explaining things to others, I:",
         options: [
-          { text: "Be concise and focus on what needs to be done", color: "fiery-red" },
-          { text: "Be animated and use stories or analogies", color: "sunshine-yellow" },
-          { text: "Be patient and check for understanding", color: "earth-green" },
-          { text: "Be precise and provide complete information", color: "cool-blue" }
+          { text: "Am concise and focus on what needs to be done", color: "fiery-red" },
+          { text: "Am animated and use stories or analogies", color: "sunshine-yellow" },
+          { text: "Am patient and check for understanding", color: "earth-green" },
+          { text: "Am precise and provide complete information", color: "cool-blue" }
         ]
       },
       {
