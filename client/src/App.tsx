@@ -6,8 +6,6 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Quiz from "@/pages/Quiz";
 import Results from "@/pages/Results";
-import Auth from "@/pages/Auth";
-import Profile from "@/pages/Profile";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -20,8 +18,6 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/quiz" component={Quiz} />
           <Route path="/results/:resultId?" component={Results} />
-          <Route path="/auth" component={Auth} />
-          <Route path="/profile" component={Profile} />
           <Route component={NotFound} />
         </Switch>
       </main>

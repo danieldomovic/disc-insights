@@ -65,7 +65,7 @@ export default function Footer() {
         
         <div className="pt-8 mt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-xs">
-            &copy; {currentYear} Insights Discovery. All rights reserved.
+            &copy; {currentYear} Insights Discovery Assessment. All rights reserved.
           </p>
           <div className="mt-4 md:mt-0 flex space-x-6">
             <a href="#" className="text-gray-400 hover:text-gray-500">

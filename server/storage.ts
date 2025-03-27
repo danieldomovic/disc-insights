@@ -22,7 +22,6 @@ export interface IStorage {
   // Quiz result methods
   createQuizResult(result: InsertQuizResult): Promise<QuizResult>;
   getQuizResult(id: number): Promise<QuizResult | undefined>;
-  getQuizResultsByUserId(userId: number): Promise<QuizResult[]>;
   
   // Quiz answer methods
   createQuizAnswer(answer: InsertQuizAnswer): Promise<QuizAnswer>;
@@ -102,12 +101,6 @@ export class MemStorage implements IStorage {
   
   async getQuizResult(id: number): Promise<QuizResult | undefined> {
     return this.quizResults.get(id);
-  }
-  
-  async getQuizResultsByUserId(userId: number): Promise<QuizResult[]> {
-    return Array.from(this.quizResults.values()).filter(
-      (result) => result.userId === userId
-    );
   }
   
   async createQuizAnswer(insertAnswer: InsertQuizAnswer): Promise<QuizAnswer> {
