@@ -24,8 +24,8 @@ export default function Home() {
             </p>
           </div>
           
-          {/* Color profiles in a single responsive row on larger screens, stacks on mobile */}
-          <div className="grid gap-4 mb-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Color profiles in a single line with increased padding */}
+          <div className="flex flex-wrap justify-center gap-6 mb-10 p-4">
             <ColorProfile color="fiery-red" />
             <ColorProfile color="sunshine-yellow" />
             <ColorProfile color="earth-green" />

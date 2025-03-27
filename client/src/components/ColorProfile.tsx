@@ -10,12 +10,12 @@ export function ColorProfile({ color }: ColorProfileProps) {
   
   return (
     <div 
-      className="bg-gray-50 rounded-lg p-4 text-center" 
-      style={{ borderLeft: `4px solid ${profile.bgColor}` }}
+      className="bg-white shadow-md rounded-lg p-6 text-center w-64" 
+      style={{ borderTop: `4px solid ${profile.bgColor}` }}
     >
       <div className="flex flex-col items-center mb-3">
         <div 
-          className="w-16 h-8 mb-2 rounded" 
+          className="w-16 h-8 mb-3 rounded" 
           style={{ backgroundColor: profile.bgColor }}
         ></div>
         <h3 className="text-lg font-semibold">{profile.name}</h3>

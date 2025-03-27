@@ -88,7 +88,13 @@ export class MemStorage implements IStorage {
   
   async createQuizResult(insertResult: InsertQuizResult): Promise<QuizResult> {
     const id = this.resultId++;
-    const result: QuizResult = { ...insertResult, id };
+    // Ensure userId is null if undefined
+    const userId = insertResult.userId === undefined ? null : insertResult.userId;
+    const result: QuizResult = { 
+      ...insertResult, 
+      id,
+      userId
+    };
     this.quizResults.set(id, result);
     return result;
   }
@@ -99,7 +105,13 @@ export class MemStorage implements IStorage {
   
   async createQuizAnswer(insertAnswer: InsertQuizAnswer): Promise<QuizAnswer> {
     const id = this.answerId++;
-    const answer: QuizAnswer = { ...insertAnswer, id };
+    // First create a clean answer object with required fields
+    const answer: QuizAnswer = {
+      id,
+      resultId: insertAnswer.resultId ?? null,
+      questionId: insertAnswer.questionId ?? null,
+      selectedColor: insertAnswer.selectedColor
+    };
     this.quizAnswers.set(id, answer);
     return answer;
   }
