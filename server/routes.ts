@@ -25,6 +25,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch quiz questions" });
     }
   });
+  
+  // Get quiz results by ID
+  app.get("/api/quiz/results/:id", async (req, res) => {
+    try {
+      const resultId = parseInt(req.params.id, 10);
+      if (isNaN(resultId)) {
+        return res.status(400).json({ message: "Invalid result ID" });
+      }
+      
+      const result = await storage.getQuizResult(resultId);
+      if (!result) {
+        return res.status(404).json({ message: "Quiz result not found" });
+      }
+      
+      // Return the formatted result
+      res.json({
+        id: result.id,
+        scores: {
+          "fiery-red": result.fieryRedScore,
+          "sunshine-yellow": result.sunshineYellowScore,
+          "earth-green": result.earthGreenScore,
+          "cool-blue": result.coolBlueScore
+        },
+        dominantColor: result.dominantColor,
+        secondaryColor: result.secondaryColor,
+        personalityType: result.personalityType
+      });
+    } catch (error) {
+      console.error("Error fetching quiz result:", error);
+      res.status(500).json({ message: "Failed to fetch quiz result" });
+    }
+  });
 
   // Submit quiz answers and get results
   app.post("/api/quiz/submit", async (req, res) => {
