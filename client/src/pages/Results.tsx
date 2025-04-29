@@ -7,6 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import ColorChart from "@/components/ColorChart";
 import { ColorProfileDetail } from "@/components/ColorProfile";
+import InsightsTypeWheel from "@/components/InsightsTypeWheel";
+import ColorDynamicsChart from "@/components/ColorDynamicsChart";
 import { colorProfiles, personalityProfiles, ColorType, PersonalityType } from "@/lib/colorProfiles";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
@@ -256,20 +258,23 @@ export default function Results() {
                 <div 
                   className="p-4 rounded-md mt-4"
                   style={{ 
-                    backgroundColor: `${colorProfiles[profile.color].bgColor}15`, 
-                    borderLeft: `4px solid ${colorProfiles[profile.color].bgColor}` 
+                    backgroundColor: `${colorProfiles[profile.color]?.bgColor || '#f0f0f0'}15`, 
+                    borderLeft: `4px solid ${colorProfiles[profile.color]?.bgColor || '#000000'}` 
                   }}
                 >
                   <p className="font-semibold mb-2">Primary Color Energies:</p>
                   <p className="text-gray-700">
-                    {profile.dominantColors.map((color, index) => (
-                      <span key={color}>
-                        <span style={{ color: colorProfiles[color].bgColor }}>
-                          {colorProfiles[color].name}
+                    {profile.dominantColors?.map((color, index) => {
+                      const colorProfile = colorProfiles[color as ColorType];
+                      return (
+                        <span key={color}>
+                          <span style={{ color: colorProfile?.bgColor || '#000000' }}>
+                            {colorProfile?.name || color}
+                          </span>
+                          {index < (profile.dominantColors?.length || 0) - 1 && " and "}
                         </span>
-                        {index < profile.dominantColors.length - 1 && " and "}
-                      </span>
-                    ))}
+                      );
+                    })}
                   </p>
                 </div>
               </div>
@@ -293,17 +298,24 @@ export default function Results() {
                 <div>
                   <h3 className="text-xl font-semibold mb-3">Personal Style</h3>
                   <p className="text-gray-700">
-                    {profile.name}s like you tend to be {profile.onGoodDay.join(", ")}. Your combination of 
-                    {profile.dominantColors.map((color, index) => (
-                      <span key={color}>
-                        {" "}
-                        <span style={{ color: colorProfiles[color].bgColor }}>
-                          {colorProfiles[color].name}
+                    {profile.name}s like you tend to be {profile.onGoodDay?.join(", ")}. Your combination of 
+                    {profile.dominantColors?.map((color, index) => {
+                      const colorProfile = colorProfiles[color as ColorType];
+                      return (
+                        <span key={color}>
+                          {" "}
+                          <span style={{ color: colorProfile?.bgColor || '#000000' }}>
+                            {colorProfile?.name || color}
+                          </span>
+                          {index < (profile.dominantColors?.length || 0) - 1 && " and "}
                         </span>
-                        {index < profile.dominantColors.length - 1 && " and "}
-                      </span>
-                    ))} 
-                    energies means you focus primarily on {colorProfiles[profile.dominantColors[0]].primaryFocus.toLowerCase()}.
+                      );
+                    })} 
+                    energies means you focus primarily on {
+                      profile.dominantColors && profile.dominantColors.length > 0 
+                      ? colorProfiles[profile.dominantColors[0] as ColorType]?.primaryFocus?.toLowerCase() || 'effectiveness'
+                      : 'effectiveness'
+                    }.
                   </p>
                 </div>
                 
@@ -343,7 +355,11 @@ export default function Results() {
                         </li>
                       ))}
                       <li className="mb-1">
-                        <span className="font-medium">Focus on {colorProfiles[profile.dominantColors[0]].primaryFocus}</span>: 
+                        <span className="font-medium">Focus on {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.primaryFocus || 'goals'
+                          : 'goals'
+                        }</span>: 
                         Your natural tendency to prioritize this helps you stay effective in your approach.
                       </li>
                     </ul>
@@ -390,9 +406,21 @@ export default function Results() {
                     <div className="bg-gray-50 p-5 rounded-lg">
                       <h4 className="font-semibold mb-2">Communication Strengths:</h4>
                       <ul className="list-disc list-inside space-y-1 text-gray-700">
-                        <li>You communicate in a {colorProfiles[profile.dominantColors[0]].decisionsAre.toLowerCase()} way</li>
-                        <li>You emphasize {colorProfiles[profile.dominantColors[0]].primaryFocus.toLowerCase()} in your messaging</li>
-                        <li>You prefer people to be {colorProfiles[profile.dominantColors[0]].likesYouToBe.toLowerCase()} when communicating with you</li>
+                        <li>You communicate in a {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.decisionsAre?.toLowerCase() || 'direct'
+                          : 'direct'
+                        } way</li>
+                        <li>You emphasize {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.primaryFocus?.toLowerCase() || 'goals'
+                          : 'goals'
+                        } in your messaging</li>
+                        <li>You prefer people to be {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.likesYouToBe?.toLowerCase() || 'straightforward'
+                          : 'straightforward'
+                        } when communicating with you</li>
                         <li>Your natural style helps you connect with similar personality types</li>
                       </ul>
                     </div>
@@ -400,10 +428,22 @@ export default function Results() {
                     <div className="bg-gray-50 p-5 rounded-lg">
                       <h4 className="font-semibold mb-2">Communication Barriers:</h4>
                       <ul className="list-disc list-inside space-y-1 text-gray-700">
-                        <li>You may get irritated by {colorProfiles[profile.dominantColors[0]].canBeIrritatedBy.toLowerCase()}</li>
-                        <li>Under pressure, you might {colorProfiles[profile.dominantColors[0]].underPressureMay.toLowerCase()}</li>
+                        <li>You may get irritated by {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.canBeIrritatedBy?.toLowerCase() || 'excessive detail'
+                          : 'excessive detail'
+                        }</li>
+                        <li>Under pressure, you might {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.underPressureMay?.toLowerCase() || 'become overly directive'
+                          : 'become overly directive'
+                        }</li>
                         <li>You may overlook the needs of those with different communication preferences</li>
-                        <li>Your focus on {colorProfiles[profile.dominantColors[0]].primaryFocus.toLowerCase()} might not resonate with everyone</li>
+                        <li>Your focus on {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.primaryFocus?.toLowerCase() || 'goals'
+                          : 'goals'
+                        } might not resonate with everyone</li>
                       </ul>
                     </div>
                   </div>
@@ -467,8 +507,16 @@ export default function Results() {
                     <div className="bg-gray-50 p-5 rounded-lg">
                       <h4 className="font-semibold mb-2">Your Management Strengths:</h4>
                       <ul className="list-disc list-inside space-y-1 text-gray-700">
-                        <li>You create environments that value {colorProfiles[profile.dominantColors[0]].primaryFocus.toLowerCase()}</li>
-                        <li>Your decisions tend to be {colorProfiles[profile.dominantColors[0]].decisionsAre.toLowerCase()}</li>
+                        <li>You create environments that value {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.primaryFocus?.toLowerCase() || 'goals'
+                          : 'goals'
+                        }</li>
+                        <li>Your decisions tend to be {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.decisionsAre?.toLowerCase() || 'direct'
+                          : 'direct'
+                        }</li>
                         <li>You naturally motivate those who respond to your energy type</li>
                         <li>You provide clear direction aligned with your preferences</li>
                       </ul>
@@ -554,6 +602,39 @@ export default function Results() {
                 </div>
               </TabsContent>
             </Tabs>
+          </CardContent>
+        </Card>
+        
+        {/* Specialized Visualizations */}
+        <Card>
+          <CardContent className="p-8">
+            <h2 className="text-2xl font-bold mb-6">Specialized Visualizations</h2>
+            
+            <div className="space-y-12">
+              <div>
+                <h3 className="text-xl font-semibold mb-4">The Insights Discovery® 72 Type Wheel</h3>
+                <p className="text-gray-700 mb-6">
+                  This visualization shows your position on the Insights Discovery® 72 Type Wheel, based on your color preferences. 
+                  Your position indicates your unique personality type and preferred styles of thinking, working, and interacting.
+                </p>
+                <InsightsTypeWheel 
+                  personalityType={result.personalityType}
+                  dominantColor={result.dominantColor}
+                  secondaryColor={result.secondaryColor}
+                  scores={result.scores}
+                />
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-semibold mb-4">The Insights Discovery® Colour Dynamics</h3>
+                <p className="text-gray-700 mb-6">
+                  This chart shows your preference levels for each color energy and illustrates the flow between 
+                  your conscious and less conscious preferences. Understanding this dynamic can help you recognize 
+                  patterns in your behaviors and interactions.
+                </p>
+                <ColorDynamicsChart scores={result.scores} />
+              </div>
+            </div>
           </CardContent>
         </Card>
         
