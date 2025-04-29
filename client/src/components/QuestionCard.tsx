@@ -79,6 +79,9 @@ export default function QuestionCard({
   return (
     <Card className="w-full">
       <CardContent className="p-8">
+        <h2 className="text-xl font-semibold mb-2 text-gray-800">
+          {question.text}
+        </h2>
         <p className="text-lg mb-6 text-gray-700">
           Please select one M (Most like me), one L (Least like me), and two different values in between.
         </p>
