@@ -87,23 +87,13 @@ export default function Results() {
     };
   }, []);
 
-  // Function to generate and download PDF
+  // Function to generate and download a professionally designed PDF
   const generatePDF = async () => {
     if (!reportRef.current) return;
     
     setIsPdfGenerating(true);
     
     try {
-      const reportElement = reportRef.current;
-      const canvas = await html2canvas(reportElement, {
-        scale: 1.5, // Higher resolution
-        useCORS: true,
-        logging: false,
-        allowTaint: true
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      
       // A4 dimensions in mm
       const pdf = new jsPDF({
         orientation: 'portrait',
@@ -113,25 +103,283 @@ export default function Results() {
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const margin = 15; // mm
+      const contentWidth = pdfWidth - (margin * 2);
       
-      let heightLeft = imgHeight;
-      let position = 0;
+      // Helper function to add text with word wrapping
+      const addWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number, fontStyle: string = 'normal') => {
+        pdf.setFontSize(fontSize);
+        pdf.setFont('helvetica', fontStyle);
+        
+        const lines = pdf.splitTextToSize(text, maxWidth);
+        pdf.text(lines, x, y);
+        
+        return lines.length * (fontSize * 0.352778); // Approximate height of text block
+      };
       
-      // First page
-      pdf.addImage(imgData, 'PNG', imgX, position, imgWidth * ratio, imgHeight * ratio);
-      heightLeft -= pdfHeight;
+      // Helper to create page header
+      const addHeader = (pageTitle: string) => {
+        // Add gradient header
+        pdf.setFillColor(65, 105, 225); // Royal blue
+        pdf.rect(0, 0, pdfWidth, 25, 'F');
+        
+        pdf.setFillColor(25, 25, 112); // Midnight blue
+        pdf.rect(pdfWidth/2, 0, pdfWidth/2, 25, 'F');
+        
+        // Add title
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text("Insights Discovery Profile", margin, 13);
+        
+        // Add page subtitle
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(pageTitle, margin, 20);
+        
+        // Add date on right
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(10);
+        pdf.text(formattedDate, pdfWidth - margin - pdf.getTextWidth(formattedDate), 13);
+        
+        // Bottom border
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, 30, pdfWidth - margin, 30);
+      };
       
-      // Additional pages if needed
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', imgX, position, imgWidth * ratio, imgHeight * ratio);
-        heightLeft -= pdfHeight;
+      // Create title page
+      addHeader("Executive Summary");
+      
+      // Add profile basics
+      let yPos = 40;
+      
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Your Color Energy Profile", margin, yPos);
+      yPos += 8;
+      
+      // SECTION 1: Color Distribution Summary
+      
+      // Get color profile chart as image
+      const colorChart = document.querySelector('.color-chart-section canvas') as HTMLCanvasElement;
+      if (colorChart) {
+        const chartImg = colorChart.toDataURL('image/png');
+        pdf.addImage(chartImg, 'PNG', margin, yPos, contentWidth * 0.5, contentWidth * 0.5 * (colorChart.height / colorChart.width));
+        yPos += contentWidth * 0.5 * (colorChart.height / colorChart.width) + 10;
+      } else {
+        yPos += 70; // Skip space if chart not available
       }
+      
+      // Color energy distribution text
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text("Your color energy distribution:", margin, yPos);
+      yPos += 7;
+      
+      // Color percentages
+      Object.entries(result.scores).forEach(([color, score]) => {
+        const colorName = colorProfiles[color as ColorType].name;
+        const formattedText = `${colorName}: ${score}%`;
+        
+        // Set text color based on the color profile
+        switch(color) {
+          case 'fiery-red':
+            pdf.setTextColor(221, 51, 51);
+            break;
+          case 'sunshine-yellow':
+            pdf.setTextColor(240, 180, 0);
+            break;
+          case 'earth-green':
+            pdf.setTextColor(0, 150, 57);
+            break;
+          case 'cool-blue':
+            pdf.setTextColor(0, 114, 187);
+            break;
+          default:
+            pdf.setTextColor(0, 0, 0);
+        }
+        
+        pdf.setFontSize(11);
+        pdf.text(formattedText, margin + 5, yPos);
+        yPos += 6;
+      });
+      
+      // Reset text color
+      pdf.setTextColor(0, 0, 0);
+      yPos += 5;
+      
+      // Personality type summary
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Your Personality Type", margin, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      const typeSummary = `Your profile identifies you as a ${result.personalityType} type, with dominant ${colorProfiles[result.dominantColor].name} energy and supporting ${colorProfiles[result.secondaryColor as ColorType].name} energy.`;
+      yPos += addWrappedText(typeSummary, margin, yPos, contentWidth, 12) + 5;
+      
+      // Add personality description
+      yPos += addWrappedText(profile.description, margin, yPos, contentWidth, 11) + 10;
+      
+      // Check if we need a page break
+      if (yPos > pdfHeight - 40) {
+        pdf.addPage();
+        addHeader("Key Strengths & Characteristics");
+        yPos = 40;
+      }
+      
+      // SECTION 2: Strengths & Characteristics
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Your Key Strengths", margin, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      yPos += addWrappedText(profile.strengths, margin, yPos, contentWidth, 11) + 10;
+      
+      // On a good day
+      pdf.setFontSize(13);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("On a Good Day", margin, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      profile.onGoodDay.forEach(trait => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        pdf.text(trait, margin + 5, yPos);
+        yPos += 6;
+      });
+      yPos += 5;
+      
+      // On a bad day
+      pdf.setFontSize(13);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Under Pressure", margin, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      profile.onBadDay.forEach(trait => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        pdf.text(trait, margin + 5, yPos);
+        yPos += 6;
+      });
+      yPos += 10;
+      
+      // Add a new page for the color wheel and dynamics
+      pdf.addPage();
+      addHeader("Type Wheel & Color Dynamics");
+      yPos = 40;
+      
+      // SECTION 3: Type Wheel
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Insights Discovery Type Wheel", margin, yPos);
+      yPos += 8;
+      
+      // Get type wheel as image
+      const typeWheel = document.querySelector('.type-wheel-section canvas') as HTMLCanvasElement;
+      if (typeWheel) {
+        const wheelImg = typeWheel.toDataURL('image/png');
+        const wheelWidth = contentWidth;
+        const wheelHeight = wheelWidth * (typeWheel.height / typeWheel.width);
+        pdf.addImage(wheelImg, 'PNG', margin, yPos, wheelWidth, wheelHeight);
+        yPos += wheelHeight + 10;
+      } else {
+        yPos += 100; // Skip space if chart not available
+      }
+      
+      // Add a small explanation if there's space
+      if (yPos < pdfHeight - 60) {
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        const wheelText = "The Insights Discovery Type Wheel shows your position among the 72 types based on your color preferences. Your exact position reflects your unique behavioral preferences.";
+        yPos += addWrappedText(wheelText, margin, yPos, contentWidth, 11) + 15;
+      }
+      
+      // Check if we need to add a new page for color dynamics
+      if (yPos > pdfHeight - 130) {
+        pdf.addPage();
+        addHeader("Color Dynamics");
+        yPos = 40;
+      }
+      
+      // SECTION 4: Color Dynamics
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Color Dynamics", margin, yPos);
+      yPos += 8;
+      
+      // Get color dynamics chart as image
+      const dynamicsChart = document.querySelector('.color-dynamics-section canvas') as HTMLCanvasElement;
+      if (dynamicsChart) {
+        const dynamicsImg = dynamicsChart.toDataURL('image/png');
+        const dynamicsWidth = contentWidth;
+        const dynamicsHeight = dynamicsWidth * (dynamicsChart.height / dynamicsChart.width);
+        pdf.addImage(dynamicsImg, 'PNG', margin, yPos, dynamicsWidth, dynamicsHeight);
+        yPos += dynamicsHeight + 10;
+      } else {
+        yPos += 100; // Skip space if chart not available
+      }
+      
+      // Add final page with development areas
+      pdf.addPage();
+      addHeader("Development Areas & Practical Applications");
+      yPos = 40;
+      
+      // SECTION 5: Development Areas
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Areas for Development", margin, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      yPos += addWrappedText(profile.development, margin, yPos, contentWidth, 11) + 15;
+      
+      // Goals and values
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Your Key Goals & Values", margin, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      profile.goals.forEach(goal => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(goal, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // Potential blind spots and fears
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Potential Blind Spots", margin, yPos);
+      yPos += 8;
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      profile.fears.forEach(fear => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(fear, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 15;
+      
+      // Closing
+      yPos += addWrappedText(
+        "Thank you for completing the Insights Discovery assessment. This profile is designed to deepen your understanding of yourself and provide a foundation for ongoing personal and professional development.",
+        margin, yPos, contentWidth, 11) + 10;
+      
+      // Footer
+      const footerY = pdfHeight - 10;
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text("© Insights Discovery Color Profile Assessment", margin, footerY);
+      pdf.text(`Generated on ${formattedDate}`, pdfWidth - margin - pdf.getTextWidth(`Generated on ${formattedDate}`), footerY);
       
       // Save the PDF
       pdf.save(`Insights_Discovery_Profile_${new Date().toISOString().split('T')[0]}.pdf`);
@@ -222,7 +470,7 @@ export default function Results() {
           
           <CardContent className="p-8">
             <div className="grid md:grid-cols-2 gap-10">
-              <div>
+              <div className="color-chart-section">
                 <h3 className="text-xl font-semibold mb-4">Your Color Energy Preferences</h3>
                 {chartJsLoaded && <ColorChart scores={result.scores} />}
                 <div className="grid grid-cols-2 gap-4 mt-4">
@@ -245,7 +493,7 @@ export default function Results() {
                 </div>
               </div>
               
-              <div>
+              <div className="personality-type-section">
                 <h3 className="text-xl font-semibold mb-4">
                   Your Dominant Type: <span style={{ color: colorProfiles[profile.color].bgColor }}>{profile.name}</span>
                 </h3>
@@ -615,7 +863,7 @@ export default function Results() {
             <h2 className="text-2xl font-bold mb-6">Specialized Visualizations</h2>
             
             <div className="space-y-12">
-              <div>
+              <div className="type-wheel-section">
                 <h3 className="text-xl font-semibold mb-4">The Insights Discovery® 72 Type Wheel</h3>
                 <p className="text-gray-700 mb-6">
                   This visualization shows your position on the Insights Discovery® 72 Type Wheel, based on your color preferences. 
@@ -629,7 +877,7 @@ export default function Results() {
                 />
               </div>
               
-              <div>
+              <div className="color-dynamics-section">
                 <h3 className="text-xl font-semibold mb-4">The Insights Discovery® Colour Dynamics</h3>
                 <p className="text-gray-700 mb-6">
                   This chart shows your preference levels for each color energy and illustrates the flow between 
