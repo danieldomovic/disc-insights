@@ -73,7 +73,7 @@ export default function Quiz() {
   
   return (
     <motion.section 
-      className="max-w-3xl mx-auto"
+      className="max-w-3xl mx-auto px-3 sm:px-4 md:px-0"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}

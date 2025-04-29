@@ -122,12 +122,12 @@ export default function QuestionCard({
                       return (
                         <div 
                           key={rIdx} 
-                          className="flex justify-center items-center px-4 py-3 cursor-pointer hover:bg-gray-100"
+                          className="flex justify-center items-center px-3 sm:px-4 py-3 cursor-pointer hover:bg-gray-100 active:bg-gray-200 transition-colors"
                           onClick={() => onSelectOption(valueIndex)}
                         >
                           <div
                             className={cn(
-                              "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-gray-400 flex items-center justify-center",
+                              "min-w-5 min-h-5 md:min-w-6 md:min-h-6 w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-gray-400 flex items-center justify-center",
                               isSelected && "border-indigo-600"
                             )}
                           >
