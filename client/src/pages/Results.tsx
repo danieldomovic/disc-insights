@@ -546,7 +546,11 @@ export default function Results() {
                     <ul className="list-disc list-inside space-y-1 text-gray-700">
                       <li>Provide clear direction and expectations</li>
                       <li>Recognize and value your natural strengths</li>
-                      <li>Are {colorProfiles[profile.dominantColors[0]].likesYouToBe.toLowerCase()} in their communication</li>
+                      <li>Are {
+                          profile.dominantColors && profile.dominantColors.length > 0 
+                          ? colorProfiles[profile.dominantColors[0] as ColorType]?.likesYouToBe?.toLowerCase() || 'straightforward'
+                          : 'straightforward'
+                        } in their communication</li>
                       <li>Create an environment that aligns with your preferences</li>
                       <li>Balance challenge with appropriate support</li>
                     </ul>
@@ -592,8 +596,8 @@ export default function Results() {
                 <div>
                   <h3 className="text-xl font-semibold mb-3">Leveraging Your Strengths</h3>
                   <div className="p-6 rounded-lg" style={{ 
-                    backgroundColor: `${colorProfiles[profile.color].bgColor}15`, 
-                    borderLeft: `4px solid ${colorProfiles[profile.color].bgColor}` 
+                    backgroundColor: `${colorProfiles[profile.color]?.bgColor || '#f0f0f0'}15`, 
+                    borderLeft: `4px solid ${colorProfiles[profile.color]?.bgColor || '#000000'}` 
                   }}>
                     <p className="text-gray-700">
                       {profile.strengths}
