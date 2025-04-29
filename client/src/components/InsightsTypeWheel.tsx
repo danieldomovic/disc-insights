@@ -374,19 +374,31 @@ function drawSegmentNumbers(
   const totalSegments = 72;
   const segmentAngle = (2 * Math.PI) / totalSegments;
   
-  // Define which segments to show numbers for (based on reference image)
-  // We'll show numbers at regular intervals
-  const labelsToShow = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10, 11, 12, 13, 14, 15, 16,
-    21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
-    31, 32, 33, 34, 35, 36,
-    41, 42, 44, 45, 46, 47, 48, 49, 
-    50, 51, 52, 53, 54, 55, 56,
-    101, 104, 105, 108, 109, 112, 113, 116,
-    121, 124, 125, 128, 129, 132, 133, 136,
-    141, 144, 145, 148, 149, 152, 153, 156
-  ];
+  // Define all numbers to show based on the reference image
+  // Mapping angle in degrees to label text for precise positioning
+  const angleToLabelMap: Record<number, string> = {
+    // Top quadrant
+    0: "1", 15: "2", 30: "3", 45: "4", 60: "5", 75: "6", 90: "7",
+    105: "8", 120: "9", 135: "10", 150: "11", 165: "12", 180: "13",
+    195: "14", 210: "15", 225: "16",
+    
+    // Inner numbers - second ring
+    5: "21", 20: "22", 35: "23", 50: "24", 65: "25", 80: "26", 
+    95: "27", 110: "28", 125: "29", 140: "30", 155: "31", 170: "32", 
+    185: "33", 200: "34", 215: "35", 230: "36",
+    
+    // Inner numbers - third ring
+    10: "41", 25: "42", 40: "44", 55: "45", 70: "46", 85: "47", 
+    100: "48", 115: "49", 130: "50", 145: "51", 160: "52", 175: "53", 
+    190: "54", 205: "55", 220: "56",
+    
+    // Three-digit numbers for gray segments
+    7: "101", 22: "121", 37: "141", 52: "101", 67: "104", 82: "105", 
+    97: "108", 112: "109", 127: "112", 142: "113", 157: "116", 
+    172: "121", 187: "124", 202: "125", 217: "128", 232: "129", 
+    247: "132", 262: "133", 277: "136", 292: "141", 307: "144", 
+    322: "145", 337: "148", 352: "149", 7: "152", 22: "153", 37: "156"
+  };
   
   // Set text properties
   ctx.font = '9px Arial';
@@ -394,23 +406,20 @@ function drawSegmentNumbers(
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   
-  // Add the segment numbers
-  for (let i = 0; i < totalSegments; i++) {
-    const segmentNumber = i + 1;
+  // Calculate middle radius for all labels
+  const middleRadius = (innerRadius + outerRadius) / 2;
+  
+  // Draw each number at the specified angle
+  Object.entries(angleToLabelMap).forEach(([angleDeg, label]) => {
+    const angleRad = (parseInt(angleDeg) * Math.PI / 180) - Math.PI/2; // Convert to radians, adjust to start from top
     
-    // Only draw numbers in our list
-    if (labelsToShow.includes(segmentNumber)) {
-      const middleAngle = i * segmentAngle;
-      const middleRadius = (innerRadius + outerRadius) / 2;
-      
-      // Calculate text position
-      const x = centerX + middleRadius * Math.cos(middleAngle - Math.PI/2);
-      const y = centerY + middleRadius * Math.sin(middleAngle - Math.PI/2);
-      
-      // Draw the number
-      ctx.fillText(segmentNumber.toString(), x, y);
-    }
-  }
+    // Calculate position
+    const x = centerX + middleRadius * Math.cos(angleRad);
+    const y = centerY + middleRadius * Math.sin(angleRad);
+    
+    // Draw the number
+    ctx.fillText(label, x, y);
+  });
 }
 
 // Draw center color wheel
