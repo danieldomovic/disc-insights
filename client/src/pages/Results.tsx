@@ -118,7 +118,7 @@ export default function Results() {
       };
       
       // Helper to create page header
-      const addHeader = (pageTitle: string) => {
+      const addHeader = (pageTitle: string, pageNumber?: number) => {
         // Add gradient header
         pdf.setFillColor(65, 105, 225); // Royal blue
         pdf.rect(0, 0, pdfWidth, 25, 'F');
@@ -140,146 +140,570 @@ export default function Results() {
         // Add date on right
         pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(10);
-        pdf.text(formattedDate, pdfWidth - margin - pdf.getTextWidth(formattedDate), 13);
+        const dateText = formattedDate;
+        pdf.text(dateText, pdfWidth - margin - pdf.getTextWidth(dateText), 13);
+        
+        // Add page number if provided
+        if (pageNumber) {
+          pdf.text(`Page ${pageNumber}`, pdfWidth - margin - pdf.getTextWidth(`Page ${pageNumber}`), 20);
+        }
         
         // Bottom border
         pdf.setDrawColor(200, 200, 200);
         pdf.line(margin, 30, pdfWidth - margin, 30);
       };
       
-      // Create title page
-      addHeader("Executive Summary");
+      // Function to add section title with styling
+      const addSectionTitle = (title: string, yPosition: number) => {
+        pdf.setFillColor(240, 240, 240);
+        pdf.rect(margin, yPosition - 6, contentWidth, 8, 'F');
+        
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title, margin + 2, yPosition);
+        
+        return yPosition + 10;
+      };
+      
+      // ===== TITLE PAGE =====
+      pdf.setFillColor(25, 25, 112); // Midnight blue
+      pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
       
       // Add profile basics
-      let yPos = 40;
+      let yPos = 70;
       
+      // Title
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("INSIGHTS DISCOVERY", pdfWidth/2, yPos, { align: 'center' });
+      yPos += 15;
+      
+      pdf.setFontSize(18);
+      pdf.text("Personal Profile", pdfWidth/2, yPos, { align: 'center' });
+      yPos += 40;
+      
+      // Add personality type
+      pdf.setFontSize(22);
+      pdf.text(`${result.personalityType} Type`, pdfWidth/2, yPos, { align: 'center' });
+      yPos += 20;
+      
+      // Add color distribution
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'normal');
+      
+      // Color energies
+      const colorCircleSize = 15;
+      const colorTextOffset = 20;
+      const colorsYPos = yPos + 20;
+      const colorsXStart = pdfWidth/2 - 60;
+      
+      // Fiery Red
+      pdf.setFillColor(221, 51, 51);
+      pdf.circle(colorsXStart, colorsYPos, colorCircleSize/2, 'F');
+      pdf.text(`Fiery Red: ${result.scores["fiery-red"]}%`, colorsXStart + colorTextOffset, colorsYPos + 5);
+      
+      // Sunshine Yellow
+      pdf.setFillColor(240, 180, 0);
+      pdf.circle(colorsXStart, colorsYPos + 30, colorCircleSize/2, 'F');
+      pdf.text(`Sunshine Yellow: ${result.scores["sunshine-yellow"]}%`, colorsXStart + colorTextOffset, colorsYPos + 35);
+      
+      // Earth Green
+      pdf.setFillColor(0, 150, 57);
+      pdf.circle(colorsXStart, colorsYPos + 60, colorCircleSize/2, 'F');
+      pdf.text(`Earth Green: ${result.scores["earth-green"]}%`, colorsXStart + colorTextOffset, colorsYPos + 65);
+      
+      // Cool Blue
+      pdf.setFillColor(0, 114, 187);
+      pdf.circle(colorsXStart, colorsYPos + 90, colorCircleSize/2, 'F');
+      pdf.text(`Cool Blue: ${result.scores["cool-blue"]}%`, colorsXStart + colorTextOffset, colorsYPos + 95);
+      
+      yPos = colorsYPos + 120;
+      
+      // Add date
+      pdf.setFontSize(12);
+      pdf.text(`Generated on ${formattedDate}`, pdfWidth/2, yPos, { align: 'center' });
+      
+      // ===== CONTENTS PAGE =====
+      pdf.addPage();
+      addHeader("Contents", 1);
+      
+      yPos = 50;
       pdf.setTextColor(0, 0, 0);
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text("Your Color Energy Profile", margin, yPos);
-      yPos += 8;
+      pdf.text("CONTENTS", pdfWidth/2, yPos, { align: 'center' });
+      yPos += 20;
       
-      // SECTION 1: Color Distribution Summary
+      const addContentItem = (title: string, page: number) => {
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(title, margin, yPos);
+        
+        // Add dots
+        const titleWidth = pdf.getTextWidth(title);
+        const pageNumWidth = pdf.getTextWidth(page.toString());
+        const dotsWidth = contentWidth - titleWidth - pageNumWidth - 4;
+        const dotCount = Math.floor(dotsWidth / pdf.getTextWidth('.'));
+        let dots = '';
+        for (let i = 0; i < dotCount; i++) {
+          dots += '.';
+        }
+        
+        pdf.text(dots, margin + titleWidth + 2, yPos);
+        pdf.text(page.toString(), pdfWidth - margin - pageNumWidth, yPos);
+        
+        return yPos + 8;
+      };
+      
+      // Section pages
+      yPos = addContentItem("Introduction and Overview", 3);
+      yPos = addContentItem("Personal Style", 5);
+      yPos = addContentItem("Interacting with Others", 7);
+      yPos = addContentItem("Decision Making", 9);
+      yPos = addContentItem("Key Strengths & Weaknesses", 11);
+      yPos = addContentItem("Value to the Team", 13);
+      yPos = addContentItem("Communication Style", 15);
+      yPos = addContentItem("Possible Blind Spots", 17);
+      yPos = addContentItem("Opposite Type", 19);
+      yPos = addContentItem("Suggestions for Development", 21);
+      yPos = addContentItem("The Insights Discovery 72 Type Wheel", 23);
+      yPos = addContentItem("Color Dynamics", 25);
+      
+      // ===== INTRODUCTION AND OVERVIEW =====
+      pdf.addPage();
+      addHeader("Introduction and Overview", 3);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("INTRODUCTION AND OVERVIEW", margin, yPos);
+      yPos += 10;
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      
+      const introText = "This Insights Discovery profile is based on your responses to the Insights Discovery Evaluator. It provides a framework for self-understanding and development. Understanding your personality profile can help you greatly in areas such as improving communication, decision-making, and managing relationships.";
+      
+      yPos += addWrappedText(introText, margin, yPos, contentWidth, 11) + 10;
       
       // Get color profile chart as image
       const colorChart = document.querySelector('.color-chart-section canvas') as HTMLCanvasElement;
       if (colorChart) {
         const chartImg = colorChart.toDataURL('image/png');
-        pdf.addImage(chartImg, 'PNG', margin, yPos, contentWidth * 0.5, contentWidth * 0.5 * (colorChart.height / colorChart.width));
-        yPos += contentWidth * 0.5 * (colorChart.height / colorChart.width) + 10;
+        pdf.addImage(chartImg, 'PNG', margin, yPos, contentWidth * 0.6, contentWidth * 0.6 * (colorChart.height / colorChart.width));
+        yPos += contentWidth * 0.6 * (colorChart.height / colorChart.width) + 10;
       } else {
         yPos += 70; // Skip space if chart not available
       }
       
-      // Color energy distribution text
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text("Your color energy distribution:", margin, yPos);
-      yPos += 7;
-      
-      // Color percentages
-      Object.entries(result.scores).forEach(([color, score]) => {
-        const colorName = colorProfiles[color as ColorType].name;
-        const formattedText = `${colorName}: ${score}%`;
-        
-        // Set text color based on the color profile
-        switch(color) {
-          case 'fiery-red':
-            pdf.setTextColor(221, 51, 51);
-            break;
-          case 'sunshine-yellow':
-            pdf.setTextColor(240, 180, 0);
-            break;
-          case 'earth-green':
-            pdf.setTextColor(0, 150, 57);
-            break;
-          case 'cool-blue':
-            pdf.setTextColor(0, 114, 187);
-            break;
-          default:
-            pdf.setTextColor(0, 0, 0);
-        }
-        
-        pdf.setFontSize(11);
-        pdf.text(formattedText, margin + 5, yPos);
-        yPos += 6;
-      });
-      
-      // Reset text color
-      pdf.setTextColor(0, 0, 0);
-      yPos += 5;
-      
       // Personality type summary
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("Your Personality Type", margin, yPos);
-      yPos += 8;
+      yPos = addSectionTitle("Your Personality Type", yPos);
       
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
       const typeSummary = `Your profile identifies you as a ${result.personalityType} type, with dominant ${colorProfiles[result.dominantColor].name} energy and supporting ${colorProfiles[result.secondaryColor as ColorType].name} energy.`;
-      yPos += addWrappedText(typeSummary, margin, yPos, contentWidth, 12) + 5;
+      yPos += addWrappedText(typeSummary, margin, yPos, contentWidth, 11) + 5;
       
       // Add personality description
       yPos += addWrappedText(profile.description, margin, yPos, contentWidth, 11) + 10;
       
-      // Check if we need a page break
-      if (yPos > pdfHeight - 40) {
-        pdf.addPage();
-        addHeader("Key Strengths & Characteristics");
-        yPos = 40;
-      }
+      // ===== PERSONAL STYLE =====
+      pdf.addPage();
+      addHeader("Personal Style", 5);
       
-      // SECTION 2: Strengths & Characteristics
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text("Your Key Strengths", margin, yPos);
-      yPos += 8;
+      pdf.text("PERSONAL STYLE", margin, yPos);
+      yPos += 10;
       
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
-      yPos += addWrappedText(profile.strengths, margin, yPos, contentWidth, 11) + 10;
+      
+      yPos = addSectionTitle("Core Characteristics", yPos);
+      
+      let personalStyleText = `As a ${result.personalityType} with ${colorProfiles[result.dominantColor].name} as your dominant energy, you tend to be ${profile.onGoodDay.join(", ")}. Your approach to work and life is characterized by a focus on ${colorProfiles[result.dominantColor].primaryFocus}.`;
+      
+      yPos += addWrappedText(personalStyleText, margin, yPos, contentWidth, 11) + 10;
       
       // On a good day
-      pdf.setFontSize(13);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("On a Good Day", margin, yPos);
-      yPos += 8;
+      yPos = addSectionTitle("On a Good Day", yPos);
       
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
       profile.onGoodDay.forEach(trait => {
         pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
-        pdf.text(trait, margin + 5, yPos);
-        yPos += 6;
+        yPos += addWrappedText(trait, margin + 5, yPos, contentWidth - 5, 11) + 6;
       });
       yPos += 5;
       
-      // On a bad day
-      pdf.setFontSize(13);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("Under Pressure", margin, yPos);
-      yPos += 8;
+      // Under pressure
+      yPos = addSectionTitle("Under Pressure", yPos);
       
       pdf.setFontSize(11);
       pdf.setFont('helvetica', 'normal');
       profile.onBadDay.forEach(trait => {
         pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
-        pdf.text(trait, margin + 5, yPos);
-        yPos += 6;
+        yPos += addWrappedText(trait, margin + 5, yPos, contentWidth - 5, 11) + 6;
       });
-      yPos += 10;
       
-      // Add a new page for the color wheel and dynamics
+      // ===== INTERACTING WITH OTHERS =====
       pdf.addPage();
-      addHeader("Type Wheel & Color Dynamics");
-      yPos = 40;
+      addHeader("Interacting with Others", 7);
       
-      // SECTION 3: Type Wheel
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text("Insights Discovery Type Wheel", margin, yPos);
-      yPos += 8;
+      pdf.text("INTERACTING WITH OTHERS", margin, yPos);
+      yPos += 10;
+      
+      // Interaction style
+      yPos = addSectionTitle("Your Interaction Style", yPos);
+      
+      let interactionText = `Your ${colorProfiles[result.dominantColor].name} energy influences how you interact with others. You typically appear ${colorProfiles[result.dominantColor].appears} to others. You want to be seen as ${colorProfiles[result.dominantColor].wantsToBe}.`;
+      
+      yPos += addWrappedText(interactionText, margin, yPos, contentWidth, 11) + 10;
+      
+      // What you value in others
+      yPos = addSectionTitle("What You Value in Others", yPos);
+      
+      let valueText = `You appreciate when others are ${colorProfiles[result.dominantColor].likesYouToBe}. This reflects your preference for interaction styles that complement your own approach.`;
+      
+      yPos += addWrappedText(valueText, margin, yPos, contentWidth, 11) + 10;
+      
+      // How others may perceive you
+      yPos = addSectionTitle("How Others May Perceive You", yPos);
+      
+      let perceptionText = `Others likely see you as ${profile.onGoodDay.slice(0, 3).join(", ")}. Under pressure, they might experience you as ${profile.onBadDay.slice(0, 2).join(" and ")}.`;
+      
+      yPos += addWrappedText(perceptionText, margin, yPos, contentWidth, 11) + 10;
+      
+      // ===== DECISION MAKING =====
+      pdf.addPage();
+      addHeader("Decision Making", 9);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("DECISION MAKING", margin, yPos);
+      yPos += 10;
+      
+      // Decision making approach
+      yPos = addSectionTitle("Your Approach to Decisions", yPos);
+      
+      let decisionText = `Your decisions are typically ${colorProfiles[result.dominantColor].decisionsAre}. With your ${result.personalityType} preferences, you tend to consider ${profile.dominantColors.map(color => colorProfiles[color as ColorType].primaryFocus.toLowerCase()).join(" and ")} when making important choices.`;
+      
+      yPos += addWrappedText(decisionText, margin, yPos, contentWidth, 11) + 10;
+      
+      // Motivating factors
+      yPos = addSectionTitle("What Motivates Your Decisions", yPos);
+      
+      let motivationText = "Your decision-making is motivated by:";
+      yPos += addWrappedText(motivationText, margin, yPos, contentWidth, 11) + 5;
+      
+      profile.goals.forEach(goal => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(goal, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // ===== KEY STRENGTHS & WEAKNESSES =====
+      pdf.addPage();
+      addHeader("Key Strengths & Weaknesses", 11);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("KEY STRENGTHS & WEAKNESSES", margin, yPos);
+      yPos += 10;
+      
+      // Key strengths section
+      yPos = addSectionTitle("Key Strengths", yPos);
+      
+      yPos += addWrappedText(profile.strengths, margin, yPos, contentWidth, 11) + 10;
+      
+      profile.onGoodDay.forEach(trait => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(trait, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // Potential weaknesses
+      yPos = addSectionTitle("Potential Weaknesses", yPos);
+      
+      yPos += addWrappedText("When overusing your strengths or under pressure, you may:", margin, yPos, contentWidth, 11) + 10;
+      
+      profile.onBadDay.forEach(trait => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(trait, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // ===== VALUE TO THE TEAM =====
+      pdf.addPage();
+      addHeader("Value to the Team", 13);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("VALUE TO THE TEAM", margin, yPos);
+      yPos += 10;
+      
+      // Team contribution
+      yPos = addSectionTitle("Your Contribution to Teams", yPos);
+      
+      let teamText = `As a ${result.personalityType}, you bring valuable ${colorProfiles[result.dominantColor].name} energy to your team. Your natural strengths help the team in multiple ways:`;
+      
+      yPos += addWrappedText(teamText, margin, yPos, contentWidth, 11) + 10;
+      
+      // List team contributions based on profile
+      const teamContributions = [
+        `You help the team focus on ${colorProfiles[result.dominantColor].primaryFocus.toLowerCase()}`,
+        `You bring ${profile.onGoodDay.slice(0, 3).join(", ")} to team interactions`,
+        `You help the team overcome challenges through your natural approach`,
+        `You contribute a valuable ${result.personalityType} perspective`
+      ];
+      
+      teamContributions.forEach(contribution => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(contribution, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // Team environment
+      yPos = addSectionTitle("Ideal Team Environment", yPos);
+      
+      let environmentText = "You perform best in team environments that provide:";
+      yPos += addWrappedText(environmentText, margin, yPos, contentWidth, 11) + 5;
+      
+      // Environment factors based on color
+      const environmentFactors = [
+        `Opportunities to utilize your ${colorProfiles[result.dominantColor].name} energy`,
+        `Recognition of your ${profile.onGoodDay[0]} approach`,
+        `Clear alignment with your preferences and goals`,
+        `Space to contribute in your natural style`
+      ];
+      
+      environmentFactors.forEach(factor => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(factor, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      
+      // ===== COMMUNICATION STYLE =====
+      pdf.addPage();
+      addHeader("Communication Style", 15);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("COMMUNICATION STYLE", margin, yPos);
+      yPos += 10;
+      
+      // Communication approach
+      yPos = addSectionTitle("Your Communication Approach", yPos);
+      
+      let commText = `Your communication style is influenced by your ${colorProfiles[result.dominantColor].name} energy. You typically communicate in a way that is ${colorProfiles[result.dominantColor].decisionsAre.toLowerCase()}.`;
+      
+      yPos += addWrappedText(commText, margin, yPos, contentWidth, 11) + 10;
+      
+      // Effective communication
+      yPos = addSectionTitle("Communicating Effectively With You", yPos);
+      
+      let effectiveText = "To communicate effectively with you, others should:";
+      yPos += addWrappedText(effectiveText, margin, yPos, contentWidth, 11) + 5;
+      
+      // Communication tips based on color
+      const communicationTips = [
+        `Be ${colorProfiles[result.dominantColor].likesYouToBe.toLowerCase()}`,
+        `Focus on aspects related to ${colorProfiles[result.dominantColor].primaryFocus.toLowerCase()}`,
+        `Avoid being ${colorProfiles[result.dominantColor].canBeIrritatedBy.toLowerCase()}`,
+        `Recognize and respect your ${result.personalityType} preferences`
+      ];
+      
+      communicationTips.forEach(tip => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(tip, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // Barriers to communication
+      yPos = addSectionTitle("Potential Communication Barriers", yPos);
+      
+      let barriersText = "You may find it difficult to communicate with people who are:";
+      yPos += addWrappedText(barriersText, margin, yPos, contentWidth, 11) + 5;
+      
+      // Communication barriers based on profile
+      profile.fears.slice(0, 4).forEach(fear => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(fear, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      
+      // ===== POSSIBLE BLIND SPOTS =====
+      pdf.addPage();
+      addHeader("Possible Blind Spots", 17);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("POSSIBLE BLIND SPOTS", margin, yPos);
+      yPos += 10;
+      
+      // Blind spots introduction
+      let blindspotsText = "Everyone has potential blind spots - areas where we may not see the full picture due to our personality preferences. Awareness of these can lead to personal growth.";
+      
+      yPos += addWrappedText(blindspotsText, margin, yPos, contentWidth, 11) + 10;
+      
+      // Potential blind spots
+      yPos = addSectionTitle("Your Potential Blind Spots", yPos);
+      
+      profile.fears.forEach(fear => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(fear, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // Under pressure behaviors
+      yPos = addSectionTitle("Under Pressure You May", yPos);
+      
+      profile.onBadDay.forEach(trait => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(trait, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // ===== OPPOSITE TYPE =====
+      pdf.addPage();
+      addHeader("Opposite Type", 19);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("OPPOSITE TYPE", margin, yPos);
+      yPos += 10;
+      
+      // Determine opposite color
+      const oppositeColors: Record<ColorType, ColorType> = {
+        'fiery-red': 'earth-green',
+        'earth-green': 'fiery-red',
+        'sunshine-yellow': 'cool-blue',
+        'cool-blue': 'sunshine-yellow'
+      };
+      
+      const oppositeColor = oppositeColors[result.dominantColor];
+      
+      // Opposite type description
+      yPos = addSectionTitle("Understanding Your Opposite", yPos);
+      
+      let oppositeText = `Your opposite type would prioritize ${colorProfiles[oppositeColor].name} energy, which focuses on ${colorProfiles[oppositeColor].primaryFocus.toLowerCase()}. This is quite different from your preference for ${colorProfiles[result.dominantColor].primaryFocus.toLowerCase()}.`;
+      
+      yPos += addWrappedText(oppositeText, margin, yPos, contentWidth, 11) + 10;
+      
+      // Potential challenges
+      yPos = addSectionTitle("Potential Challenges with Opposite Types", yPos);
+      
+      let challengesText = `You may find it challenging to work with those who are ${colorProfiles[oppositeColor].appears.toLowerCase()} as this is very different from your natural style. They may irritate you by being ${colorProfiles[result.dominantColor].canBeIrritatedBy.toLowerCase()}.`;
+      
+      yPos += addWrappedText(challengesText, margin, yPos, contentWidth, 11) + 10;
+      
+      // Growth opportunities
+      yPos = addSectionTitle("Growth Opportunities", yPos);
+      
+      let growthText = "Interacting with your opposite type offers growth opportunities:";
+      yPos += addWrappedText(growthText, margin, yPos, contentWidth, 11) + 5;
+      
+      // Growth points
+      const growthPoints = [
+        `You can learn to appreciate different perspectives and approaches`,
+        `You may develop more balance by incorporating some of their strengths`,
+        `Understanding opposite preferences can improve your adaptability`,
+        `Working effectively with opposites can enhance your leadership capabilities`
+      ];
+      
+      growthPoints.forEach(point => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(point, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      
+      // ===== SUGGESTIONS FOR DEVELOPMENT =====
+      pdf.addPage();
+      addHeader("Suggestions for Development", 21);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("SUGGESTIONS FOR DEVELOPMENT", margin, yPos);
+      yPos += 10;
+      
+      // Development introduction
+      yPos = addSectionTitle("Development Opportunities", yPos);
+      
+      yPos += addWrappedText(profile.development, margin, yPos, contentWidth, 11) + 10;
+      
+      // Specific development suggestions
+      yPos = addSectionTitle("Specific Development Areas", yPos);
+      
+      let devTitle = "Based on your profile, consider developing these areas:";
+      yPos += addWrappedText(devTitle, margin, yPos, contentWidth, 11) + 5;
+      
+      // Create development suggestions based on weak areas in color profile
+      const devSuggestions = [
+        `Balance your ${colorProfiles[result.dominantColor].name} energy by developing some ${oppositeColors[result.dominantColor]} qualities`,
+        `Be aware of your tendency to ${profile.onBadDay[0].toLowerCase()} under pressure`,
+        `Practice approaches that address your potential blind spots`,
+        `Develop strategies to work more effectively with opposite types`
+      ];
+      
+      devSuggestions.forEach(suggestion => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(suggestion, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      yPos += 5;
+      
+      // Action planning
+      yPos = addSectionTitle("Action Planning", yPos);
+      
+      let actionText = "Consider these steps to continue your development:";
+      yPos += addWrappedText(actionText, margin, yPos, contentWidth, 11) + 5;
+      
+      // Action steps
+      const actionSteps = [
+        "Reflect on this profile and identify key growth areas",
+        "Seek feedback from trusted colleagues or mentors",
+        "Create specific, measurable development goals",
+        "Practice new behaviors in low-risk situations first",
+        "Review your progress regularly"
+      ];
+      
+      actionSteps.forEach((step, index) => {
+        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
+        yPos += addWrappedText(`${index + 1}. ${step}`, margin + 5, yPos, contentWidth - 5, 11) + 6;
+      });
+      
+      // ===== THE INSIGHTS DISCOVERY 72 TYPE WHEEL =====
+      pdf.addPage();
+      addHeader("The Insights Discovery 72 Type Wheel", 23);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("THE INSIGHTS DISCOVERY 72 TYPE WHEEL", margin, yPos);
+      yPos += 10;
+      
+      // Wheel explanation
+      let wheelText = "The Insights Discovery 72 Type Wheel shows your position among all personality types based on the four color energies. Your position indicates your unique blend of preferences and style.";
+      
+      yPos += addWrappedText(wheelText, margin, yPos, contentWidth, 11) + 10;
       
       // Get type wheel as image
       const typeWheel = document.querySelector('.type-wheel-section canvas') as HTMLCanvasElement;
@@ -293,26 +717,28 @@ export default function Results() {
         yPos += 100; // Skip space if chart not available
       }
       
-      // Add a small explanation if there's space
-      if (yPos < pdfHeight - 60) {
-        pdf.setFontSize(11);
-        pdf.setFont('helvetica', 'normal');
-        const wheelText = "The Insights Discovery Type Wheel shows your position among the 72 types based on your color preferences. Your exact position reflects your unique behavioral preferences.";
-        yPos += addWrappedText(wheelText, margin, yPos, contentWidth, 11) + 15;
-      }
+      // Add explanation of wheel
+      yPos = addSectionTitle("Understanding Your Position", yPos);
       
-      // Check if we need to add a new page for color dynamics
-      if (yPos > pdfHeight - 130) {
-        pdf.addPage();
-        addHeader("Color Dynamics");
-        yPos = 40;
-      }
+      let positionText = `Your position on the wheel as a ${result.personalityType} with dominant ${colorProfiles[result.dominantColor].name} energy shows your natural preferences. This helps explain your approach to situations and relationships.`;
       
-      // SECTION 4: Color Dynamics
+      yPos += addWrappedText(positionText, margin, yPos, contentWidth, 11) + 10;
+      
+      // ===== COLOR DYNAMICS =====
+      pdf.addPage();
+      addHeader("Color Dynamics", 25);
+      
+      yPos = 40;
+      pdf.setTextColor(0, 0, 0);
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text("Color Dynamics", margin, yPos);
-      yPos += 8;
+      pdf.text("COLOR DYNAMICS", margin, yPos);
+      yPos += 10;
+      
+      // Dynamics explanation
+      let dynamicsText = "The Color Dynamics chart shows the relationship between your conscious and less conscious preferences. It illustrates the flow between your preferences and how they might manifest in different situations.";
+      
+      yPos += addWrappedText(dynamicsText, margin, yPos, contentWidth, 11) + 10;
       
       // Get color dynamics chart as image
       const dynamicsChart = document.querySelector('.color-dynamics-section canvas') as HTMLCanvasElement;
@@ -326,60 +752,32 @@ export default function Results() {
         yPos += 100; // Skip space if chart not available
       }
       
-      // Add final page with development areas
-      pdf.addPage();
-      addHeader("Development Areas & Practical Applications");
-      yPos = 40;
+      // Add explanation of dynamics
+      yPos = addSectionTitle("Your Preference Flow", yPos);
       
-      // SECTION 5: Development Areas
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("Areas for Development", margin, yPos);
-      yPos += 8;
+      let flowText = `Your preference flow demonstrates how your ${colorProfiles[result.dominantColor].name} energy interacts with your less conscious preferences. This reflects your adaptable nature and potential for growth.`;
       
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'normal');
-      yPos += addWrappedText(profile.development, margin, yPos, contentWidth, 11) + 15;
-      
-      // Goals and values
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("Your Key Goals & Values", margin, yPos);
-      yPos += 8;
-      
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'normal');
-      profile.goals.forEach(goal => {
-        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
-        yPos += addWrappedText(goal, margin + 5, yPos, contentWidth - 5, 11) + 6;
-      });
-      yPos += 5;
-      
-      // Potential blind spots and fears
-      pdf.setFontSize(14);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("Potential Blind Spots", margin, yPos);
-      yPos += 8;
-      
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'normal');
-      profile.fears.forEach(fear => {
-        pdf.ellipse(margin + 2, yPos - 2, 1, 1, 'F');
-        yPos += addWrappedText(fear, margin + 5, yPos, contentWidth - 5, 11) + 6;
-      });
-      yPos += 15;
+      yPos += addWrappedText(flowText, margin, yPos, contentWidth, 11) + 15;
       
       // Closing
-      yPos += addWrappedText(
-        "Thank you for completing the Insights Discovery assessment. This profile is designed to deepen your understanding of yourself and provide a foundation for ongoing personal and professional development.",
-        margin, yPos, contentWidth, 11) + 10;
+      let closingText = "Thank you for completing the Insights Discovery assessment. This profile is designed to deepen your understanding of yourself and provide a foundation for ongoing personal and professional development.";
       
-      // Footer
-      const footerY = pdfHeight - 10;
-      pdf.setFontSize(9);
-      pdf.setTextColor(100, 100, 100);
-      pdf.text("© Insights Discovery Color Profile Assessment", margin, footerY);
-      pdf.text(`Generated on ${formattedDate}`, pdfWidth - margin - pdf.getTextWidth(`Generated on ${formattedDate}`), footerY);
+      yPos += addWrappedText(closingText, margin, yPos, contentWidth, 11) + 10;
+      
+      // Footer on all pages
+      const addFooter = (pageNum: number) => {
+        pdf.setPage(pageNum);
+        const footerY = pdfHeight - 10;
+        pdf.setFontSize(8);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text("© Insights Discovery Color Profile Assessment", margin, footerY);
+        pdf.text(`Page ${pageNum}`, pdfWidth - margin - pdf.getTextWidth(`Page ${pageNum}`), footerY);
+      };
+      
+      // Add footers to all pages except title page
+      for (let i = 2; i <= pdf.getNumberOfPages(); i++) {
+        addFooter(i);
+      }
       
       // Save the PDF
       pdf.save(`Insights_Discovery_Profile_${new Date().toISOString().split('T')[0]}.pdf`);
