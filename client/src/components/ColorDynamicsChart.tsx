@@ -15,8 +15,8 @@ export default function ColorDynamicsChart({ scores }: ColorDynamicsChartProps) 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Set canvas size
-    canvas.width = 700;
+    // Set canvas size - wider to prevent crowding
+    canvas.width = 850; // Increased width to add more space between charts
     canvas.height = 550;
     
     // Clear canvas

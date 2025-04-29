@@ -23,9 +23,9 @@ export default function InsightsTypeWheel({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Set canvas size
-    canvas.width = 600;
-    canvas.height = 600;
+    // Set canvas size - increase width to prevent labels from being cut off
+    canvas.width = 700;
+    canvas.height = 700;
     
     // Define constants
     const centerX = canvas.width / 2;
@@ -345,22 +345,29 @@ function drawTypeLabels(
   ctx.font = '11px Arial';
   
   typePositions.forEach(pos => {
-    const x = centerX + (radius + 20) * Math.cos(pos.angle);
-    const y = centerY + (radius + 20) * Math.sin(pos.angle);
+    // Add more padding to ensure labels are not cut off
+    const padding = 35; // Increased from 20
+    const x = centerX + (radius + padding) * Math.cos(pos.angle);
+    const y = centerY + (radius + padding) * Math.sin(pos.angle);
     
-    // Set text alignment based on position
-    if (pos.angle === 0) {
+    // Set text alignment based on position for better readability
+    if (Math.abs(pos.angle) < Math.PI/4) { // Right side
       ctx.textAlign = 'left';
-    } else if (pos.angle === Math.PI) {
+    } else if (Math.abs(pos.angle - Math.PI) < Math.PI/4) { // Left side
       ctx.textAlign = 'right';
+    } else if (Math.abs(pos.angle + Math.PI/2) < Math.PI/4) { // Top
+      ctx.textAlign = 'center';
+      // Add extra spacing for top labels to prevent overlap with wheel
+    } else if (Math.abs(pos.angle - Math.PI/2) < Math.PI/4) { // Bottom
+      ctx.textAlign = 'center';
     } else {
       ctx.textAlign = 'center';
     }
     
     // Adjust vertical alignment
     let yOffset = 0;
-    if (pos.angle === -Math.PI/2) yOffset = -5;
-    if (pos.angle === Math.PI/2) yOffset = 12;
+    if (pos.angle === -Math.PI/2) yOffset = -8; // Top - move up more
+    if (pos.angle === Math.PI/2) yOffset = 15;  // Bottom - move down more
     
     ctx.fillStyle = colorMap[pos.color];
     ctx.fillText(pos.type, x, y + yOffset);
