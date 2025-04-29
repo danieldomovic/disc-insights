@@ -12,8 +12,8 @@ export default function ProgressBar({
   progress 
 }: ProgressBarProps) {
   return (
-    <div className="mb-6">
-      <div className="flex justify-between text-sm font-medium mb-2">
+    <div className="mb-4 md:mb-6 px-2 md:px-0">
+      <div className="flex justify-between text-xs sm:text-sm font-medium mb-1 md:mb-2">
         <span>Question {currentQuestion + 1} of {totalQuestions}</span>
         <span>{progress}%</span>
       </div>

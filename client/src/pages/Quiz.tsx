@@ -39,23 +39,23 @@ export default function Quiz() {
   
   if (isLoadingQuestions) {
     return (
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
-          <Skeleton className="h-4 w-40 mb-2" />
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 md:px-0">
+        <div className="mb-4 md:mb-6">
+          <Skeleton className="h-3 md:h-4 w-32 md:w-40 mb-1 md:mb-2" />
           <Skeleton className="h-2 w-full rounded-full" />
         </div>
         
         <Card>
-          <CardContent className="p-8">
-            <Skeleton className="h-6 w-3/4 mb-6" />
+          <CardContent className="p-4 sm:p-6 md:p-8">
+            <Skeleton className="h-5 md:h-6 w-3/4 mb-4 md:mb-6" />
             
             <div className="space-y-4">
               {[1, 2, 3, 4].map((i) => (
-                <Skeleton key={i} className="h-16 w-full rounded-lg" />
+                <Skeleton key={i} className="h-12 md:h-16 w-full rounded-lg" />
               ))}
             </div>
             
-            <Skeleton className="h-10 w-32 mt-8" />
+            <Skeleton className="h-9 md:h-10 w-full md:w-32 mt-6 md:mt-8" />
           </CardContent>
         </Card>
       </div>

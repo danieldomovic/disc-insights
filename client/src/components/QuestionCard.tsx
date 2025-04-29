@@ -78,12 +78,16 @@ export default function QuestionCard({
   
   return (
     <Card className="w-full">
-      <CardContent className="p-8">
-        <h2 className="text-xl font-semibold mb-2 text-gray-800">
+      <CardContent className="p-4 sm:p-6 md:p-8">
+        <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-800">
           {question.text}
         </h2>
-        <p className="text-lg mb-6 text-gray-700">
-          Please select one M (Most like me), one L (Least like me), and two different values in between.
+        <p className="text-sm md:text-base mb-4 md:mb-6 text-gray-700">
+          Please select one M (Most like me), one L (Least like me), and two different values (1-5) in between.
+        </p>
+        <p className="text-xs md:text-sm mb-4 text-gray-500 italic">
+          <span className="hidden sm:inline">Swipe horizontally if needed to see all options. </span>
+          All rows must be complete before proceeding.
         </p>
         
         <div className="space-y-4">
@@ -98,41 +102,44 @@ export default function QuestionCard({
             const selectedOption = getSelectedOptionForTrait(index);
             
             return (
-              <div key={index} className="flex items-center mb-6">
+              <div key={index} className="flex flex-col md:flex-row mb-8 md:mb-6 rounded-md overflow-hidden shadow-sm">
+                {/* Color option text - full width on mobile, partial width on desktop */}
                 <div 
-                  className="w-full md:w-2/5 p-4 text-white font-medium rounded-l-md"
+                  className="w-full md:w-2/5 p-4 text-white font-medium rounded-t-md md:rounded-t-none md:rounded-l-md"
                   style={{ backgroundColor: bgColor }}
                 >
                   {option.text}
                 </div>
                 
-                <div className="flex flex-grow justify-between bg-gray-50 rounded-r-md">
-                  {ratingOptions.map((rating, rIdx) => {
-                    // Calculate the actual value index for this option and rating
-                    // This creates a unique value for each radio button
-                    const valueIndex = index * ratingOptions.length + rIdx;
-                    const isSelected = selectedOption === valueIndex;
-                    
-                    return (
-                      <div 
-                        key={rIdx} 
-                        className="flex justify-center items-center px-4 py-2 cursor-pointer"
-                        onClick={() => onSelectOption(valueIndex)}
-                      >
-                        <div
-                          className={cn(
-                            "w-6 h-6 rounded-full border-2 border-gray-400 flex items-center justify-center",
-                            isSelected && "border-indigo-600"
-                          )}
+                {/* Rating options - scrollable container on mobile */}
+                <div className="w-full overflow-x-auto bg-gray-50 rounded-b-md md:rounded-b-none md:rounded-r-md">
+                  <div className="flex min-w-max md:min-w-0 md:flex-grow justify-between">
+                    {ratingOptions.map((rating, rIdx) => {
+                      // Calculate the actual value index for this option and rating
+                      const valueIndex = index * ratingOptions.length + rIdx;
+                      const isSelected = selectedOption === valueIndex;
+                      
+                      return (
+                        <div 
+                          key={rIdx} 
+                          className="flex justify-center items-center px-4 py-3 cursor-pointer hover:bg-gray-100"
+                          onClick={() => onSelectOption(valueIndex)}
                         >
-                          {isSelected && (
-                            <div className="w-4 h-4 rounded-full bg-indigo-600"></div>
-                          )}
+                          <div
+                            className={cn(
+                              "w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-gray-400 flex items-center justify-center",
+                              isSelected && "border-indigo-600"
+                            )}
+                          >
+                            {isSelected && (
+                              <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-indigo-600"></div>
+                            )}
+                          </div>
+                          <span className="ml-1 md:ml-2 text-sm md:text-base text-gray-700 font-medium">{rating}</span>
                         </div>
-                        <span className="ml-2 text-gray-700 font-medium">{rating}</span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             );
@@ -141,13 +148,13 @@ export default function QuestionCard({
         
         {/* Error messages */}
         {hasErrors && Object.keys(selectedOptions).length > 0 && (
-          <div className="mt-6">
+          <div className="mt-4 md:mt-6">
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <ul className="mt-2 list-disc list-inside">
+                <ul className="mt-2 list-disc list-inside text-xs sm:text-sm">
                   {errorMessages.map((error, index) => (
-                    <li key={index}>{error}</li>
+                    <li key={index} className="mb-1">{error}</li>
                   ))}
                 </ul>
               </AlertDescription>
