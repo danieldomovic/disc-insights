@@ -68,6 +68,18 @@ export default function ColorDynamicsChart({ scores }: ColorDynamicsChartProps) 
     drawFlowChart(ctx, sectionWidth, topMargin, sectionWidth, chartHeight, personaData.preferenceFlow, colorMap, colorLabels);
     drawPersonaChart(ctx, sectionWidth * 2, topMargin, sectionWidth, chartHeight, personaData.lessConscious, colorMap, colorLabels, false);
     
+    // Draw vertical dividing lines between charts (Insights standard)
+    ctx.strokeStyle = '#ccc';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    // Line between Conscious and Flow
+    ctx.moveTo(sectionWidth, topMargin - 15);
+    ctx.lineTo(sectionWidth, topMargin + chartHeight + 40);
+    // Line between Flow and Less Conscious
+    ctx.moveTo(sectionWidth * 2, topMargin - 15);
+    ctx.lineTo(sectionWidth * 2, topMargin + chartHeight + 40);
+    ctx.stroke();
+    
     // Add footer
     ctx.fillStyle = '#666';
     ctx.font = '12px Arial';
@@ -137,7 +149,8 @@ function calculatePersonaData(normalizedScores: Record<string, number>) {
     'fiery-red': Math.round((lessConsciousValues['fiery-red'] / 6) * 100)
   };
   
-  // Calculate preference flow value (balance between most and least preferred colors)
+  // Calculate preference flow value based on Insights Discovery standard
+  // This represents the gap between highest and lowest color preferences
   const preferenceFlowValue = Math.round(
     Math.abs(
       consciousValues[sortedColors[0]] - consciousValues[sortedColors[3]]
@@ -290,7 +303,7 @@ function drawFlowChart(
   const padding = 30;
   const chartWidth = width - (padding * 2);
   const chartHeight = height - 50;
-  const centerX = x + padding + (chartWidth / 2);
+  const centerY = y + (chartHeight / 2); // Center point (0 value)
   
   // Draw chart background
   ctx.fillStyle = '#fff';
@@ -300,10 +313,10 @@ function drawFlowChart(
   ctx.strokeStyle = '#ccc';
   ctx.lineWidth = 1;
   
-  // Draw horizontal grid lines and axis labels
+  // Draw horizontal grid lines and axis labels (-100, -50, 0, 50, 100)
   for (let i = 0; i <= 4; i++) {
     const gridY = y + (i * (chartHeight / 4));
-    const value = 100 - (i * 50);
+    const value = 100 - (i * 50); // 100, 50, 0, -50, -100
     
     ctx.beginPath();
     ctx.moveTo(x + padding, gridY);
@@ -314,13 +327,33 @@ function drawFlowChart(
     ctx.fillStyle = '#333';
     ctx.font = '12px Arial';
     ctx.textAlign = 'right';
-    ctx.fillText(value + '', x + padding - 5, gridY + 4);
+    
+    if (i === 2) {
+      // Middle line (0)
+      ctx.fillText('0', x + padding - 5, gridY + 4);
+      // Make the zero line slightly darker
+      ctx.strokeStyle = '#999';
+      ctx.beginPath();
+      ctx.moveTo(x + padding, gridY);
+      ctx.lineTo(x + padding + chartWidth, gridY);
+      ctx.stroke();
+      ctx.strokeStyle = '#ccc';
+    } else if (i < 2) {
+      // Positive values (above 0)
+      ctx.fillText(value + '', x + padding - 5, gridY + 4);
+    } else {
+      // Negative values (below 0)
+      ctx.fillText((value * -1) + '', x + padding - 5, gridY + 4);
+    }
   }
   
   // Draw vertical grid lines for each color
   let gridX = x + padding;
   const barWidth = chartWidth / 4;
-  Object.keys(colorLabels).forEach(color => {
+  const colors = Object.keys(colorMap) as string[];
+  
+  // Draw the vertical lines and color labels
+  colors.forEach((color, index) => {
     ctx.beginPath();
     ctx.moveTo(gridX, y);
     ctx.lineTo(gridX, y + chartHeight);
@@ -332,6 +365,34 @@ function drawFlowChart(
     ctx.textAlign = 'center';
     ctx.fillText(colorLabels[color], gridX + barWidth/2, y - 8);
     
+    // Calculate the bar position (centered in its column)
+    const barCenterX = gridX + (barWidth / 2);
+    
+    // Calculate arrow size based on color scores
+    // Get normalized value for this color from -100 to 100
+    const colorScore = calculateColorFlowScore(
+      color as ColorType, 
+      colors,
+      flowData.topColor,
+      flowData.bottomColor,
+      flowData.value
+    );
+    
+    // Draw the arrow
+    if (colorScore !== 0) {
+      const arrowHeight = Math.abs(colorScore) / 100 * (chartHeight / 2);
+      const arrowDirection = colorScore > 0 ? -1 : 1; // Up or down
+      
+      drawFlowArrow(
+        ctx,
+        barCenterX,
+        centerY, // Start at center (0 value)
+        barCenterX,
+        centerY + (arrowHeight * arrowDirection), // Move up or down based on score
+        colorMap[color]
+      );
+    }
+    
     gridX += barWidth;
   });
   
@@ -341,31 +402,64 @@ function drawFlowChart(
   ctx.lineTo(x + padding + chartWidth, y + chartHeight);
   ctx.stroke();
   
-  // Draw flow arrows for top color (pointing up)
-  drawFlowArrow(
-    ctx,
-    centerX - 40,
-    y + chartHeight / 2,
-    centerX - 40,
-    y + chartHeight / 2 - 40,
-    colorMap[flowData.topColor]
-  );
-  
-  // Draw flow arrows for bottom color (pointing down)
-  drawFlowArrow(
-    ctx,
-    centerX + 40,
-    y + chartHeight / 2,
-    centerX + 40,
-    y + chartHeight / 2 + 40,
-    colorMap[flowData.bottomColor]
-  );
-  
   // Draw preference flow value
   ctx.font = 'bold 16px Arial';
   ctx.fillStyle = '#333';
   ctx.textAlign = 'center';
-  ctx.fillText(`${flowData.value}%`, centerX, y + chartHeight + 30);
+  ctx.fillText(`${flowData.value}%`, x + padding + (chartWidth / 2), y + chartHeight + 30);
+}
+
+// Calculate flow score for each color from -100 to 100
+function calculateColorFlowScore(
+  color: ColorType,
+  colors: string[],
+  topColor: string,
+  bottomColor: string,
+  flowValue: number
+): number {
+  // Based on Insights Discovery standard:
+  // - Usually, Blue and Yellow point upwards (increasing energy)
+  // - Usually, Green points downward (decreasing energy)
+  // - Red can vary based on the specific profile
+
+  let score = 0;
+  const intensity = flowValue; // Base flow intensity
+  
+  // Assign direction based on color and adjusted by dominant/least colors
+  switch(color) {
+    case 'cool-blue':
+      // Blue typically moves up
+      score = (color === bottomColor) ? -intensity : intensity * 0.8;
+      break;
+    case 'sunshine-yellow':
+      // Yellow typically moves up
+      score = (color === bottomColor) ? -intensity : intensity * 0.7;
+      break;
+    case 'earth-green':
+      // Green typically moves down
+      score = (color === topColor) ? intensity : -intensity * 0.8;
+      break;
+    case 'fiery-red':
+      // Red's flow depends on its position
+      if (color === topColor) {
+        score = intensity;
+      } else if (color === bottomColor) {
+        score = -intensity;
+      } else {
+        // For neutral position, slight preference to up
+        score = intensity * 0.3;
+      }
+      break;
+  }
+  
+  // Ensure dominant and least dominant colors are represented correctly
+  if (color === topColor) {
+    score = Math.abs(score); // Ensure positive (up)
+  } else if (color === bottomColor) {
+    score = -Math.abs(score); // Ensure negative (down)
+  }
+  
+  return score;
 }
 
 // Helper function to draw arrows
