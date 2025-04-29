@@ -197,13 +197,14 @@ function drawPersonaChart(
   ctx.fillRect(x + padding, y, chartWidth, chartHeight);
   
   // Draw color labels
-  ctx.font = 'bold 12px Arial';
+  ctx.font = 'bold 11px Arial';
   ctx.fillStyle = '#333';
   ctx.textAlign = 'center';
   
   let labelX = x + padding + barWidth / 2;
   Object.keys(colorMap).forEach(color => {
-    ctx.fillText(colorLabels[color], labelX, y - 5);
+    // Move the labels further up to avoid overlap
+    ctx.fillText(colorLabels[color], labelX, y - 8);
     labelX += barWidth;
   });
   
@@ -326,10 +327,10 @@ function drawFlowChart(
     ctx.stroke();
     
     // Draw color labels
-    ctx.font = 'bold 12px Arial';
+    ctx.font = 'bold 11px Arial';
     ctx.fillStyle = '#333';
     ctx.textAlign = 'center';
-    ctx.fillText(colorLabels[color], gridX + barWidth/2, y - 5);
+    ctx.fillText(colorLabels[color], gridX + barWidth/2, y - 8);
     
     gridX += barWidth;
   });

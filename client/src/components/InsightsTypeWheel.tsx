@@ -101,16 +101,17 @@ function getPersonalityPositions(
   };
   
   // Define base angles for each personality type (in radians)
-  // Note: 0 = right (east), PI/2 = down (south), PI = left (west), 3PI/2 = up (north)
+  // In the Insights Discovery wheel:
+  // 0 = right (east), PI/2 = down (south), PI = left (west), -PI/2 (or 3PI/2) = up (north)
   const personalityAngles: Record<PersonalityType, number> = {
-    'Reformer': 5 * Math.PI / 4, // Between Director and Observer
-    'Director': 7 * Math.PI / 4, // Top-right (northeast)
-    'Motivator': 5 * Math.PI / 3, // Right-bottom (southeast)
-    'Inspirer': 3 * Math.PI / 2, // Bottom (south)
-    'Helper': 4 * Math.PI / 3, // Bottom-left (southwest)
-    'Supporter': Math.PI, // Left (west)
-    'Coordinator': 2 * Math.PI / 3, // Top-left (northwest)
-    'Observer': Math.PI / 4, // Top (north)
+    'Reformer': -3 * Math.PI / 4, // Between Observer and Director (top-right quadrant)
+    'Director': 0, // Right (east) - Red dominant
+    'Motivator': Math.PI / 4, // Between Director and Inspirer (bottom-right quadrant)
+    'Inspirer': Math.PI / 2, // Bottom (south) - Yellow dominant
+    'Helper': 3 * Math.PI / 4, // Between Inspirer and Supporter (bottom-left quadrant)
+    'Supporter': Math.PI, // Left (west) - Green dominant
+    'Coordinator': -5 * Math.PI / 8, // Between Supporter and Observer (top-left quadrant)
+    'Observer': -Math.PI / 2, // Top (north) - Blue dominant
   };
   
   // Get base angle for personality type
@@ -187,11 +188,14 @@ function drawWheelStructure(
   const innerRadius = radius - outerRingWidth - middleRingWidth;
   
   // Draw each quadrant with different intensities in rings
+  // Standard Insights Discovery wheel arrangement:
+  // Cool Blue (top-right), Fiery Red (bottom-right), 
+  // Sunshine Yellow (bottom-left), Earth Green (top-left)
   const quadrants = [
-    { color: 'cool-blue', startAngle: -Math.PI/2, endAngle: 0 },
-    { color: 'fiery-red', startAngle: 0, endAngle: Math.PI/2 },
-    { color: 'sunshine-yellow', startAngle: Math.PI/2, endAngle: Math.PI },
-    { color: 'earth-green', startAngle: Math.PI, endAngle: 3*Math.PI/2 }
+    { color: 'cool-blue', startAngle: -Math.PI/2, endAngle: 0 },          // Top-right
+    { color: 'fiery-red', startAngle: 0, endAngle: Math.PI/2 },           // Bottom-right
+    { color: 'sunshine-yellow', startAngle: Math.PI/2, endAngle: Math.PI },    // Bottom-left
+    { color: 'earth-green', startAngle: Math.PI, endAngle: 3*Math.PI/2 }   // Top-left
   ];
   
   // Draw all quadrants in layers
@@ -318,15 +322,24 @@ function drawTypeLabels(
   radius: number,
   colorMap: Record<string, string>
 ) {
+  // Position types around the wheel based on the Insights Discovery standard
+  // Each type is positioned at its proper location on the wheel
   const typePositions = [
-    { type: 'Coordinator', angle: -Math.PI/4, color: 'cool-blue' },
-    { type: 'Observer', angle: -Math.PI/2, color: 'cool-blue' },
-    { type: 'Reformer', angle: -3*Math.PI/4, color: 'cool-blue' },
-    { type: 'Director', angle: 0, color: 'fiery-red' },
-    { type: 'Motivator', angle: Math.PI/4, color: 'fiery-red' },
-    { type: 'Inspirer', angle: Math.PI/2, color: 'sunshine-yellow' },
-    { type: 'Helper', angle: 3*Math.PI/4, color: 'sunshine-yellow' },
-    { type: 'Supporter', angle: Math.PI, color: 'earth-green' }
+    // Blue quadrant (top-right)
+    { type: 'Observer', angle: -Math.PI/2, color: 'cool-blue' },     // Top
+    { type: 'Coordinator', angle: -Math.PI/4, color: 'cool-blue' },  // Top-right
+    
+    // Red quadrant (bottom-right)
+    { type: 'Director', angle: 0, color: 'fiery-red' },              // Right
+    { type: 'Reformer', angle: -5*Math.PI/8, color: 'cool-blue' },   // Top-right (between blue/red)
+    { type: 'Motivator', angle: Math.PI/4, color: 'fiery-red' },     // Bottom-right
+    
+    // Yellow quadrant (bottom-left)
+    { type: 'Inspirer', angle: Math.PI/2, color: 'sunshine-yellow' }, // Bottom
+    { type: 'Helper', angle: 3*Math.PI/4, color: 'sunshine-yellow' }, // Bottom-left
+    
+    // Green quadrant (top-left)
+    { type: 'Supporter', angle: Math.PI, color: 'earth-green' }      // Left
   ];
   
   ctx.font = '11px Arial';
