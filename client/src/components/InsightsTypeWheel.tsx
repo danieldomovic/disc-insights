@@ -24,8 +24,8 @@ export default function InsightsTypeWheel({
     if (!ctx) return;
     
     // Set canvas size - increase width to prevent labels from being cut off
-    canvas.width = 700;
-    canvas.height = 700;
+    canvas.width = 800;
+    canvas.height = 800;
     
     // Define constants
     const centerX = canvas.width / 2;
@@ -39,7 +39,7 @@ export default function InsightsTypeWheel({
     ctx.font = 'bold 18px Arial';
     ctx.fillStyle = '#0D3B66';
     ctx.textAlign = 'center';
-    ctx.fillText('The Insights Discovery® 72 Type Wheel', centerX, 30);
+    ctx.fillText('The Insights Discovery® 72 Type Wheel', centerX, 50);
     
     // Define color constants
     const colorMap = {
@@ -301,7 +301,7 @@ function drawQuadrantLabels(
   // Right - DIRECTOR - Red
   ctx.fillStyle = colorMap['fiery-red'];
   ctx.textAlign = 'left';
-  ctx.fillText('DIRECTOR', centerX + labelDistance * 0.7, centerY);
+  ctx.fillText('DIRECTOR', centerX + labelDistance * 0.8, centerY);
   
   // Bottom - INSPIRER - Yellow
   ctx.fillStyle = colorMap['sunshine-yellow'];
@@ -311,7 +311,7 @@ function drawQuadrantLabels(
   // Left - SUPPORTER - Green
   ctx.fillStyle = colorMap['earth-green'];
   ctx.textAlign = 'right';
-  ctx.fillText('SUPPORTER', centerX - labelDistance * 0.7, centerY);
+  ctx.fillText('SUPPORTER', centerX - labelDistance * 0.8, centerY);
 }
 
 // Draw personality type labels around the wheel
@@ -346,7 +346,11 @@ function drawTypeLabels(
   
   typePositions.forEach(pos => {
     // Add more padding to ensure labels are not cut off
-    const padding = 35; // Increased from 20
+    // Add extra padding for left/right positions to prevent cutoff
+    let padding = 35;
+    if (Math.abs(pos.angle) < Math.PI/4 || Math.abs(pos.angle - Math.PI) < Math.PI/4) {
+      padding = 60; // Extra padding for left/right labels
+    }
     const x = centerX + (radius + padding) * Math.cos(pos.angle);
     const y = centerY + (radius + padding) * Math.sin(pos.angle);
     
@@ -420,7 +424,7 @@ function drawPersonalityIndicator(
 
 // Draw legend and copyright info
 function drawLegend(ctx: CanvasRenderingContext2D, centerX: number, canvasHeight: number) {
-  const legendY = canvasHeight - 40;
+  const legendY = canvasHeight - 60; // Increased space from bottom
   
   ctx.font = '12px Arial';
   ctx.fillStyle = '#666';
