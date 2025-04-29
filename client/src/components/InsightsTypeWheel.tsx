@@ -30,7 +30,7 @@ export default function InsightsTypeWheel({
     // Define constants
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = Math.min(centerX, centerY) - 40;
+    const radius = Math.min(centerX, centerY) - 60; // More margin for outer labels
     
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -104,7 +104,7 @@ function getPersonalityPositions(
   // In the Insights Discovery wheel:
   // 0 = right (east), PI/2 = down (south), PI = left (west), -PI/2 (or 3PI/2) = up (north)
   const personalityAngles: Record<PersonalityType, number> = {
-    'Reformer': -3 * Math.PI / 4, // Between Observer and Director (top-right quadrant)
+    'Reformer': -7 * Math.PI / 8, // Updated: Between Observer and Director (top quadrant, slightly toward right)
     'Director': 0, // Right (east) - Red dominant
     'Motivator': Math.PI / 4, // Between Director and Inspirer (bottom-right quadrant)
     'Inspirer': Math.PI / 2, // Bottom (south) - Yellow dominant
@@ -146,6 +146,12 @@ function getPersonalityPositions(
     }
   }
   
+  // For Reformer type, ensure it's properly positioned in the top-right 
+  // quadrant between Observer and Director
+  if (personalityType === 'Reformer') {
+    angle = -7 * Math.PI / 8; // Fixed position to match reference image
+  }
+  
   // Calculate distance from center (0.4 to 0.75 of radius)
   // Distance is based on the strength of the dominant color relative to others
   const maxScore = Math.max(...Object.values(normalizedScores));
@@ -178,19 +184,20 @@ function drawWheelStructure(
   // Draw outer circle
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = '#555';
+  ctx.strokeStyle = '#000';
   ctx.lineWidth = 2;
   ctx.stroke();
   
-  // Define wheel rings
-  const outerRingWidth = radius * 0.2;
-  const middleRingWidth = radius * 0.3;
-  const innerRadius = radius - outerRingWidth - middleRingWidth;
+  // Define wheel rings - match the reference image
+  const outerRingWidth = radius * 0.1; // Outer ring is thinner in reference image
+  const middleRingWidth = radius * 0.2; 
+  const innerRingWidth = radius * 0.2;
+  const innerRadius = radius - outerRingWidth - middleRingWidth - innerRingWidth;
   
   // Draw each quadrant with different intensities in rings
   // Standard Insights Discovery wheel arrangement:
-  // Cool Blue (top-right), Fiery Red (bottom-right), 
-  // Sunshine Yellow (bottom-left), Earth Green (top-left)
+  // Cool Blue (top), Fiery Red (right), 
+  // Sunshine Yellow (bottom), Earth Green (left)
   const quadrants = [
     { color: 'cool-blue', startAngle: -Math.PI/2, endAngle: 0 },          // Top-right
     { color: 'fiery-red', startAngle: 0, endAngle: Math.PI/2 },           // Bottom-right
@@ -198,187 +205,251 @@ function drawWheelStructure(
     { color: 'earth-green', startAngle: Math.PI, endAngle: 3*Math.PI/2 }   // Top-left
   ];
   
-  // Draw all quadrants in layers
-  // Outer ring - 18 segments per quadrant
+  // Draw the outer personality type bands
+  drawTypeColorBands(ctx, centerX, centerY, radius, colorMap);
+  
+  // Draw quadrants as rings
   quadrants.forEach(quadrant => {
-    const segmentAngle = (quadrant.endAngle - quadrant.startAngle) / 18;
     const colorHex = colorMap[quadrant.color];
     
-    // Outer ring segments (graduated color)
-    for (let i = 0; i < 18; i++) {
+    // Draw middle ring (lighter gray color)
+    drawRingSegment(
+      ctx,
+      centerX,
+      centerY,
+      radius - outerRingWidth,
+      radius - outerRingWidth - middleRingWidth,
+      quadrant.startAngle,
+      quadrant.endAngle,
+      '#EEEEEE', // Light gray for middle ring
+      1.0
+    );
+    
+    // Draw inner ring (lighter gray alternating with white)
+    const segmentCount = 9; // Number of segments per quadrant
+    const segmentAngle = (quadrant.endAngle - quadrant.startAngle) / segmentCount;
+    
+    for (let i = 0; i < segmentCount; i++) {
       const startAngle = quadrant.startAngle + (i * segmentAngle);
       const endAngle = startAngle + segmentAngle;
-      const opacity = 0.4 + (i * 0.03); // Graduated opacity
       
-      // Draw outer ring segment
+      // Alternating gray and white
+      const fillColor = i % 2 === 0 ? '#EEEEEE' : '#FFFFFF';
+      
       drawRingSegment(
-        ctx, 
-        centerX, 
-        centerY, 
-        radius - outerRingWidth, 
-        radius, 
-        startAngle, 
-        endAngle, 
-        colorHex, 
-        opacity
+        ctx,
+        centerX,
+        centerY,
+        innerRadius,
+        radius - outerRingWidth - middleRingWidth,
+        startAngle,
+        endAngle,
+        fillColor,
+        1.0
       );
     }
-    
-    // Middle ring (lighter)
-    drawRingSegment(
-      ctx,
-      centerX,
-      centerY,
-      innerRadius,
-      radius - outerRingWidth,
-      quadrant.startAngle,
-      quadrant.endAngle,
-      colorHex,
-      0.3
-    );
-    
-    // Inner quadrant (lightest)
-    drawRingSegment(
-      ctx,
-      centerX,
-      centerY,
-      0,
-      innerRadius,
-      quadrant.startAngle,
-      quadrant.endAngle,
-      colorHex,
-      0.1
-    );
   });
   
-  // Draw inner circle
+  // Draw inner circles for center
   ctx.beginPath();
   ctx.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
-  ctx.strokeStyle = '#999';
+  ctx.strokeStyle = '#000';
   ctx.lineWidth = 1;
   ctx.stroke();
+  
+  // Draw color wheel in center
+  const centerRadius = innerRadius * 0.3;
+  drawCenterColorWheel(ctx, centerX, centerY, centerRadius, colorMap);
   
   // Draw middle circle
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius - outerRingWidth, 0, 2 * Math.PI);
-  ctx.strokeStyle = '#999';
+  ctx.strokeStyle = '#000';
   ctx.lineWidth = 1;
   ctx.stroke();
   
-  // Draw diagonal lines
+  // Draw third circle
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius - outerRingWidth - middleRingWidth, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  
+  // Draw segment numbers in the inner ring
+  drawSegmentNumbers(ctx, centerX, centerY, innerRadius, radius - outerRingWidth - middleRingWidth);
+  
+  // Draw horizontal and vertical lines (thicker)
   ctx.beginPath();
   ctx.moveTo(centerX - radius, centerY);
   ctx.lineTo(centerX + radius, centerY);
   ctx.moveTo(centerX, centerY - radius);
   ctx.lineTo(centerX, centerY + radius);
-  ctx.strokeStyle = '#999';
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]); // Dashed line
   ctx.stroke();
+  ctx.setLineDash([]); // Reset to solid line
   
-  // Draw quadrant labels
-  drawQuadrantLabels(ctx, centerX, centerY, radius, colorMap);
-  
-  // Draw type labels around the wheel
-  drawTypeLabels(ctx, centerX, centerY, radius, colorMap);
+  // Draw diagonal lines
+  ctx.beginPath();
+  // Top-left to bottom-right
+  ctx.moveTo(centerX - (radius * 0.7), centerY - (radius * 0.7));
+  ctx.lineTo(centerX + (radius * 0.7), centerY + (radius * 0.7));
+  // Top-right to bottom-left
+  ctx.moveTo(centerX + (radius * 0.7), centerY - (radius * 0.7));
+  ctx.lineTo(centerX - (radius * 0.7), centerY + (radius * 0.7));
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5, 5]); // Dashed line
+  ctx.stroke();
+  ctx.setLineDash([]); // Reset to solid line
 }
 
-// Draw quadrant labels (Observer, Director, etc.)
-function drawQuadrantLabels(
+// Draw the outer colored bands with personality type labels
+function drawTypeColorBands(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
   radius: number,
   colorMap: Record<string, string>
 ) {
-  const labelDistance = radius * 0.6;
+  const outerRingWidth = radius * 0.1;
   
-  // Top - REFORMER/OBSERVER - Blue
-  ctx.font = 'bold 14px Arial';
-  ctx.fillStyle = colorMap['cool-blue'];
-  ctx.textAlign = 'center';
-  ctx.fillText('OBSERVER', centerX, centerY - labelDistance);
-  
-  // Right - DIRECTOR - Red
-  ctx.fillStyle = colorMap['fiery-red'];
-  ctx.textAlign = 'left';
-  ctx.fillText('DIRECTOR', centerX + labelDistance * 0.8, centerY);
-  
-  // Bottom - INSPIRER - Yellow
-  ctx.fillStyle = colorMap['sunshine-yellow'];
-  ctx.textAlign = 'center';
-  ctx.fillText('INSPIRER', centerX, centerY + labelDistance);
-  
-  // Left - SUPPORTER - Green
-  ctx.fillStyle = colorMap['earth-green'];
-  ctx.textAlign = 'right';
-  ctx.fillText('SUPPORTER', centerX - labelDistance * 0.8, centerY);
-}
-
-// Draw personality type labels around the wheel
-function drawTypeLabels(
-  ctx: CanvasRenderingContext2D,
-  centerX: number,
-  centerY: number,
-  radius: number,
-  colorMap: Record<string, string>
-) {
-  // Position types around the wheel based on the Insights Discovery standard
-  // Each type is positioned at its proper location on the wheel
-  const typePositions = [
-    // Blue quadrant (top-right)
-    { type: 'Observer', angle: -Math.PI/2, color: 'cool-blue' },     // Top
-    { type: 'Coordinator', angle: -Math.PI/4, color: 'cool-blue' },  // Top-right
-    
-    // Red quadrant (bottom-right)
-    { type: 'Director', angle: 0, color: 'fiery-red' },              // Right
-    { type: 'Reformer', angle: -5*Math.PI/8, color: 'cool-blue' },   // Top-right (between blue/red)
-    { type: 'Motivator', angle: Math.PI/4, color: 'fiery-red' },     // Bottom-right
-    
-    // Yellow quadrant (bottom-left)
-    { type: 'Inspirer', angle: Math.PI/2, color: 'sunshine-yellow' }, // Bottom
-    { type: 'Helper', angle: 3*Math.PI/4, color: 'sunshine-yellow' }, // Bottom-left
-    
-    // Green quadrant (top-left)
-    { type: 'Supporter', angle: Math.PI, color: 'earth-green' }      // Left
+  // Define the personality types and their corresponding colors
+  const typeSegments = [
+    { type: 'REFORMER', startAngle: -Math.PI, endAngle: -0.75 * Math.PI, color: '#B53E90' }, // Reformer (top)
+    { type: 'DIRECTOR', startAngle: -0.75 * Math.PI, endAngle: -0.25 * Math.PI, color: '#D04E31' }, // Director (right)
+    { type: 'MOTIVATOR', startAngle: -0.25 * Math.PI, endAngle: 0.25 * Math.PI, color: '#E77C30' }, // Motivator (right-bottom)
+    { type: 'INSPIRER', startAngle: 0.25 * Math.PI, endAngle: 0.75 * Math.PI, color: '#F5D033' }, // Inspirer (bottom)
+    { type: 'HELPER', startAngle: 0.75 * Math.PI, endAngle: 1.25 * Math.PI, color: '#D6E04D' }, // Helper (bottom-left)
+    { type: 'SUPPORTER', startAngle: 1.25 * Math.PI, endAngle: 1.75 * Math.PI, color: '#7E9C3B' }, // Supporter (left)
+    { type: 'COORDINATOR', startAngle: 1.75 * Math.PI, endAngle: 2.25 * Math.PI, color: '#29857D' }, // Coordinator (left-top)
+    { type: 'OBSERVER', startAngle: 2.25 * Math.PI, endAngle: 2.75 * Math.PI, color: '#2E7CB9' }, // Observer (top)
   ];
   
-  ctx.font = '11px Arial';
-  
-  typePositions.forEach(pos => {
-    // Add more padding to ensure labels are not cut off
-    // Add extra padding for left/right positions to prevent cutoff
-    let padding = 35;
-    if (Math.abs(pos.angle) < Math.PI/4 || Math.abs(pos.angle - Math.PI) < Math.PI/4) {
-      padding = 60; // Extra padding for left/right labels
-    }
-    const x = centerX + (radius + padding) * Math.cos(pos.angle);
-    const y = centerY + (radius + padding) * Math.sin(pos.angle);
+  // Draw each segment and its label
+  typeSegments.forEach(segment => {
+    // Draw the colored band
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, segment.startAngle, segment.endAngle);
+    ctx.arc(centerX, centerY, radius - outerRingWidth, segment.endAngle, segment.startAngle, true);
+    ctx.closePath();
+    ctx.fillStyle = segment.color;
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1;
+    ctx.stroke();
     
-    // Set text alignment based on position for better readability
-    if (Math.abs(pos.angle) < Math.PI/4) { // Right side
-      ctx.textAlign = 'left';
-    } else if (Math.abs(pos.angle - Math.PI) < Math.PI/4) { // Left side
-      ctx.textAlign = 'right';
-    } else if (Math.abs(pos.angle + Math.PI/2) < Math.PI/4) { // Top
-      ctx.textAlign = 'center';
-      // Add extra spacing for top labels to prevent overlap with wheel
-    } else if (Math.abs(pos.angle - Math.PI/2) < Math.PI/4) { // Bottom
-      ctx.textAlign = 'center';
-    } else {
-      ctx.textAlign = 'center';
-    }
+    // Calculate position for the label
+    const midAngle = (segment.startAngle + segment.endAngle) / 2;
+    const labelRadius = radius - (outerRingWidth / 2);
+    const x = centerX + labelRadius * Math.cos(midAngle);
+    const y = centerY + labelRadius * Math.sin(midAngle);
     
-    // Adjust vertical alignment
-    let yOffset = 0;
-    if (pos.angle === -Math.PI/2) yOffset = -8; // Top - move up more
-    if (pos.angle === Math.PI/2) yOffset = 15;  // Bottom - move down more
+    // Adjust text rotation to follow the curve
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(midAngle + Math.PI/2); // Rotate text to align with band
     
-    ctx.fillStyle = colorMap[pos.color];
-    ctx.fillText(pos.type, x, y + yOffset);
+    // Draw the label
+    ctx.font = 'bold 12px Arial';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(segment.type, 0, 0);
+    
+    ctx.restore();
   });
 }
 
-// Draw a position indicator for the person's type
+// Draw number segments in the inner ring
+function drawSegmentNumbers(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  innerRadius: number,
+  outerRadius: number
+) {
+  // Define total segments and angle per segment
+  const totalSegments = 72;
+  const segmentAngle = (2 * Math.PI) / totalSegments;
+  
+  // Define which segments to show numbers for (based on reference image)
+  // We'll show numbers at regular intervals
+  const labelsToShow = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9,
+    10, 11, 12, 13, 14, 15, 16,
+    21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+    31, 32, 33, 34, 35, 36,
+    41, 42, 44, 45, 46, 47, 48, 49, 
+    50, 51, 52, 53, 54, 55, 56,
+    101, 104, 105, 108, 109, 112, 113, 116,
+    121, 124, 125, 128, 129, 132, 133, 136,
+    141, 144, 145, 148, 149, 152, 153, 156
+  ];
+  
+  // Set text properties
+  ctx.font = '9px Arial';
+  ctx.fillStyle = '#333';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  // Add the segment numbers
+  for (let i = 0; i < totalSegments; i++) {
+    const segmentNumber = i + 1;
+    
+    // Only draw numbers in our list
+    if (labelsToShow.includes(segmentNumber)) {
+      const middleAngle = i * segmentAngle;
+      const middleRadius = (innerRadius + outerRadius) / 2;
+      
+      // Calculate text position
+      const x = centerX + middleRadius * Math.cos(middleAngle - Math.PI/2);
+      const y = centerY + middleRadius * Math.sin(middleAngle - Math.PI/2);
+      
+      // Draw the number
+      ctx.fillText(segmentNumber.toString(), x, y);
+    }
+  }
+}
+
+// Draw center color wheel
+function drawCenterColorWheel(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  radius: number,
+  colorMap: Record<string, string>
+) {
+  // Draw the four color quadrants
+  const quadrants = [
+    { color: 'cool-blue', startAngle: -Math.PI/2, endAngle: 0 },
+    { color: 'fiery-red', startAngle: 0, endAngle: Math.PI/2 },
+    { color: 'sunshine-yellow', startAngle: Math.PI/2, endAngle: Math.PI },
+    { color: 'earth-green', startAngle: Math.PI, endAngle: 3*Math.PI/2 }
+  ];
+  
+  quadrants.forEach(quadrant => {
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, quadrant.startAngle, quadrant.endAngle);
+    ctx.closePath();
+    ctx.fillStyle = colorMap[quadrant.color];
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  });
+  
+  // Add a black circle around the wheel
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+// Draw a position indicator for the person's type with small color wheel
 function drawPersonalityIndicator(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -400,26 +471,46 @@ function drawPersonalityIndicator(
   ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
   ctx.fill();
   
-  // Draw indicator
+  // Draw small color wheel indicator
+  const miniWheelRadius = 10;
+  
+  // Draw four color quadrants in mini wheel
+  const quadrants = [
+    { color: 'cool-blue', startAngle: -Math.PI/2, endAngle: 0 },
+    { color: 'fiery-red', startAngle: 0, endAngle: Math.PI/2 },
+    { color: 'sunshine-yellow', startAngle: Math.PI/2, endAngle: Math.PI },
+    { color: 'earth-green', startAngle: Math.PI, endAngle: 3*Math.PI/2 }
+  ];
+  
+  quadrants.forEach(quadrant => {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.arc(x, y, miniWheelRadius, quadrant.startAngle, quadrant.endAngle);
+    ctx.closePath();
+    ctx.fillStyle = quadrant.color === 'fiery-red' ? '#E23D28' : 
+                    quadrant.color === 'sunshine-yellow' ? '#F2CF1D' : 
+                    quadrant.color === 'earth-green' ? '#42A640' : 
+                    '#1C77C3';
+    ctx.fill();
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  });
+  
+  // Add a black circle around the wheel
   ctx.beginPath();
-  ctx.arc(x, y, 10, 0, 2 * Math.PI);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.strokeStyle = '#333';
-  ctx.lineWidth = 2;
+  ctx.arc(x, y, miniWheelRadius, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 1;
   ctx.stroke();
   
-  // Draw "YOU" label
-  ctx.font = 'bold 12px Arial';
+  // Draw "YOU ARE HERE" label
+  ctx.font = 'bold 10px Arial';
   ctx.fillStyle = '#333';
   ctx.textAlign = 'center';
   ctx.fillText('YOU', x, y - 20);
   
-  // Draw personality type in center
-  ctx.font = 'bold 14px Arial';
-  ctx.fillStyle = '#333';
-  ctx.textAlign = 'center';
-  ctx.fillText(`Your Type: ${personalityType}`, centerX, centerY);
+  // No need to draw personality type in center as it's shown in the outer ring
 }
 
 // Draw legend and copyright info
@@ -457,11 +548,15 @@ function drawRingSegment(
   ctx.closePath();
   
   // Fill and stroke
-  ctx.fillStyle = hexToRgba(color, opacity);
+  ctx.fillStyle = color.startsWith('#') ? hexToRgba(color, opacity) : color;
   ctx.fill();
-  ctx.strokeStyle = hexToRgba(color, opacity + 0.1);
-  ctx.lineWidth = 0.5;
-  ctx.stroke();
+  
+  // Only add stroke if specified
+  if (color !== 'transparent') {
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
 }
 
 // Convert hex color to rgba
