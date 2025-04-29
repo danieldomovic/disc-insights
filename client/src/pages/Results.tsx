@@ -293,8 +293,88 @@ export default function Results() {
       const colorChart = document.querySelector('.color-chart-section canvas') as HTMLCanvasElement;
       if (colorChart) {
         const chartImg = colorChart.toDataURL('image/png');
-        pdf.addImage(chartImg, 'PNG', margin, yPos, contentWidth * 0.6, contentWidth * 0.6 * (colorChart.height / colorChart.width));
-        yPos += contentWidth * 0.6 * (colorChart.height / colorChart.width) + 10;
+        
+        // Set up for chart and legend side by side
+        const chartWidth = contentWidth * 0.5; // Chart takes 50% of content width
+        const chartHeight = chartWidth * (colorChart.height / colorChart.width);
+        const legendStartX = margin + chartWidth + 10; // Legend starts after chart plus padding
+        
+        // Add the chart image
+        pdf.addImage(chartImg, 'PNG', margin, yPos, chartWidth, chartHeight);
+        
+        // Add legend title
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text("Color Energy Legend:", legendStartX, yPos + 10);
+        
+        // Add detailed legend with color meaning
+        const legendItems = [
+          { 
+            color: 'fiery-red', 
+            name: 'Fiery Red', 
+            score: result.scores["fiery-red"],
+            desc: 'Competitive, demanding, determined, strong-willed, purposeful'
+          },
+          { 
+            color: 'sunshine-yellow', 
+            name: 'Sunshine Yellow', 
+            score: result.scores["sunshine-yellow"],
+            desc: 'Sociable, dynamic, demonstrative, enthusiastic, persuasive'
+          },
+          { 
+            color: 'earth-green', 
+            name: 'Earth Green', 
+            score: result.scores["earth-green"],
+            desc: 'Caring, encouraging, sharing, patient, relaxed'
+          },
+          { 
+            color: 'cool-blue', 
+            name: 'Cool Blue', 
+            score: result.scores["cool-blue"],
+            desc: 'Cautious, precise, deliberate, questioning, formal'
+          }
+        ];
+        
+        let legendY = yPos + 22;
+        pdf.setFontSize(9);
+        
+        // Add each color item to legend
+        legendItems.forEach(item => {
+          // Color circle
+          switch(item.color) {
+            case 'fiery-red':
+              pdf.setFillColor(221, 51, 51);
+              break;
+            case 'sunshine-yellow':
+              pdf.setFillColor(240, 180, 0);
+              break;
+            case 'earth-green':
+              pdf.setFillColor(0, 150, 57);
+              break;
+            case 'cool-blue':
+              pdf.setFillColor(0, 114, 187);
+              break;
+          }
+          
+          // Draw color circle
+          pdf.circle(legendStartX + 3, legendY - 3, 3, 'F');
+          
+          // Add color name and score
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(0, 0, 0);
+          pdf.text(`${item.name}: ${item.score}%`, legendStartX + 8, legendY);
+          
+          // Add description
+          pdf.setFont('helvetica', 'normal');
+          pdf.setTextColor(80, 80, 80);
+          const descLines = pdf.splitTextToSize(item.desc, contentWidth * 0.4);
+          pdf.text(descLines, legendStartX + 8, legendY + 4);
+          
+          legendY += 15 + (descLines.length - 1) * 4;
+        });
+        
+        // Determine the new vertical position after chart and legend
+        yPos += Math.max(chartHeight, legendY - yPos) + 10;
       } else {
         yPos += 70; // Skip space if chart not available
       }
@@ -305,7 +385,12 @@ export default function Results() {
       const typeSummary = `Your profile identifies you as a ${result.personalityType} type, with dominant ${colorProfiles[result.dominantColor].name} energy and supporting ${colorProfiles[result.secondaryColor as ColorType].name} energy.`;
       yPos += addWrappedText(typeSummary, margin, yPos, contentWidth, 11) + 5;
       
-      // Add personality description
+      // Add more detailed personality type explanation
+      const typeDetail = `As a ${result.personalityType}, you balance analytical thinking with decisive action. Your combination of energies gives you the ability to evaluate situations objectively while still maintaining focus on results and outcomes. This makes you particularly effective in roles that require both careful analysis and decisive implementation.`;
+      
+      yPos += addWrappedText(typeDetail, margin, yPos, contentWidth, 11) + 8;
+      
+      // Add personality description (non-redundant)
       yPos += addWrappedText(profile.description, margin, yPos, contentWidth, 11) + 10;
       
       // ===== PERSONAL STYLE =====
