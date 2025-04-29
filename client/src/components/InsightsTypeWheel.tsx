@@ -141,28 +141,39 @@ export default function InsightsTypeWheel({
       ctx.stroke();
     });
 
-    // Add position indicators
+    // Add position indicators with actual scores
     const indicator1 = { x: centerX + maxRadius * 0.4, y: centerY - maxRadius * 0.4 };
     const indicator2 = { x: centerX + maxRadius * 0.6, y: centerY - maxRadius * 0.2 };
 
     [indicator1, indicator2].forEach(pos => {
+      // Draw white background circle
       ctx.beginPath();
       ctx.arc(pos.x, pos.y, 15, 0, 2 * Math.PI);
       ctx.fillStyle = '#FFFFFF';
       ctx.fill();
       ctx.stroke();
 
-      // Add mini DISC chart
+      // Add mini DISC chart with actual scores
       const miniRadius = 12;
-      discSegments.forEach((color, i) => {
-        const startAngle = -Math.PI/2 + (i * Math.PI/2);
+      let totalScore = 0;
+      discSegments.forEach(color => {
+        totalScore += scores[color];
+      });
+
+      let currentAngle = -Math.PI/2; // Start at top
+      discSegments.forEach(color => {
+        const score = scores[color];
+        const angle = (score / totalScore) * (2 * Math.PI);
+        
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
-        ctx.arc(pos.x, pos.y, miniRadius, startAngle, startAngle + Math.PI/2);
+        ctx.arc(pos.x, pos.y, miniRadius, currentAngle, currentAngle + angle);
         ctx.closePath();
         ctx.fillStyle = discColors[color];
         ctx.fill();
         ctx.stroke();
+        
+        currentAngle += angle;
       });
     });
 
