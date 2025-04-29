@@ -42,7 +42,7 @@ export default function InsightsTypeWheel({
     ctx.fillText('The Insights Discovery® 72 Type Wheel', centerX, 40);
     
     // Draw the entire wheel
-    drawWheel(ctx, centerX, centerY, maxRadius, personalityType, scores);
+    drawDiscWheel(ctx, centerX, centerY, maxRadius, personalityType, scores);
     
     // Draw copyright
     ctx.font = '12px Arial';
@@ -59,8 +59,55 @@ export default function InsightsTypeWheel({
   );
 }
 
-// Main function to draw the entire wheel
-function drawWheel(
+// Constants for the wheel
+const RADII_RATIOS = [1.0, 0.75, 0.5, 0.25]; // Normalized radii for the rings
+const CENTER_RADIUS_RATIO = 0.15; // Radius of central DISC wheel as ratio of max radius
+const RIM_COLORS = {
+  'REFORMER': '#AF6BAA',    // Purple
+  'DIRECTOR': '#E15736',    // Red
+  'MOTIVATOR': '#F28E2B',   // Orange
+  'INSPIRER': '#F1C84C',    // Yellow
+  'HELPER': '#D5D95D',      // Light green
+  'SUPPORTER': '#7EB758',   // Green
+  'COORDINATOR': '#1B8673', // Teal
+  'OBSERVER': '#4576A8'     // Blue
+};
+
+// DISC colors for central wheel and mini pie charts
+const DISC_COLORS = {
+  'BLUE': '#2B70B6',   // Top-left (Cool Blue)
+  'RED': '#E13A3E',    // Top-right (Fiery Red)
+  'GREEN': '#9BB53C',  // Bottom-left (Earth Green)
+  'YELLOW': '#F4D35E'  // Bottom-right (Sunshine Yellow)
+};
+
+// Cell numbers in concentric rings (4x8 grid)
+const CELL_NUMBERS = [
+  [1, 2, 3, 4, 5, 6, 7, 8],                    // Outermost ring
+  [101, 102, 103, 104, 105, 108, 109, 112],    // Second ring
+  [121, 122, 123, 124, 125, 128, 129, 132],    // Third ring
+  [141, 142, 143, 144, 145, 148, 149, 152]     // Innermost ring
+];
+
+// Mini pie positions and slices
+const PIE1 = {
+  position: {
+    angleDeg: 22.5,  // Angle in degrees from top
+    radiusRatio: 0.55 // Distance as ratio of max radius
+  },
+  slices: [0.35, 0.25, 0.25, 0.15]  // BLUE, RED, GREEN, YELLOW proportions
+};
+
+const PIE2 = {
+  position: {
+    angleDeg: 67.5,  // Angle in degrees from top
+    radiusRatio: 0.85 // Distance as ratio of max radius
+  },
+  slices: [0.45, 0.30, 0.15, 0.10]  // BLUE, RED, GREEN, YELLOW proportions
+};
+
+// Main function to draw the DISC wheel
+function drawDiscWheel(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
@@ -68,78 +115,31 @@ function drawWheel(
   personalityType: PersonalityType,
   scores: Record<ColorType, number>
 ) {
-  // Define constants based on specifications
-  const RIM_COLORS = {
-    'REFORMER': '#AF6BAA',
-    'DIRECTOR': '#E15736',
-    'MOTIVATOR': '#F28E2B',
-    'INSPIRER': '#F1C84C',
-    'HELPER': '#D5D95D',
-    'SUPPORTER': '#7EB758',
-    'COORDINATOR': '#1B8673',
-    'OBSERVER': '#4576A8'
-  };
-  
-  const DISC_COLORS = {
-    'BLUE': '#2B70B6',   // Top-left (Cool Blue)
-    'RED': '#E13A3E',    // Top-right (Fiery Red)
-    'GREEN': '#9BB53C',  // Bottom-left (Earth Green)
-    'YELLOW': '#F4D35E'  // Bottom-right (Sunshine Yellow)
-  };
-  
-  const GRAY_COLOR = '#ECECEC';
-  const WHITE_COLOR = '#FFFFFF';
-  
-  const RADII_RATIOS = [1.0, 0.8, 0.6, 0.4, 0.2]; // 4 rings + center
+  // Calculate actual radii from ratios
   const radii = RADII_RATIOS.map(ratio => radius * ratio);
+  const centerRadius = radius * CENTER_RADIUS_RATIO;
   
-  // Cell numbers in concentric rings (4x8 grid)
-  const CELL_NUMBERS = [
-    [1, 2, 3, 4, 5, 6, 7, 8],            // Outermost ring
-    [101, 102, 103, 104, 105, 108, 109, 112],  // Second ring
-    [121, 122, 123, 124, 125, 128, 129, 132],  // Third ring
-    [141, 142, 143, 144, 145, 148, 149, 152]   // Innermost ring
-  ];
-  
-  // Mini pie slices data for the two indicators
-  const PIE1_POSITION = {
-    angle: Math.PI/8, // 22.5 degrees
-    distance: 0.55 * radius,
-    slices: [0.35, 0.25, 0.25, 0.15]
-  };
-  
-  const PIE2_POSITION = {
-    angle: 3*Math.PI/8, // 67.5 degrees
-    distance: 0.85 * radius,
-    slices: [0.45, 0.30, 0.15, 0.10]
-  };
-  
-  // Draw the 3 gray/white alternating bands
+  // Draw alternating gray/white bands
   drawConcentrisBands(ctx, centerX, centerY, radii);
   
-  // Draw the outer colored rim with labels
-  drawColoredRim(ctx, centerX, centerY, radii[0], RIM_COLORS);
+  // Draw the outer colored rim with type labels
+  drawColoredRim(ctx, centerX, centerY, radius);
   
   // Draw radial guides (solid axes and dashed bisectors)
-  drawRadialGuides(ctx, centerX, centerY, radii[0]);
+  drawRadialGuides(ctx, centerX, centerY, radius);
   
-  // Draw cell numbers
-  drawCellNumbers(ctx, centerX, centerY, radii, CELL_NUMBERS);
+  // Draw cell numbers in each segment
+  drawCellNumbers(ctx, centerX, centerY, radii);
   
   // Draw central DISC wheel
-  drawDISCWheel(ctx, centerX, centerY, radii[4], DISC_COLORS);
+  drawCentralDisc(ctx, centerX, centerY, centerRadius);
   
-  // Draw the two mini pie charts (indicators)
-  const pie1X = centerX + PIE1_POSITION.distance * Math.cos(PIE1_POSITION.angle);
-  const pie1Y = centerY + PIE1_POSITION.distance * Math.sin(PIE1_POSITION.angle);
-  drawMiniPieChart(ctx, pie1X, pie1Y, 15, PIE1_POSITION.slices, DISC_COLORS);
+  // Draw mini pie charts (position indicators)
+  drawMiniPie(ctx, centerX, centerY, radius, PIE1.position, PIE1.slices);
+  drawMiniPie(ctx, centerX, centerY, radius, PIE2.position, PIE2.slices);
   
-  const pie2X = centerX + PIE2_POSITION.distance * Math.cos(PIE2_POSITION.angle);
-  const pie2Y = centerY + PIE2_POSITION.distance * Math.sin(PIE2_POSITION.angle);
-  drawMiniPieChart(ctx, pie2X, pie2Y, 15, PIE2_POSITION.slices, DISC_COLORS);
-  
-  // Draw label for active type (Your position)
-  drawPositionLabel(ctx, personalityType, centerX, centerY, radii[0], RIM_COLORS);
+  // Draw indicator for the user's personality type position
+  drawPersonalityIndicator(ctx, centerX, centerY, radius, personalityType);
 }
 
 // Draw concentric bands with alternating gray/white fill
@@ -149,27 +149,31 @@ function drawConcentrisBands(
   centerY: number,
   radii: number[]
 ) {
-  // Draw each concentric band (4 rings total)
+  const GRAY_COLOR = '#ECECEC'; // Light gray color
+  const WHITE_COLOR = '#FFFFFF';
+  
+  // Draw each concentric band (between consecutive radii)
   for (let i = 0; i < radii.length - 1; i++) {
     // Alternate fill colors
-    const fillColor = i % 2 === 0 ? '#ECECEC' : '#FFFFFF';
+    const fillColor = i % 2 === 0 ? GRAY_COLOR : WHITE_COLOR;
     
-    // Draw the band
+    // Draw band (annular ring)
     ctx.beginPath();
     ctx.arc(centerX, centerY, radii[i], 0, 2 * Math.PI);
     ctx.arc(centerX, centerY, radii[i+1], 0, 2 * Math.PI, true);
+    ctx.closePath();
     ctx.fillStyle = fillColor;
     ctx.fill();
     
-    // Draw the circle at each radius
+    // Draw circle outline at this radius
     ctx.beginPath();
     ctx.arc(centerX, centerY, radii[i], 0, 2 * Math.PI);
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = i === 0 ? 2 : 1;  // Thicker line for outermost circle
+    ctx.lineWidth = i === 0 ? 2 : 1; // Thicker line for outermost circle
     ctx.stroke();
   }
   
-  // Draw innermost circle
+  // Draw innermost circle outline
   ctx.beginPath();
   ctx.arc(centerX, centerY, radii[radii.length-1], 0, 2 * Math.PI);
   ctx.strokeStyle = '#000000';
@@ -182,40 +186,41 @@ function drawColoredRim(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
-  outerRadius: number,
-  rimColors: Record<string, string>
+  radius: number
 ) {
-  const innerRadius = outerRadius * 0.9; // 10% width for rim
-  const typeLabels = Object.keys(rimColors);
-  const segmentAngle = (2 * Math.PI) / typeLabels.length;
+  const rimWidth = radius * 0.1; // Width of rim (10% of max radius)
+  const innerRadius = radius - rimWidth;
+  const typeLabels = Object.keys(RIM_COLORS);
+  const segmentAngle = (2 * Math.PI) / typeLabels.length; // 45° in radians
   
-  // Draw each segment
+  // Draw each colored segment and its label
   typeLabels.forEach((label, index) => {
+    // Calculate angles (clockwise from top)
     const startAngle = -Math.PI/2 + (index * segmentAngle);
     const endAngle = startAngle + segmentAngle;
     const midAngle = startAngle + (segmentAngle / 2);
     
-    // Draw rim segment
+    // Draw colored rim segment
     ctx.beginPath();
-    ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
     ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
     ctx.closePath();
-    ctx.fillStyle = rimColors[label];
+    ctx.fillStyle = RIM_COLORS[label];
     ctx.fill();
-    ctx.strokeStyle = '#000000';
+    ctx.strokeStyle = '#FFFFFF'; // White borders between segments
     ctx.lineWidth = 1;
     ctx.stroke();
     
-    // Add label
-    const labelRadius = (outerRadius + innerRadius) / 2;
+    // Position and rotate text for the curved label
+    const labelRadius = (radius + innerRadius) / 2;
     const x = centerX + labelRadius * Math.cos(midAngle);
     const y = centerY + labelRadius * Math.sin(midAngle);
     
-    // Rotate and position text along the arc
     ctx.save();
     ctx.translate(x, y);
-    ctx.rotate(midAngle + Math.PI/2);
+    ctx.rotate(midAngle + Math.PI/2); // Rotate text to follow the arc
     
+    // Draw the label
     ctx.font = 'bold 12px Arial';
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
@@ -226,36 +231,40 @@ function drawColoredRim(
   });
 }
 
-// Draw horizontal, vertical, and diagonal guides
+// Draw radial guide lines (axes and bisectors)
 function drawRadialGuides(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
   radius: number
 ) {
-  // Draw main axes (solid)
+  // Draw main axes (solid lines at 0°, 90°, 180°, 270°)
   ctx.beginPath();
-  // Horizontal
+  // Horizontal axis
   ctx.moveTo(centerX - radius, centerY);
   ctx.lineTo(centerX + radius, centerY);
-  // Vertical
+  // Vertical axis
   ctx.moveTo(centerX, centerY - radius);
   ctx.lineTo(centerX, centerY + radius);
   ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1;
   ctx.stroke();
   
-  // Draw bisector guides (dashed) - 22.5° increments
-  ctx.setLineDash([5, 3]);
+  // Draw bisector guides (dashed lines at 22.5° increments)
+  ctx.setLineDash([5, 3]); // Dashed line pattern
   ctx.beginPath();
   
+  // Draw bisector lines (at 22.5°, 67.5°, 112.5°, 157.5°, etc.)
   for (let i = 0; i < 4; i++) {
-    const angle = (i * Math.PI / 4) + (Math.PI / 8);
+    const angle = (i * Math.PI / 4) + (Math.PI / 8); // 22.5°, 112.5°, 202.5°, 292.5°
+    
+    // Calculate end points
     const startX = centerX + radius * Math.cos(angle);
     const startY = centerY + radius * Math.sin(angle);
-    const endX = centerX + radius * Math.cos(angle + Math.PI);
+    const endX = centerX + radius * Math.cos(angle + Math.PI); // opposite point
     const endY = centerY + radius * Math.sin(angle + Math.PI);
     
+    // Draw the dashed line
     ctx.moveTo(startX, startY);
     ctx.lineTo(endX, endY);
   }
@@ -263,7 +272,7 @@ function drawRadialGuides(
   ctx.strokeStyle = '#000000';
   ctx.lineWidth = 1;
   ctx.stroke();
-  ctx.setLineDash([]); // Reset dash pattern
+  ctx.setLineDash([]); // Reset to solid line
 }
 
 // Draw cell numbers in each segment
@@ -271,11 +280,10 @@ function drawCellNumbers(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
-  radii: number[],
-  cellNumbers: number[][]
+  radii: number[]
 ) {
-  const numSections = 8;
-  const segmentAngle = (2 * Math.PI) / numSections;
+  const numSections = 8; // 8 equal segments
+  const segmentAngle = (2 * Math.PI) / numSections; // 45° in radians
   
   ctx.font = '10px Arial';
   ctx.fillStyle = '#000000';
@@ -283,65 +291,67 @@ function drawCellNumbers(
   ctx.textBaseline = 'middle';
   
   // For each ring
-  for (let ring = 0; ring < cellNumbers.length; ring++) {
+  for (let ring = 0; ring < CELL_NUMBERS.length; ring++) {
     const innerRadius = radii[ring + 1];
     const outerRadius = radii[ring];
     const midRadius = (innerRadius + outerRadius) / 2;
     
     // For each segment
     for (let segment = 0; segment < numSections; segment++) {
-      const number = cellNumbers[ring][segment];
+      const number = CELL_NUMBERS[ring][segment];
+      // Calculate angle (clockwise from top)
       const angle = -Math.PI/2 + (segment * segmentAngle) + (segmentAngle / 2);
       
+      // Calculate position
       const x = centerX + midRadius * Math.cos(angle);
       const y = centerY + midRadius * Math.sin(angle);
       
+      // Draw the number
       ctx.fillText(number.toString(), x, y);
     }
   }
 }
 
-// Draw central DISC color wheel
-function drawDISCWheel(
+// Draw central DISC quartered circle
+function drawCentralDisc(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
-  radius: number,
-  discColors: Record<string, string>
+  radius: number
 ) {
-  const colors = Object.values(discColors);
+  const colors = Object.values(DISC_COLORS);
   
-  // Draw the four quadrants
-  ctx.beginPath();
-  ctx.moveTo(centerX, centerY);
-  ctx.arc(centerX, centerY, radius, -Math.PI/2, 0);
-  ctx.lineTo(centerX, centerY);
-  ctx.closePath();
-  ctx.fillStyle = colors[1]; // RED - top right
-  ctx.fill();
-  
-  ctx.beginPath();
-  ctx.moveTo(centerX, centerY);
-  ctx.arc(centerX, centerY, radius, 0, Math.PI/2);
-  ctx.lineTo(centerX, centerY);
-  ctx.closePath();
-  ctx.fillStyle = colors[3]; // YELLOW - bottom right
-  ctx.fill();
-  
-  ctx.beginPath();
-  ctx.moveTo(centerX, centerY);
-  ctx.arc(centerX, centerY, radius, Math.PI/2, Math.PI);
-  ctx.lineTo(centerX, centerY);
-  ctx.closePath();
-  ctx.fillStyle = colors[2]; // GREEN - bottom left
-  ctx.fill();
-  
+  // Draw each quadrant
+  // Top-left (BLUE)
   ctx.beginPath();
   ctx.moveTo(centerX, centerY);
   ctx.arc(centerX, centerY, radius, Math.PI, 3*Math.PI/2);
-  ctx.lineTo(centerX, centerY);
   ctx.closePath();
-  ctx.fillStyle = colors[0]; // BLUE - top left
+  ctx.fillStyle = colors[0]; // BLUE
+  ctx.fill();
+  
+  // Top-right (RED)
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY);
+  ctx.arc(centerX, centerY, radius, -Math.PI/2, 0);
+  ctx.closePath();
+  ctx.fillStyle = colors[1]; // RED
+  ctx.fill();
+  
+  // Bottom-left (GREEN)
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY);
+  ctx.arc(centerX, centerY, radius, Math.PI/2, Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = colors[2]; // GREEN
+  ctx.fill();
+  
+  // Bottom-right (YELLOW)
+  ctx.beginPath();
+  ctx.moveTo(centerX, centerY);
+  ctx.arc(centerX, centerY, radius, 0, Math.PI/2);
+  ctx.closePath();
+  ctx.fillStyle = colors[3]; // YELLOW
   ctx.fill();
   
   // Draw outline
@@ -352,36 +362,46 @@ function drawDISCWheel(
   ctx.stroke();
 }
 
-// Draw mini pie chart (position indicators)
-function drawMiniPieChart(
+// Draw mini pie chart
+function drawMiniPie(
   ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  radius: number,
-  slices: number[],
-  colors: Record<string, string>
+  centerX: number,
+  centerY: number,
+  maxRadius: number,
+  position: { angleDeg: number, radiusRatio: number },
+  slices: number[]
 ) {
-  const colorValues = Object.values(colors);
-  let startAngle = 0;
+  // Convert angle from degrees to radians (clockwise from top)
+  const angleRad = (position.angleDeg - 90) * Math.PI / 180;
   
-  // Draw white background
+  // Calculate position in cartesian coordinates
+  const distance = position.radiusRatio * maxRadius;
+  const x = centerX + distance * Math.cos(angleRad);
+  const y = centerY + distance * Math.sin(angleRad);
+  
+  const pieRadius = maxRadius * 0.06; // Size of mini pie chart
+  
+  // Draw white background circle with slight padding
   ctx.beginPath();
-  ctx.arc(x, y, radius + 3, 0, 2 * Math.PI);
+  ctx.arc(x, y, pieRadius + 2, 0, 2 * Math.PI);
   ctx.fillStyle = '#FFFFFF';
   ctx.fill();
   ctx.strokeStyle = '#000000';
   ctx.lineWidth = 0.5;
   ctx.stroke();
   
-  // Draw each slice
+  // Draw the slices
+  const colors = Object.values(DISC_COLORS);
+  let startAngle = Math.PI; // Start from top (180° in radians)
+  
   slices.forEach((slice, i) => {
     const endAngle = startAngle + (slice * 2 * Math.PI);
     
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.arc(x, y, radius, startAngle, endAngle);
+    ctx.arc(x, y, pieRadius, startAngle, endAngle);
     ctx.closePath();
-    ctx.fillStyle = colorValues[i];
+    ctx.fillStyle = colors[i];
     ctx.fill();
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 1;
@@ -390,47 +410,35 @@ function drawMiniPieChart(
     startAngle = endAngle;
   });
   
-  // Draw outline
-  ctx.beginPath();
-  ctx.arc(x, y, radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-  
-  // "YOU" label
+  // Add "YOU" label above pie
   ctx.font = 'bold 9px Arial';
   ctx.fillStyle = '#000000';
   ctx.textAlign = 'center';
-  ctx.fillText('YOU', x, y - radius - 8);
+  ctx.fillText('YOU', x, y - pieRadius - 8);
 }
 
-// Draw position label for the personality type
-function drawPositionLabel(
+// Draw indicator for personality type position
+function drawPersonalityIndicator(
   ctx: CanvasRenderingContext2D,
-  personalityType: PersonalityType,
   centerX: number,
   centerY: number,
   radius: number,
-  rimColors: Record<string, string>
+  personalityType: PersonalityType
 ) {
-  // Find the segment for this personality type
-  const angleMap: Record<PersonalityType, number> = {
-    'Reformer': -Math.PI/2,            // Top (0 degrees)
-    'Director': -Math.PI/4,            // Top-right (45 degrees)
-    'Motivator': 0,                    // Right (90 degrees)
-    'Inspirer': Math.PI/4,             // Bottom-right (135 degrees)
-    'Helper': Math.PI/2,               // Bottom (180 degrees)
-    'Supporter': 3*Math.PI/4,          // Bottom-left (225 degrees)
-    'Coordinator': Math.PI,            // Left (270 degrees)
-    'Observer': -3*Math.PI/4           // Top-left (315 degrees)
+  // Map personality types to angles (in radians, clockwise from top)
+  const typeAngles: Record<PersonalityType, number> = {
+    'Reformer': -Math.PI/2,           // Top (0°)
+    'Director': -Math.PI/4,           // Top-right (45°)
+    'Motivator': 0,                   // Right (90°)
+    'Inspirer': Math.PI/4,            // Bottom-right (135°)
+    'Helper': Math.PI/2,              // Bottom (180°)
+    'Supporter': 3*Math.PI/4,         // Bottom-left (225°)
+    'Coordinator': Math.PI,           // Left (270°)
+    'Observer': -3*Math.PI/4          // Top-left (315°)
   };
   
-  // Position a small marker at the edge of the wheel in the appropriate segment
-  const angle = angleMap[personalityType];
+  const angle = typeAngles[personalityType];
   
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, radius * 1.05, angle - 0.05, angle + 0.05);
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 3;
-  ctx.stroke();
+  // Draw a subtle indicator on the rim at the appropriate position
+  // (we've chosen to show the position with the mini pie charts instead of a rim marker)
 }
