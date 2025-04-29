@@ -156,41 +156,20 @@ export default function InsightsTypeWheel({
       // Add mini DISC chart with actual scores
       const miniRadius = 12;
       let totalScore = 0;
-      let totalLessConsciousScore = 0;
-      
       discSegments.forEach(color => {
         totalScore += scores[color];
-        // Calculate less conscious score as inverse of conscious score
-        totalLessConsciousScore += (6 - scores[color]) * 0.7; // Using same factor as ColorDynamicsChart
       });
 
       let currentAngle = -Math.PI/2; // Start at top
-      
-      // For second indicator (less conscious), make it more transparent
-      const isLessConscious = pos === indicator2;
-      const opacity = isLessConscious ? 0.6 : 1;
-      
       discSegments.forEach(color => {
-        let score;
-        if (isLessConscious) {
-          // Calculate less conscious score
-          score = (6 - scores[color]) * 0.7;
-          score = score / totalLessConsciousScore;
-        } else {
-          score = scores[color] / totalScore;
-        }
-        
-        const angle = score * (2 * Math.PI);
+        const score = scores[color];
+        const angle = (score / totalScore) * (2 * Math.PI);
         
         ctx.beginPath();
         ctx.moveTo(pos.x, pos.y);
         ctx.arc(pos.x, pos.y, miniRadius, currentAngle, currentAngle + angle);
         ctx.closePath();
-        
-        // Set fill style with opacity
-        const color_rgb = discColors[color];
-        const rgb_values = color_rgb.match(/\d+/g);
-        ctx.fillStyle = `rgba(${rgb_values![0]}, ${rgb_values![1]}, ${rgb_values![2]}, ${opacity})`;
+        ctx.fillStyle = discColors[color];
         ctx.fill();
         ctx.stroke();
         
