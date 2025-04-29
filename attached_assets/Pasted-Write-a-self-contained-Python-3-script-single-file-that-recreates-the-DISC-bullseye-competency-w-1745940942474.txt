@@ -1,0 +1,43 @@
+Write a self-contained Python 3 script (single file) that recreates the DISC “bullseye” competency wheel shown in the attached image.
+
+REQUIREMENTS
+1. Use only matplotlib (no seaborn, plotly, etc.).
+2. Canvas size: 8 × 8 in, equal aspect.
+3. Structure:
+   • 8 equal 45° wedges labelled, clockwise from the top:  
+     “REFORMER”, “DIRECTOR”, “MOTIVATOR”, “INSPIRER”,  
+     “HELPER”, “SUPPORTER”, “COORDINATOR”, “OBSERVER”.  
+     - Label text sits on the coloured outer rim, curved along the arc.  
+     - Rim colours (hex):  
+       Reformer #AF6BAA, Director #E15736, Motivator #F28E2B, Inspirer #F1C84C,  
+       Helper #D5D95D, Supporter #7EB758, Coordinator #1B8673, Observer #4576A8.
+4. Concentric rings:
+   • 4 radii → 3 gray “score” bands plus the white centre.  
+   • Alternate gray/white fill starting with light-gray (#ECECEC) for the outermost band.  
+   • Bold black circle outlines at each radius.
+5. Radial guides:
+   • Solid black lines on the 0°, 90°, 180°, 270° axes.  
+   • Dashed black guides at 22.5° increments (i.e., the bisectors of each wedge).
+6. Cell numbers:
+   • Load the 4 × 8 integer grid below and place each number centred in its cell:  
+
+     ```python
+     data = [
+         [  1,   2,   3,   4,   5,   6,   7,   8],   # outermost ring
+         [101, 102, 103, 104, 105, 108, 109, 112],   # second ring
+         [121, 122, 123, 124, 125, 128, 129, 132],   # third ring
+         [141, 142, 143, 144, 145, 148, 149, 152]    # innermost score ring
+     ]
+     ```
+7. Central DISC quartered circle: four equal quadrants (top-left blue #2B70B6, top-right red #E13A3E, bottom-left green #9BB53C, bottom-right yellow #F4D35E) with a thin black outline.
+8. Two miniature pie charts:
+   • First pie: centre at polar (θ = 22.5°, r ≈ 0.55 × max) with 4 slices [0.35, 0.25, 0.25, 0.15] and matching blue/red/green/yellow colours; draw a black 1-pt outline around each wedge.  
+   • Second pie: centre at polar (θ = 67.5°, r ≈ 0.85 × max) with slices [0.45, 0.30, 0.15, 0.10] and same colours.
+9. Automatically hide axes, ticks, and frame.
+10. Save figure to “disc_wheel.png”.
+
+Be sure to:
+- Build polar coordinates manually with matplotlib.patches.Wedge for full control.  
+- Wrap repetitive wedge drawing in helper functions.  
+- Keep code under 150 lines and include clear inline comments.
+- Put all magic numbers (radii, colours, labels) as named constants at the top.
