@@ -69,7 +69,8 @@ export default function InsightsTypeWheel({
       personalityPositions.angle,
       personalityPositions.distance,
       colorMap[dominantColor as keyof typeof colorMap],
-      personalityType
+      personalityType,
+      scores
     );
     
     // Draw legend and copyright
@@ -376,29 +377,29 @@ function drawSegmentNumbers(
   
   // Define all numbers to show based on the reference image
   // Mapping angle in degrees to label text for precise positioning
-  const angleToLabelMap: Record<number, string> = {
-    // Top quadrant
-    0: "1", 15: "2", 30: "3", 45: "4", 60: "5", 75: "6", 90: "7",
-    105: "8", 120: "9", 135: "10", 150: "11", 165: "12", 180: "13",
-    195: "14", 210: "15", 225: "16",
+  const angleToLabelMap = new Map<number, string>([
+    // Top quadrant - outer ring
+    [0, "1"], [15, "2"], [30, "3"], [45, "4"], [60, "5"], [75, "6"], [90, "7"],
+    [105, "8"], [120, "9"], [135, "10"], [150, "11"], [165, "12"], [180, "13"],
+    [195, "14"], [210, "15"], [225, "16"],
     
     // Inner numbers - second ring
-    5: "21", 20: "22", 35: "23", 50: "24", 65: "25", 80: "26", 
-    95: "27", 110: "28", 125: "29", 140: "30", 155: "31", 170: "32", 
-    185: "33", 200: "34", 215: "35", 230: "36",
+    [5, "21"], [20, "22"], [35, "23"], [50, "24"], [65, "25"], [80, "26"], 
+    [95, "27"], [110, "28"], [125, "29"], [140, "30"], [155, "31"], [170, "32"], 
+    [185, "33"], [200, "34"], [215, "35"], [230, "36"],
     
     // Inner numbers - third ring
-    10: "41", 25: "42", 40: "44", 55: "45", 70: "46", 85: "47", 
-    100: "48", 115: "49", 130: "50", 145: "51", 160: "52", 175: "53", 
-    190: "54", 205: "55", 220: "56",
+    [10, "41"], [25, "42"], [40, "44"], [55, "45"], [70, "46"], [85, "47"], 
+    [100, "48"], [115, "49"], [130, "50"], [145, "51"], [160, "52"], [175, "53"], 
+    [190, "54"], [205, "55"], [220, "56"],
     
     // Three-digit numbers for gray segments
-    7: "101", 22: "121", 37: "141", 52: "101", 67: "104", 82: "105", 
-    97: "108", 112: "109", 127: "112", 142: "113", 157: "116", 
-    172: "121", 187: "124", 202: "125", 217: "128", 232: "129", 
-    247: "132", 262: "133", 277: "136", 292: "141", 307: "144", 
-    322: "145", 337: "148", 352: "149", 7: "152", 22: "153", 37: "156"
-  };
+    [7, "101"], [23, "121"], [38, "141"], [53, "101"], [68, "104"], [83, "105"], 
+    [98, "108"], [113, "109"], [128, "112"], [143, "113"], [158, "116"], 
+    [173, "121"], [188, "124"], [203, "125"], [218, "128"], [233, "129"], 
+    [248, "132"], [263, "133"], [278, "136"], [293, "141"], [308, "144"], 
+    [323, "145"], [338, "148"], [353, "149"], [2, "152"], [17, "153"], [32, "156"]
+  ]);
   
   // Set text properties
   ctx.font = '9px Arial';
@@ -410,8 +411,8 @@ function drawSegmentNumbers(
   const middleRadius = (innerRadius + outerRadius) / 2;
   
   // Draw each number at the specified angle
-  Object.entries(angleToLabelMap).forEach(([angleDeg, label]) => {
-    const angleRad = (parseInt(angleDeg) * Math.PI / 180) - Math.PI/2; // Convert to radians, adjust to start from top
+  angleToLabelMap.forEach((label, angleDeg) => {
+    const angleRad = (angleDeg * Math.PI / 180) - Math.PI/2; // Convert to radians, adjust to start from top
     
     // Calculate position
     const x = centerX + middleRadius * Math.cos(angleRad);
@@ -458,7 +459,7 @@ function drawCenterColorWheel(
   ctx.stroke();
 }
 
-// Draw a position indicator for the person's type with small color wheel
+// Draw a position indicator for the person's type with personal score distribution
 function drawPersonalityIndicator(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -467,59 +468,93 @@ function drawPersonalityIndicator(
   angle: number,
   distanceFactor: number,
   color: string,
-  personalityType: string
+  personalityType: string,
+  scores: Record<ColorType, number> = {
+    'fiery-red': 25,
+    'sunshine-yellow': 25,
+    'earth-green': 25,
+    'cool-blue': 25
+  }
 ) {
   // Calculate position
   const distance = radius * distanceFactor;
   const x = centerX + distance * Math.cos(angle);
   const y = centerY + distance * Math.sin(angle);
   
-  // Draw highlight circle
+  // Draw white background circle
   ctx.beginPath();
   ctx.arc(x, y, 15, 0, 2 * Math.PI);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
   ctx.fill();
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
   
-  // Draw small color wheel indicator
-  const miniWheelRadius = 10;
+  // Size of the personal profile circle
+  const profileRadius = 12;
   
-  // Draw four color quadrants in mini wheel
-  const quadrants = [
-    { color: 'cool-blue', startAngle: -Math.PI/2, endAngle: 0 },
-    { color: 'fiery-red', startAngle: 0, endAngle: Math.PI/2 },
-    { color: 'sunshine-yellow', startAngle: Math.PI/2, endAngle: Math.PI },
-    { color: 'earth-green', startAngle: Math.PI, endAngle: 3*Math.PI/2 }
-  ];
+  // Color mapping for the profile
+  const colorMap = {
+    'fiery-red': '#E23D28',
+    'sunshine-yellow': '#F2CF1D',
+    'earth-green': '#42A640',
+    'cool-blue': '#1C77C3'
+  };
   
-  quadrants.forEach(quadrant => {
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.arc(x, y, miniWheelRadius, quadrant.startAngle, quadrant.endAngle);
-    ctx.closePath();
-    ctx.fillStyle = quadrant.color === 'fiery-red' ? '#E23D28' : 
-                    quadrant.color === 'sunshine-yellow' ? '#F2CF1D' : 
-                    quadrant.color === 'earth-green' ? '#42A640' : 
-                    '#1C77C3';
-    ctx.fill();
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-  });
-  
-  // Add a black circle around the wheel
+  // Draw a small pie chart representing personal color profile
+  // Use a simple representation with fixed segments for now
   ctx.beginPath();
-  ctx.arc(x, y, miniWheelRadius, 0, 2 * Math.PI);
+  ctx.arc(x, y, profileRadius, 0, Math.PI/2);
+  ctx.lineTo(x, y);
+  ctx.closePath();
+  ctx.fillStyle = colorMap['cool-blue'];
+  ctx.fill();
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.arc(x, y, profileRadius, Math.PI/2, Math.PI);
+  ctx.lineTo(x, y);
+  ctx.closePath();
+  ctx.fillStyle = colorMap['sunshine-yellow'];
+  ctx.fill();
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.arc(x, y, profileRadius, Math.PI, 3*Math.PI/2);
+  ctx.lineTo(x, y);
+  ctx.closePath();
+  ctx.fillStyle = colorMap['earth-green'];
+  ctx.fill();
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.arc(x, y, profileRadius, 3*Math.PI/2, 2*Math.PI);
+  ctx.lineTo(x, y);
+  ctx.closePath();
+  ctx.fillStyle = colorMap['fiery-red'];
+  ctx.fill();
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 0.5;
+  ctx.stroke();
+  
+  // Add a black circle around the personal profile
+  ctx.beginPath();
+  ctx.arc(x, y, profileRadius, 0, 2 * Math.PI);
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 1;
   ctx.stroke();
   
-  // Draw "YOU ARE HERE" label
+  // Draw "YOU" label
   ctx.font = 'bold 10px Arial';
   ctx.fillStyle = '#333';
   ctx.textAlign = 'center';
   ctx.fillText('YOU', x, y - 20);
-  
-  // No need to draw personality type in center as it's shown in the outer ring
 }
 
 // Draw legend and copyright info
