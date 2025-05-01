@@ -7,8 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import ColorChart from "@/components/ColorChart";
 import { ColorProfileDetail } from "@/components/ColorProfile";
-import InsightsTypeWheel from "@/components/InsightsTypeWheel";
-import ColorDynamicsChart from "@/components/ColorDynamicsChart";
 import { colorProfiles, personalityProfiles, ColorType, PersonalityType } from "@/lib/colorProfiles";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
@@ -268,8 +266,6 @@ export default function Results() {
       yPos = addContentItem("Possible Blind Spots", 17);
       yPos = addContentItem("Opposite Type", 19);
       yPos = addContentItem("Suggestions for Development", 21);
-      yPos = addContentItem("The Insights Discovery 72 Type Wheel", 23);
-      yPos = addContentItem("Color Dynamics", 25);
       
       // ===== INTRODUCTION AND OVERVIEW =====
       pdf.addPage();
@@ -1340,38 +1336,7 @@ export default function Results() {
           </CardContent>
         </Card>
         
-        {/* Specialized Visualizations */}
-        <Card>
-          <CardContent className="p-8">
-            <h2 className="text-2xl font-bold mb-6">Specialized Visualizations</h2>
-            
-            <div className="space-y-12">
-              <div className="type-wheel-section">
-                <h3 className="text-xl font-semibold mb-4">The Insights Discovery® 72 Type Wheel</h3>
-                <p className="text-gray-700 mb-6">
-                  This visualization shows your position on the Insights Discovery® 72 Type Wheel, based on your color preferences. 
-                  Your position indicates your unique personality type and preferred styles of thinking, working, and interacting.
-                </p>
-                <InsightsTypeWheel 
-                  personalityType={result.personalityType}
-                  dominantColor={result.dominantColor}
-                  secondaryColor={result.secondaryColor}
-                  scores={result.scores}
-                />
-              </div>
-              
-              <div className="color-dynamics-section">
-                <h3 className="text-xl font-semibold mb-4">The Insights Discovery® Colour Dynamics</h3>
-                <p className="text-gray-700 mb-6">
-                  This chart shows your preference levels for each color energy and illustrates the flow between 
-                  your conscious and less conscious preferences. Understanding this dynamic can help you recognize 
-                  patterns in your behaviors and interactions.
-                </p>
-                <ColorDynamicsChart scores={result.scores} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
         
         {/* Color Profiles Section */}
         <div className="space-y-6">
