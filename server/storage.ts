@@ -302,15 +302,6 @@ export class MemStorage implements IStorage {
         ]
       },
       {
-        text: "My approach to time management is:",
-        options: [
-          { text: "Prioritize efficiently and take prompt action", color: "fiery-red" },
-          { text: "Keep schedules flexible and focus on what's enjoyable", color: "sunshine-yellow" },
-          { text: "Allow sufficient time for people's needs", color: "earth-green" },
-          { text: "Plan meticulously and be punctual", color: "cool-blue" }
-        ]
-      },
-      {
         text: "My greatest strength is being:",
         options: [
           { text: "Action-oriented and decisive", color: "fiery-red" },
@@ -337,15 +328,7 @@ export class MemStorage implements IStorage {
           { text: "Quality, accuracy and process improvement", color: "cool-blue" }
         ]
       },
-      {
-        text: "Others may misinterpret my intentions when I am being:",
-        options: [
-          { text: "Direct and focused on the task", color: "fiery-red" },
-          { text: "Expressive and quick to change course", color: "sunshine-yellow" },
-          { text: "Accommodating and reluctant to disagree", color: "earth-green" },
-          { text: "Reserved and analytical about decisions", color: "cool-blue" }
-        ]
-      }
+
     ];
     
     questions.forEach(question => {
