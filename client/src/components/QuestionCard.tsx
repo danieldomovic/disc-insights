@@ -78,19 +78,18 @@ export default function QuestionCard({
   
   return (
     <Card className="w-full">
-      <CardContent className="p-4 sm:p-6 md:p-8">
-        <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-800">
+      <CardContent className="p-3 sm:p-4 md:p-5">
+        <h2 className="text-base md:text-lg font-semibold mb-2 text-gray-800">
           {question.text}
         </h2>
-        <p className="text-sm md:text-base mb-4 md:mb-6 text-gray-700">
+        <p className="text-xs md:text-sm mb-2 text-gray-700">
           Please select one M (Most like me), one L (Least like me), and two different values (1-5) in between.
         </p>
-        <p className="text-xs md:text-sm mb-4 text-gray-500 italic">
-          <span className="hidden sm:inline">Swipe horizontally if needed to see all options. </span>
+        <p className="text-xs mb-2 text-gray-500 italic">
           All rows must be complete before proceeding.
         </p>
         
-        <div className="space-y-4">
+        <div className="space-y-2">
           {question.options.map((option, index) => {
             const colorMap: Record<string, string> = {
               'fiery-red': '#E23D28',
@@ -102,18 +101,18 @@ export default function QuestionCard({
             const selectedOption = getSelectedOptionForTrait(index);
             
             return (
-              <div key={index} className="flex flex-col md:flex-row mb-8 md:mb-6 rounded-md overflow-hidden shadow-sm">
+              <div key={index} className="flex flex-col md:flex-row mb-2 rounded-md overflow-hidden shadow-sm">
                 {/* Color option text - full width on mobile, partial width on desktop */}
                 <div 
-                  className="w-full md:w-2/5 p-4 text-white font-medium rounded-t-md md:rounded-t-none md:rounded-l-md"
+                  className="w-full md:w-2/5 p-2 md:p-3 text-white font-medium rounded-t-md md:rounded-t-none md:rounded-l-md flex items-center min-h-[50px]"
                   style={{ backgroundColor: bgColor }}
                 >
-                  {option.text}
+                  <span className="text-sm md:text-base">{option.text}</span>
                 </div>
                 
-                {/* Rating options - scrollable container on mobile */}
-                <div className="w-full overflow-x-auto bg-gray-50 rounded-b-md md:rounded-b-none md:rounded-r-md">
-                  <div className="flex min-w-max md:min-w-0 md:flex-grow justify-between">
+                {/* Rating options - grid layout instead of scrollable */}
+                <div className="w-full bg-gray-50 rounded-b-md md:rounded-b-none md:rounded-r-md">
+                  <div className="grid grid-cols-7 w-full">
                     {ratingOptions.map((rating, rIdx) => {
                       // Calculate the actual value index for this option and rating
                       const valueIndex = index * ratingOptions.length + rIdx;
@@ -122,20 +121,20 @@ export default function QuestionCard({
                       return (
                         <div 
                           key={rIdx} 
-                          className="flex justify-center items-center px-3 sm:px-4 py-3 cursor-pointer hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                          className="flex flex-col justify-center items-center py-2 cursor-pointer hover:bg-gray-100 active:bg-gray-200 transition-colors"
                           onClick={() => onSelectOption(valueIndex)}
                         >
                           <div
                             className={cn(
-                              "min-w-5 min-h-5 md:min-w-6 md:min-h-6 w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-gray-400 flex items-center justify-center",
+                              "w-4 h-4 rounded-full border-2 border-gray-400 flex items-center justify-center",
                               isSelected && "border-indigo-600"
                             )}
                           >
                             {isSelected && (
-                              <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-indigo-600"></div>
+                              <div className="w-2 h-2 rounded-full bg-indigo-600"></div>
                             )}
                           </div>
-                          <span className="ml-1 md:ml-2 text-sm md:text-base text-gray-700 font-medium">{rating}</span>
+                          <span className="mt-1 text-xs text-gray-700 font-medium">{rating}</span>
                         </div>
                       );
                     })}
