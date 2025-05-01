@@ -122,246 +122,228 @@ export class MemStorage implements IStorage {
   private initializeQuizQuestions() {
     const questions: InsertQuizQuestion[] = [
       {
-        text: "I am perceived as someone who is:",
+        text: "I am perceived as someone who:",
         options: [
-          { text: "Determined and dominant", color: "fiery-red" },
-          { text: "Sociable and dynamic", color: "sunshine-yellow" },
-          { text: "Caring and patient", color: "earth-green" },
-          { text: "Precise and questioning", color: "cool-blue" }
+          { text: "Is determined and decisive", color: "fiery-red" },
+          { text: "Is sociable and dynamic", color: "sunshine-yellow" },
+          { text: "Is caring and patient", color: "earth-green" },
+          { text: "Is precise and questioning", color: "cool-blue" }
         ]
       },
       {
-        text: "When interacting with others, I am:",
+        text: "When facing challenges, I prefer to:",
         options: [
-          { text: "Direct and straightforward", color: "fiery-red" },
-          { text: "Enthusiastic and expressive", color: "sunshine-yellow" },
-          { text: "Supportive and considerate", color: "earth-green" },
-          { text: "Formal and analytical", color: "cool-blue" }
+          { text: "Act quickly and directly", color: "fiery-red" },
+          { text: "Involve others and be enthusiastic", color: "sunshine-yellow" },
+          { text: "Support the team and maintain harmony", color: "earth-green" },
+          { text: "Analyze all options methodically", color: "cool-blue" }
         ]
       },
       {
-        text: "I contribute to a team by being:",
+        text: "My communication style can be described as:",
         options: [
-          { text: "Action-oriented and decisive", color: "fiery-red" },
-          { text: "Inspiring and persuasive", color: "sunshine-yellow" },
-          { text: "Patient and diplomatic", color: "earth-green" },
-          { text: "Cautious and accurate", color: "cool-blue" }
+          { text: "Brief and to the point", color: "fiery-red" },
+          { text: "Expressive and persuasive", color: "sunshine-yellow" },
+          { text: "Considerate and agreeable", color: "earth-green" },
+          { text: "Factual and precise", color: "cool-blue" }
         ]
       },
       {
-        text: "What motivates me most is:",
+        text: "In a team environment, I naturally:",
         options: [
-          { text: "Challenge and control", color: "fiery-red" },
-          { text: "Recognition and involvement", color: "sunshine-yellow" },
-          { text: "Harmony and appreciation", color: "earth-green" },
-          { text: "Precision and expertise", color: "cool-blue" }
+          { text: "Take charge and focus on results", color: "fiery-red" },
+          { text: "Motivate others and generate ideas", color: "sunshine-yellow" },
+          { text: "Create harmony and support colleagues", color: "earth-green" },
+          { text: "Ensure accuracy and maintain quality", color: "cool-blue" }
         ]
       },
       {
-        text: "Under pressure, I can be:",
+        text: "When making decisions, I tend to:",
         options: [
-          { text: "Demanding and forceful", color: "fiery-red" },
+          { text: "Be direct and focus on outcomes", color: "fiery-red" },
+          { text: "Consider what's exciting and engaging", color: "sunshine-yellow" },
+          { text: "Think about how others will feel", color: "earth-green" },
+          { text: "Analyze the facts and logical implications", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "My ideal work environment is:",
+        options: [
+          { text: "Fast-paced with clear goals", color: "fiery-red" },
+          { text: "Varied and people-oriented", color: "sunshine-yellow" },
+          { text: "Collaborative and supportive", color: "earth-green" },
+          { text: "Structured and detail-focused", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "Others might describe me as:",
+        options: [
+          { text: "Determined and assertive", color: "fiery-red" },
+          { text: "Enthusiastic and persuasive", color: "sunshine-yellow" },
+          { text: "Calm and accommodating", color: "earth-green" },
+          { text: "Analytical and thorough", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "Under pressure, I may become:",
+        options: [
+          { text: "Demanding and controlling", color: "fiery-red" },
           { text: "Excitable and disorganized", color: "sunshine-yellow" },
-          { text: "Compliant and indecisive", color: "earth-green" },
-          { text: "Withdrawn and critical", color: "cool-blue" }
+          { text: "Submissive and indecisive", color: "earth-green" },
+          { text: "Withdrawn and nitpicking", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "My conflict resolution approach tends to be:",
+        options: [
+          { text: "Confronting issues directly", color: "fiery-red" },
+          { text: "Discussing openly and expressively", color: "sunshine-yellow" },
+          { text: "Finding compromises and maintaining relationships", color: "earth-green" },
+          { text: "Analyzing the facts and being objective", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "I am motivated by:",
+        options: [
+          { text: "Challenges and achieving results", color: "fiery-red" },
+          { text: "Recognition and social interaction", color: "sunshine-yellow" },
+          { text: "Helping others and creating harmony", color: "earth-green" },
+          { text: "Intellectual stimulation and expertise", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "When leading others, I emphasize:",
+        options: [
+          { text: "Clear direction and accountability", color: "fiery-red" },
+          { text: "Inspiration and team spirit", color: "sunshine-yellow" },
+          { text: "Consensus and personal development", color: "earth-green" },
+          { text: "High standards and systematic approaches", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "My primary contribution to a team is:",
+        options: [
+          { text: "Driving action and focusing on goals", color: "fiery-red" },
+          { text: "Creating energy and generating ideas", color: "sunshine-yellow" },
+          { text: "Promoting cooperation and supporting members", color: "earth-green" },
+          { text: "Ensuring accuracy and questioning assumptions", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "In meetings, I typically:",
+        options: [
+          { text: "Focus on objectives and outcomes", color: "fiery-red" },
+          { text: "Share ideas and encourage participation", color: "sunshine-yellow" },
+          { text: "Listen carefully and build consensus", color: "earth-green" },
+          { text: "Examine details and provide analysis", color: "cool-blue" }
+        ]
+      },
+      {
+        text: "When implementing change, I prefer to:",
+        options: [
+          { text: "Move quickly and deal with resistance firmly", color: "fiery-red" },
+          { text: "Sell the benefits and make it exciting", color: "sunshine-yellow" },
+          { text: "Ensure everyone is comfortable and supported", color: "earth-green" },
+          { text: "Provide a detailed plan with clear rationale", color: "cool-blue" }
         ]
       },
       {
         text: "I value others who are:",
         options: [
-          { text: "Efficient and competent", color: "fiery-red" },
-          { text: "Optimistic and flexible", color: "sunshine-yellow" },
-          { text: "Sincere and harmonious", color: "earth-green" },
-          { text: "Factual and correct", color: "cool-blue" }
+          { text: "Decisive and straightforward", color: "fiery-red" },
+          { text: "Engaging and optimistic", color: "sunshine-yellow" },
+          { text: "Supportive and considerate", color: "earth-green" },
+          { text: "Accurate and logical", color: "cool-blue" }
         ]
       },
       {
-        text: "I believe a good leader should be:",
+        text: "My approach to planning is:",
         options: [
-          { text: "Authoritative and results-focused", color: "fiery-red" },
-          { text: "Visionary and engaging", color: "sunshine-yellow" },
-          { text: "Supportive and team-oriented", color: "earth-green" },
-          { text: "Objective and strategic", color: "cool-blue" }
+          { text: "Focus on immediate actions and results", color: "fiery-red" },
+          { text: "Keep options open and be adaptable", color: "sunshine-yellow" },
+          { text: "Consider how the plan affects everyone", color: "earth-green" },
+          { text: "Create detailed strategies with contingencies", color: "cool-blue" }
         ]
       },
       {
-        text: "In my communication, I tend to be:",
+        text: "When receiving feedback, I prefer it to be:",
         options: [
-          { text: "Brief and to the point", color: "fiery-red" },
-          { text: "Animated and persuasive", color: "sunshine-yellow" },
-          { text: "Amiable and people-focused", color: "earth-green" },
-          { text: "Detailed and systematic", color: "cool-blue" }
+          { text: "Direct and results-focused", color: "fiery-red" },
+          { text: "Enthusiastic and future-oriented", color: "sunshine-yellow" },
+          { text: "Supportive and constructive", color: "earth-green" },
+          { text: "Detailed and specific", color: "cool-blue" }
         ]
       },
       {
-        text: "My ideal working environment is:",
+        text: "I find it challenging to work with people who are:",
         options: [
-          { text: "Fast-paced and results-oriented", color: "fiery-red" },
-          { text: "Creative and stimulating", color: "sunshine-yellow" },
-          { text: "Calm and collaborative", color: "earth-green" },
-          { text: "Structured and methodical", color: "cool-blue" }
+          { text: "Slow to decide or overly cautious", color: "fiery-red" },
+          { text: "Serious and lacking enthusiasm", color: "sunshine-yellow" },
+          { text: "Aggressive or insensitive to others", color: "earth-green" },
+          { text: "Disorganized or too impulsive", color: "cool-blue" }
         ]
       },
       {
-        text: "When making decisions, I prefer to:",
+        text: "In social settings, I tend to:",
         options: [
-          { text: "Act quickly and assertively", color: "fiery-red" },
-          { text: "Follow intuition and explore options", color: "sunshine-yellow" },
-          { text: "Seek consensus and consider feelings", color: "earth-green" },
-          { text: "Gather facts and be methodical", color: "cool-blue" }
+          { text: "Take the lead and be direct", color: "fiery-red" },
+          { text: "Be lively and the center of attention", color: "sunshine-yellow" },
+          { text: "Listen and focus on individual connections", color: "earth-green" },
+          { text: "Observe and engage in meaningful conversations", color: "cool-blue" }
         ]
       },
       {
-        text: "My strengths include being:",
+        text: "When explaining a concept, I typically:",
         options: [
-          { text: "Bold and purposeful", color: "fiery-red" },
-          { text: "Outgoing and enthusiastic", color: "sunshine-yellow" },
-          { text: "Reliable and relationship-oriented", color: "earth-green" },
-          { text: "Thorough and logical", color: "cool-blue" }
+          { text: "Get straight to the point and focus on application", color: "fiery-red" },
+          { text: "Make it engaging and use stories", color: "sunshine-yellow" },
+          { text: "Ensure it's accessible and check for understanding", color: "earth-green" },
+          { text: "Provide comprehensive information with precise details", color: "cool-blue" }
         ]
       },
       {
-        text: "I may need to develop my ability to be more:",
+        text: "My approach to time management is:",
         options: [
-          { text: "Patient and empathetic", color: "fiery-red" },
-          { text: "Focused and organized", color: "sunshine-yellow" },
-          { text: "Assertive and decisive", color: "earth-green" },
-          { text: "Open and adaptable", color: "cool-blue" }
+          { text: "Prioritize efficiently and take prompt action", color: "fiery-red" },
+          { text: "Keep schedules flexible and focus on what's enjoyable", color: "sunshine-yellow" },
+          { text: "Allow sufficient time for people's needs", color: "earth-green" },
+          { text: "Plan meticulously and be punctual", color: "cool-blue" }
         ]
       },
       {
-        text: "Others may describe me as:",
+        text: "My greatest strength is being:",
         options: [
-          { text: "Competitive and driven", color: "fiery-red" },
-          { text: "Spontaneous and lively", color: "sunshine-yellow" },
-          { text: "Accommodating and gentle", color: "earth-green" },
-          { text: "Methodical and reserved", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "When making plans, I tend to be:",
-        options: [
-          { text: "Focused on immediate results", color: "fiery-red" },
-          { text: "Adaptable and embracing change", color: "sunshine-yellow" },
-          { text: "Thoughtful about everyone involved", color: "earth-green" },
-          { text: "Systematic and thorough", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "In group discussions, I typically:",
-        options: [
-          { text: "Get straight to the point", color: "fiery-red" },
-          { text: "Generate enthusiasm and ideas", color: "sunshine-yellow" },
-          { text: "Listen carefully to others' views", color: "earth-green" },
-          { text: "Analyze different perspectives", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "My approach to relationships is being:",
-        options: [
-          { text: "Direct and purposeful", color: "fiery-red" },
-          { text: "Expressive and fun-loving", color: "sunshine-yellow" },
-          { text: "Loyal and supportive", color: "earth-green" },
-          { text: "Reserved and selective", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "When setting goals, I prioritize:",
-        options: [
-          { text: "Achieving results as quickly as possible", color: "fiery-red" },
-          { text: "Making the process enjoyable for everyone", color: "sunshine-yellow" },
-          { text: "Ensuring everyone's needs are considered", color: "earth-green" },
-          { text: "Creating a detailed plan with clear metrics", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "My preferred way to celebrate success is:",
-        options: [
-          { text: "Acknowledging achievements and moving to the next challenge", color: "fiery-red" },
-          { text: "Having a lively social gathering", color: "sunshine-yellow" },
-          { text: "Showing personal appreciation to each team member", color: "earth-green" },
-          { text: "Reflecting on what worked well and why", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "In challenging situations, I tend to become:",
-        options: [
-          { text: "Assertive and take control", color: "fiery-red" },
-          { text: "Expressive and talk things through", color: "sunshine-yellow" },
-          { text: "Agreeable and seek compromise", color: "earth-green" },
-          { text: "Reflective and analyze options", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "I find it difficult to work with people who are:",
-        options: [
-          { text: "Overly cautious and indecisive", color: "fiery-red" },
-          { text: "Too serious or rigid", color: "sunshine-yellow" },
-          { text: "Too forceful or confrontational", color: "earth-green" },
-          { text: "Disorganized or impulsive", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "My greatest strength at work is being:",
-        options: [
-          { text: "Results-oriented and determined", color: "fiery-red" },
-          { text: "Enthusiastic and persuasive", color: "sunshine-yellow" },
+          { text: "Action-oriented and decisive", color: "fiery-red" },
+          { text: "Optimistic and inspirational", color: "sunshine-yellow" },
           { text: "Patient and supportive", color: "earth-green" },
-          { text: "Detailed and analytical", color: "cool-blue" }
+          { text: "Analytical and systematic", color: "cool-blue" }
         ]
       },
       {
-        text: "The way I process information is:",
+        text: "I am at my best when:",
         options: [
-          { text: "Quickly, focusing on main points", color: "fiery-red" },
-          { text: "Intuitively, looking for possibilities", color: "sunshine-yellow" },
-          { text: "Carefully, considering implications for people", color: "earth-green" },
-          { text: "Methodically, examining all aspects", color: "cool-blue" }
+          { text: "Taking control of challenging situations", color: "fiery-red" },
+          { text: "Generating enthusiasm for new initiatives", color: "sunshine-yellow" },
+          { text: "Bringing people together harmoniously", color: "earth-green" },
+          { text: "Solving complex problems methodically", color: "cool-blue" }
         ]
       },
       {
-        text: "I make decisions based primarily on:",
+        text: "When evaluating success, I focus on:",
         options: [
-          { text: "What will achieve results most efficiently", color: "fiery-red" },
-          { text: "What feels right and will engage others", color: "sunshine-yellow" },
-          { text: "What will maintain harmony and support people", color: "earth-green" },
-          { text: "What makes the most logical sense", color: "cool-blue" }
+          { text: "Measurable results and achievements", color: "fiery-red" },
+          { text: "Innovation and positive impact on people", color: "sunshine-yellow" },
+          { text: "Team cohesion and personal growth", color: "earth-green" },
+          { text: "Quality, accuracy and process improvement", color: "cool-blue" }
         ]
       },
       {
-        text: "In social situations, I tend to be:",
+        text: "Others may misinterpret my intentions when I am being:",
         options: [
-          { text: "Bold and direct with my opinions", color: "fiery-red" },
-          { text: "Energetic and the center of attention", color: "sunshine-yellow" },
-          { text: "Quiet and focused on others' needs", color: "earth-green" },
-          { text: "Reserved and observant", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "When implementing new ideas, I prefer to:",
-        options: [
-          { text: "Take immediate action and adjust as needed", color: "fiery-red" },
-          { text: "Generate enthusiasm and involve others", color: "sunshine-yellow" },
-          { text: "Make gradual changes with team input", color: "earth-green" },
-          { text: "Plan thoroughly before starting", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "When giving feedback, I tend to be:",
-        options: [
-          { text: "Direct and straightforward", color: "fiery-red" },
-          { text: "Enthusiastic and encouraging", color: "sunshine-yellow" },
-          { text: "Diplomatic and considerate", color: "earth-green" },
-          { text: "Objective and specific", color: "cool-blue" }
-        ]
-      },
-      {
-        text: "At my best, I am known for being:",
-        options: [
-          { text: "Confident and achievement-oriented", color: "fiery-red" },
-          { text: "Creative and inspirational", color: "sunshine-yellow" },
-          { text: "Dependable and supportive", color: "earth-green" },
-          { text: "Knowledgeable and precise", color: "cool-blue" }
+          { text: "Direct and focused on the task", color: "fiery-red" },
+          { text: "Expressive and quick to change course", color: "sunshine-yellow" },
+          { text: "Accommodating and reluctant to disagree", color: "earth-green" },
+          { text: "Reserved and analytical about decisions", color: "cool-blue" }
         ]
       }
     ];
