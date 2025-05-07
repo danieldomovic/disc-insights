@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 export type QuizQuestion = {
   id: number;
@@ -38,6 +39,7 @@ export function useQuiz() {
   });
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   // Rating options
   const ratingOptions = ['L', '1', '2', '3', '4', '5', 'M'];
@@ -52,6 +54,12 @@ export function useQuiz() {
       return response.json();
     },
     onSuccess: (data) => {
+      if (user) {
+        toast({
+          title: "Quiz completed",
+          description: "Your results have been saved to your profile.",
+        });
+      }
       setLocation(`/results/${data.id}`);
     },
     onError: (error) => {

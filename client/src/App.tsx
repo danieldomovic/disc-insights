@@ -6,18 +6,22 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Quiz from "@/pages/Quiz";
 import Results from "@/pages/Results";
+import AuthPage from "@/pages/auth-page";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
 
 function Router() {
   return (
     <div className="min-h-screen flex flex-col bg-light-gray">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow">
         <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/quiz" component={Quiz} />
-          <Route path="/results/:resultId?" component={Results} />
+          <ProtectedRoute path="/" component={Home} />
+          <ProtectedRoute path="/quiz" component={Quiz} />
+          <ProtectedRoute path="/results/:resultId?" component={Results} />
+          <Route path="/auth" component={AuthPage} />
           <Route component={NotFound} />
         </Switch>
       </main>
@@ -29,8 +33,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

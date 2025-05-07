@@ -1,10 +1,38 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { 
+  RefreshCw, 
+  User, 
+  LogOut, 
+  BarChart2, 
+  Users, 
+  FileText,
+  Loader2
+} from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Header() {
   const [location] = useLocation();
-  const showRestartButton = location !== "/";
+  const showRestartButton = location !== "/" && location !== "/auth";
+  const { user, logoutMutation } = useAuth();
+  
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase();
+  };
   
   return (
     <header className="bg-white shadow-sm">
@@ -26,7 +54,8 @@ export default function Header() {
             </h1>
           </div>
         </Link>
-        <nav>
+        
+        <div className="flex items-center gap-4">
           {showRestartButton && (
             <Link href="/">
               <Button 
@@ -39,7 +68,79 @@ export default function Header() {
               </Button>
             </Link>
           )}
-        </nav>
+          
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar>
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {user ? getInitials(user.fullName) : 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel className="font-normal text-xs text-muted-foreground truncate">
+                  {user.email}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <Link href="/profile">
+                    <DropdownMenuItem>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/reports">
+                    <DropdownMenuItem>
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>My Reports</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/teams">
+                    <DropdownMenuItem>
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>My Teams</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/comparisons">
+                    <DropdownMenuItem>
+                      <BarChart2 className="mr-2 h-4 w-4" />
+                      <span>Comparisons</span>
+                    </DropdownMenuItem>
+                  </Link>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                >
+                  {logoutMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <span>Logging out...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          
+          {!user && location !== "/auth" && (
+            <Link href="/auth">
+              <Button size="sm" variant="default">
+                Sign In
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
