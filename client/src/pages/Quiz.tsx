@@ -62,12 +62,8 @@ export default function Quiz() {
     );
   }
   
+  // If there are no questions, return null
   if (!currentQuestion) {
-    toast({
-      variant: "destructive",
-      title: "Error loading quiz questions",
-      description: "Unable to load quiz questions. Please try again later."
-    });
     return null;
   }
   

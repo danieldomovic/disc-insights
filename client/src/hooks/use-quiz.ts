@@ -30,7 +30,7 @@ export type ValidationError = {
 export function useQuiz() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswer[]>([]);
-  const [selectedOptions, setSelectedOptions] = useState<Record<number, number>>({});
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, number>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError>({
     hasL: false,
     hasM: false,
@@ -156,7 +156,7 @@ export function useQuiz() {
       const [rowIdx] = ratingLocation;
       const newSelectedOptions = { ...selectedOptions };
       delete newSelectedOptions[rowIdx]; // Remove the rating from its previous location
-      newSelectedOptions[optionIdx] = optionIndex; // Add it to the new location
+      newSelectedOptions[optionIdx.toString()] = optionIndex; // Add it to the new location
       setSelectedOptions(newSelectedOptions);
       
       // Show a toast notifying the user about what happened
@@ -181,7 +181,7 @@ export function useQuiz() {
     
     // Update selected options
     const newSelectedOptions = { ...selectedOptions };
-    newSelectedOptions[optionIdx] = optionIndex;
+    newSelectedOptions[optionIdx.toString()] = optionIndex;
     
     setSelectedOptions(newSelectedOptions);
     
@@ -192,7 +192,7 @@ export function useQuiz() {
   };
   
   const getSelectedOptionForTrait = (optionIdx: number): number | undefined => {
-    return selectedOptions[optionIdx];
+    return selectedOptions[optionIdx.toString()];
   };
   
   const goToNextQuestion = () => {
@@ -251,7 +251,7 @@ export function useQuiz() {
     
     // Save answers for this question
     const newAnswers = currentQuestion.options.map((option, idx) => {
-      const optionIndex = selectedOptions[idx];
+      const optionIndex = selectedOptions[idx.toString()];
       const ratingIdx = optionIndex % ratingOptions.length;
       const rating = ratingOptions[ratingIdx];
       
