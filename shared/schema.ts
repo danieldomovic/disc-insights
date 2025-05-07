@@ -228,12 +228,7 @@ export const teamAnalytics = pgTable("team_analytics", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const teamAnalyticsRelations = relations(teamAnalytics, ({ one }) => ({
-  team: one(teams, {
-    fields: [teamAnalytics.teamId],
-    references: [teams.id],
-  }),
-}));
+// Relations will be defined after all tables are declared
 
 export const insertTeamAnalyticsSchema = createInsertSchema(teamAnalytics).omit({
   id: true,
@@ -257,12 +252,7 @@ export const organizationAnalytics = pgTable("organization_analytics", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const organizationAnalyticsRelations = relations(organizationAnalytics, ({ one }) => ({
-  organization: one(organizations, {
-    fields: [organizationAnalytics.organizationId],
-    references: [organizations.id],
-  }),
-}));
+// Relations will be defined after all tables are declared
 
 export const insertOrgAnalyticsSchema = createInsertSchema(organizationAnalytics).omit({
   id: true,
@@ -271,3 +261,96 @@ export const insertOrgAnalyticsSchema = createInsertSchema(organizationAnalytics
 
 export type InsertOrgAnalytics = z.infer<typeof insertOrgAnalyticsSchema>;
 export type OrganizationAnalytics = typeof organizationAnalytics.$inferSelect;
+
+// Define all relations after tables to avoid circular references
+export const usersRelations = relations(users, ({ many }) => ({
+  teamMembers: many(teamMembers),
+  organizations: many(organizationMembers),
+  quizResults: many(quizResults),
+  reportComparisons: many(reportComparisons),
+}));
+
+export const teamsRelations = relations(teams, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [teams.createdById],
+    references: [users.id],
+  }),
+  organization: one(organizations, {
+    fields: [teams.organizationId],
+    references: [organizations.id],
+  }),
+  members: many(teamMembers),
+  analytics: many(teamAnalytics),
+  quizResults: many(quizResults),
+}));
+
+export const organizationsRelations = relations(organizations, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [organizations.createdById],
+    references: [users.id],
+  }),
+  members: many(organizationMembers),
+  teams: many(teams),
+  analytics: many(organizationAnalytics),
+  quizResults: many(quizResults),
+}));
+
+export const teamAnalyticsRelations = relations(teamAnalytics, ({ one }) => ({
+  team: one(teams, {
+    fields: [teamAnalytics.teamId],
+    references: [teams.id],
+  }),
+}));
+
+export const organizationAnalyticsRelations = relations(organizationAnalytics, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [organizationAnalytics.organizationId],
+    references: [organizations.id],
+  }),
+}));
+
+export const quizResultsRelations = relations(quizResults, ({ one, many }) => ({
+  user: one(users, {
+    fields: [quizResults.userId],
+    references: [users.id],
+  }),
+  team: one(teams, {
+    fields: [quizResults.teamId],
+    references: [teams.id],
+  }),
+  organization: one(organizations, {
+    fields: [quizResults.organizationId],
+    references: [organizations.id],
+  }),
+  answers: many(quizAnswers),
+  comparisonReportsA: many(reportComparisons, { relationName: "reportA" }),
+  comparisonReportsB: many(reportComparisons, { relationName: "reportB" }),
+}));
+
+export const reportComparisonsRelations = relations(reportComparisons, ({ one }) => ({
+  user: one(users, {
+    fields: [reportComparisons.userId],
+    references: [users.id],
+  }),
+  reportA: one(quizResults, {
+    fields: [reportComparisons.reportAId],
+    references: [quizResults.id],
+    relationName: "reportA",
+  }),
+  reportB: one(quizResults, {
+    fields: [reportComparisons.reportBId],
+    references: [quizResults.id],
+    relationName: "reportB",
+  }),
+}));
+
+export const quizAnswersRelations = relations(quizAnswers, ({ one }) => ({
+  result: one(quizResults, {
+    fields: [quizAnswers.resultId],
+    references: [quizResults.id],
+  }),
+  question: one(quizQuestions, {
+    fields: [quizAnswers.questionId],
+    references: [quizQuestions.id],
+  }),
+}));

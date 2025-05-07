@@ -7,11 +7,32 @@ import {
   type InsertQuizResult,
   type QuizAnswer,
   type InsertQuizAnswer,
+  type Team,
+  type InsertTeam,
+  type TeamMember,
+  type InsertTeamMember,
+  type Organization,
+  type InsertOrganization,
+  type OrganizationMember,
+  type InsertOrganizationMember,
+  type TeamAnalytics,
+  type InsertTeamAnalytics,
+  type OrganizationAnalytics,
+  type InsertOrgAnalytics,
+  type ReportComparison,
+  type InsertReportComparison,
 } from "@shared/schema";
+import { Store } from "express-session";
+import session from "express-session";
+import createMemoryStore from "memorystore";
+import { DatabaseStorage } from "./database-storage";
 
+// Interface that defines all storage operations
 export interface IStorage {
+  // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   
   // Quiz question methods
@@ -22,12 +43,47 @@ export interface IStorage {
   // Quiz result methods
   createQuizResult(result: InsertQuizResult): Promise<QuizResult>;
   getQuizResult(id: number): Promise<QuizResult | undefined>;
+  getUserQuizResults(userId: number): Promise<QuizResult[]>;
   
   // Quiz answer methods
   createQuizAnswer(answer: InsertQuizAnswer): Promise<QuizAnswer>;
   getQuizAnswersByResultId(resultId: number): Promise<QuizAnswer[]>;
+  
+  // Team methods
+  createTeam(team: InsertTeam): Promise<Team>;
+  getTeam(id: number): Promise<Team | undefined>;
+  getUserTeams(userId: number): Promise<Team[]>;
+  getTeamMembers(teamId: number): Promise<TeamMember[]>;
+  getTeamsByOrganization(organizationId: number): Promise<Team[]>;
+  addTeamMember(teamMember: InsertTeamMember): Promise<TeamMember>;
+  isTeamLeader(userId: number, teamId: number): Promise<boolean>;
+  isTeamMember(userId: number, teamId: number): Promise<boolean>;
+  
+  // Organization methods
+  createOrganization(organization: InsertOrganization): Promise<Organization>;
+  getOrganization(id: number): Promise<Organization | undefined>;
+  getUserOrganizations(userId: number): Promise<Organization[]>;
+  addOrganizationMember(orgMember: InsertOrganizationMember): Promise<OrganizationMember>;
+  isOrganizationAdmin(userId: number, organizationId: number): Promise<boolean>;
+  
+  // Team analytics methods
+  createOrUpdateTeamAnalytics(analytics: InsertTeamAnalytics): Promise<TeamAnalytics>;
+  getTeamAnalytics(teamId: number): Promise<TeamAnalytics | undefined>;
+  
+  // Organization analytics methods
+  createOrUpdateOrgAnalytics(analytics: InsertOrgAnalytics): Promise<OrganizationAnalytics>;
+  getOrganizationAnalytics(organizationId: number): Promise<OrganizationAnalytics | undefined>;
+  
+  // Report comparison methods
+  createReportComparison(comparison: InsertReportComparison): Promise<ReportComparison>;
+  getUserReportComparisons(userId: number): Promise<ReportComparison[]>;
+  getReportComparison(id: number): Promise<ReportComparison | undefined>;
+  
+  // Session store for authentication
+  sessionStore: Store;
 }
 
+// In-memory storage implementation
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private quizQuestions: Map<number, QuizQuestion>;
@@ -38,8 +94,14 @@ export class MemStorage implements IStorage {
   private questionId: number;
   private resultId: number;
   private answerId: number;
+  sessionStore: Store;
 
   constructor() {
+    const MemoryStore = createMemoryStore(session);
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000, // One day
+    });
+
     this.users = new Map();
     this.quizQuestions = new Map();
     this.quizResults = new Map();
@@ -63,10 +125,18 @@ export class MemStorage implements IStorage {
       (user) => user.username === username,
     );
   }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email
+    );
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userId++;
-    const user: User = { ...insertUser, id };
+    // We need to cast here because the User type requires more fields
+    // than what we provide, but this is fine for in-memory storage
+    const user = { ...insertUser, id } as User;
     this.users.set(id, user);
     return user;
   }
@@ -81,18 +151,21 @@ export class MemStorage implements IStorage {
   
   async createQuizQuestion(insertQuestion: InsertQuizQuestion): Promise<QuizQuestion> {
     const id = this.questionId++;
-    const question: QuizQuestion = { ...insertQuestion, id };
+    // Cast to QuizQuestion for in-memory storage
+    const question = { ...insertQuestion, id } as QuizQuestion;
     this.quizQuestions.set(id, question);
     return question;
   }
   
   async createQuizResult(insertResult: InsertQuizResult): Promise<QuizResult> {
     const id = this.resultId++;
-    const result: QuizResult = { 
+    // Cast to QuizResult for in-memory storage
+    const result = { 
       ...insertResult, 
       id,
-      userId: insertResult.userId || null 
-    };
+      userId: insertResult.userId || null,
+      createdAt: new Date()
+    } as QuizResult;
     this.quizResults.set(id, result);
     return result;
   }
@@ -101,14 +174,21 @@ export class MemStorage implements IStorage {
     return this.quizResults.get(id);
   }
   
+  async getUserQuizResults(userId: number): Promise<QuizResult[]> {
+    return Array.from(this.quizResults.values()).filter(
+      (result) => result.userId === userId
+    );
+  }
+  
   async createQuizAnswer(insertAnswer: InsertQuizAnswer): Promise<QuizAnswer> {
     const id = this.answerId++;
-    const answer: QuizAnswer = { 
+    // Cast to QuizAnswer for in-memory storage
+    const answer = { 
       ...insertAnswer, 
       id,
       resultId: insertAnswer.resultId || null,
       questionId: insertAnswer.questionId || null
-    };
+    } as QuizAnswer;
     this.quizAnswers.set(id, answer);
     return answer;
   }
@@ -117,6 +197,90 @@ export class MemStorage implements IStorage {
     return Array.from(this.quizAnswers.values()).filter(
       (answer) => answer.resultId === resultId
     );
+  }
+  
+  // Stubbed team methods
+  async createTeam(team: InsertTeam): Promise<Team> {
+    throw new Error("MemStorage does not implement team functionality");
+  }
+  
+  async getTeam(id: number): Promise<Team | undefined> {
+    throw new Error("MemStorage does not implement team functionality");
+  }
+  
+  async getUserTeams(userId: number): Promise<Team[]> {
+    return [];
+  }
+  
+  async getTeamMembers(teamId: number): Promise<TeamMember[]> {
+    return [];
+  }
+  
+  async getTeamsByOrganization(organizationId: number): Promise<Team[]> {
+    return [];
+  }
+  
+  async addTeamMember(teamMember: InsertTeamMember): Promise<TeamMember> {
+    throw new Error("MemStorage does not implement team functionality");
+  }
+  
+  async isTeamLeader(userId: number, teamId: number): Promise<boolean> {
+    return false;
+  }
+  
+  async isTeamMember(userId: number, teamId: number): Promise<boolean> {
+    return false;
+  }
+  
+  // Stubbed organization methods
+  async createOrganization(organization: InsertOrganization): Promise<Organization> {
+    throw new Error("MemStorage does not implement organization functionality");
+  }
+  
+  async getOrganization(id: number): Promise<Organization | undefined> {
+    throw new Error("MemStorage does not implement organization functionality");
+  }
+  
+  async getUserOrganizations(userId: number): Promise<Organization[]> {
+    return [];
+  }
+  
+  async addOrganizationMember(orgMember: InsertOrganizationMember): Promise<OrganizationMember> {
+    throw new Error("MemStorage does not implement organization functionality");
+  }
+  
+  async isOrganizationAdmin(userId: number, organizationId: number): Promise<boolean> {
+    return false;
+  }
+  
+  // Stubbed analytics methods
+  async createOrUpdateTeamAnalytics(analytics: InsertTeamAnalytics): Promise<TeamAnalytics> {
+    throw new Error("MemStorage does not implement analytics functionality");
+  }
+  
+  async getTeamAnalytics(teamId: number): Promise<TeamAnalytics | undefined> {
+    throw new Error("MemStorage does not implement analytics functionality");
+  }
+  
+  async createOrUpdateOrgAnalytics(analytics: InsertOrgAnalytics): Promise<OrganizationAnalytics> {
+    throw new Error("MemStorage does not implement analytics functionality");
+  }
+  
+  async getOrganizationAnalytics(organizationId: number): Promise<OrganizationAnalytics | undefined> {
+    throw new Error("MemStorage does not implement analytics functionality");
+  }
+  
+  // Stubbed comparison methods
+  async createReportComparison(comparison: InsertReportComparison): Promise<ReportComparison> {
+    throw new Error("MemStorage does not implement comparison functionality");
+  }
+  
+  async getUserReportComparisons(userId: number): Promise<ReportComparison[]> {
+    return [];
+  }
+  
+  async getReportComparison(id: number): Promise<ReportComparison | undefined> {
+    throw new Error("MemStorage does not implement comparison functionality");
   }
   
   private initializeQuizQuestions() {
@@ -350,10 +514,12 @@ export class MemStorage implements IStorage {
     
     questions.forEach(question => {
       const id = this.questionId++;
-      const newQuestion = { ...question, id };
+      // Cast to QuizQuestion for in-memory storage
+      const newQuestion = { ...question, id } as QuizQuestion;
       this.quizQuestions.set(id, newQuestion);
     });
   }
 }
 
-export const storage = new MemStorage();
+// Use DatabaseStorage for production
+export const storage = new DatabaseStorage();
