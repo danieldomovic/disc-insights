@@ -65,7 +65,7 @@ export default function Dashboard() {
   });
   
   return (
-    <div className="container py-8 max-w-6xl">
+    <div className="container mx-auto py-8 px-4 sm:px-6 md:px-8 max-w-6xl">
       <header className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Welcome, {user?.fullName}</h1>
         <p className="text-muted-foreground">

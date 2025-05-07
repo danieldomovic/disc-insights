@@ -59,6 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Welcome back!",
         description: `You're now logged in as ${user.username}.`,
       });
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
     },
     onError: (error: Error) => {
       toast({
@@ -80,6 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Account created",
         description: `Welcome, ${user.username}! Your account has been created successfully.`,
       });
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
     },
     onError: (error: Error) => {
       toast({
@@ -100,6 +104,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         title: "Logged out",
         description: "You have been successfully logged out.",
       });
+      // Redirect to homepage
+      window.location.href = "/";
     },
     onError: (error: Error) => {
       toast({
