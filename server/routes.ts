@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import { insertQuizResultSchema } from "@shared/schema";
+import { setupAuth, requireAuth } from "./auth";
 
 const answerSchema = z.object({
   questionId: z.number(),
@@ -15,6 +16,243 @@ const submissionSchema = z.object({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  setupAuth(app);
+  
+  // User results endpoints
+  app.get("/api/user/results", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const results = await storage.getUserQuizResults(userId);
+      res.json(results.map(result => ({
+        id: result.id,
+        createdAt: result.createdAt,
+        scores: {
+          "fiery-red": result.fieryRedScore,
+          "sunshine-yellow": result.sunshineYellowScore,
+          "earth-green": result.earthGreenScore,
+          "cool-blue": result.coolBlueScore
+        },
+        dominantColor: result.dominantColor,
+        secondaryColor: result.secondaryColor,
+        personalityType: result.personalityType,
+        title: result.title
+      })));
+    } catch (error) {
+      console.error("Error fetching user results:", error);
+      res.status(500).json({ message: "Failed to fetch user results" });
+    }
+  });
+  
+  // Team management endpoints
+  app.post("/api/teams", requireAuth, async (req, res) => {
+    try {
+      const { name, description } = req.body;
+      const userId = req.user!.id;
+      
+      const team = await storage.createTeam({
+        name,
+        description,
+        createdById: userId,
+        organizationId: null
+      });
+      
+      res.status(201).json(team);
+    } catch (error) {
+      console.error("Error creating team:", error);
+      res.status(500).json({ message: "Failed to create team" });
+    }
+  });
+  
+  app.get("/api/teams", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const teams = await storage.getUserTeams(userId);
+      res.json(teams);
+    } catch (error) {
+      console.error("Error fetching teams:", error);
+      res.status(500).json({ message: "Failed to fetch teams" });
+    }
+  });
+  
+  app.get("/api/teams/:id", requireAuth, async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id, 10);
+      if (isNaN(teamId)) {
+        return res.status(400).json({ message: "Invalid team ID" });
+      }
+      
+      const userId = req.user!.id;
+      const isMember = await storage.isTeamMember(userId, teamId);
+      
+      if (!isMember) {
+        return res.status(403).json({ message: "Not a member of this team" });
+      }
+      
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      const members = await storage.getTeamMembers(teamId);
+      
+      res.json({
+        ...team,
+        members: members.map(m => ({
+          id: m.id,
+          userId: m.userId,
+          isLeader: m.isLeader
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching team:", error);
+      res.status(500).json({ message: "Failed to fetch team" });
+    }
+  });
+  
+  app.post("/api/teams/:id/members", requireAuth, async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id, 10);
+      if (isNaN(teamId)) {
+        return res.status(400).json({ message: "Invalid team ID" });
+      }
+      
+      const userId = req.user!.id;
+      const isLeader = await storage.isTeamLeader(userId, teamId);
+      
+      if (!isLeader) {
+        return res.status(403).json({ message: "Only team leaders can add members" });
+      }
+      
+      const { userEmail } = req.body;
+      if (!userEmail) {
+        return res.status(400).json({ message: "User email is required" });
+      }
+      
+      const userToAdd = await storage.getUserByEmail(userEmail);
+      if (!userToAdd) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user is already a member
+      const isAlreadyMember = await storage.isTeamMember(userToAdd.id, teamId);
+      if (isAlreadyMember) {
+        return res.status(400).json({ message: "User is already a member of this team" });
+      }
+      
+      const member = await storage.addTeamMember({
+        teamId,
+        userId: userToAdd.id,
+        isLeader: false
+      });
+      
+      res.status(201).json(member);
+    } catch (error) {
+      console.error("Error adding team member:", error);
+      res.status(500).json({ message: "Failed to add team member" });
+    }
+  });
+  
+  // Report comparison endpoints
+  app.post("/api/comparisons", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const { reportAId, reportBId, title } = req.body;
+      
+      if (!reportAId || !reportBId) {
+        return res.status(400).json({ message: "Two report IDs are required" });
+      }
+      
+      // Verify both reports belong to the user
+      const reportA = await storage.getQuizResult(reportAId);
+      const reportB = await storage.getQuizResult(reportBId);
+      
+      if (!reportA || !reportB || reportA.userId !== userId || reportB.userId !== userId) {
+        return res.status(403).json({ message: "Cannot compare reports you don't own" });
+      }
+      
+      const comparison = await storage.createReportComparison({
+        userId,
+        reportAId,
+        reportBId,
+        title: title || `Comparison of Reports ${reportAId} and ${reportBId}`
+      });
+      
+      res.status(201).json(comparison);
+    } catch (error) {
+      console.error("Error creating comparison:", error);
+      res.status(500).json({ message: "Failed to create comparison" });
+    }
+  });
+  
+  app.get("/api/comparisons", requireAuth, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const comparisons = await storage.getUserReportComparisons(userId);
+      res.json(comparisons);
+    } catch (error) {
+      console.error("Error fetching comparisons:", error);
+      res.status(500).json({ message: "Failed to fetch comparisons" });
+    }
+  });
+  
+  app.get("/api/comparisons/:id", requireAuth, async (req, res) => {
+    try {
+      const comparisonId = parseInt(req.params.id, 10);
+      if (isNaN(comparisonId)) {
+        return res.status(400).json({ message: "Invalid comparison ID" });
+      }
+      
+      const userId = req.user!.id;
+      const comparison = await storage.getReportComparison(comparisonId);
+      
+      if (!comparison || comparison.userId !== userId) {
+        return res.status(404).json({ message: "Comparison not found" });
+      }
+      
+      const reportA = await storage.getQuizResult(comparison.reportAId);
+      const reportB = await storage.getQuizResult(comparison.reportBId);
+      
+      if (!reportA || !reportB) {
+        return res.status(404).json({ message: "One or both reports not found" });
+      }
+      
+      res.json({
+        id: comparison.id,
+        title: comparison.title,
+        createdAt: comparison.createdAt,
+        reportA: {
+          id: reportA.id,
+          scores: {
+            "fiery-red": reportA.fieryRedScore,
+            "sunshine-yellow": reportA.sunshineYellowScore,
+            "earth-green": reportA.earthGreenScore,
+            "cool-blue": reportA.coolBlueScore
+          },
+          dominantColor: reportA.dominantColor,
+          secondaryColor: reportA.secondaryColor,
+          personalityType: reportA.personalityType,
+          title: reportA.title
+        },
+        reportB: {
+          id: reportB.id,
+          scores: {
+            "fiery-red": reportB.fieryRedScore,
+            "sunshine-yellow": reportB.sunshineYellowScore,
+            "earth-green": reportB.earthGreenScore,
+            "cool-blue": reportB.coolBlueScore
+          },
+          dominantColor: reportB.dominantColor,
+          secondaryColor: reportB.secondaryColor,
+          personalityType: reportB.personalityType,
+          title: reportB.title
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching comparison:", error);
+      res.status(500).json({ message: "Failed to fetch comparison" });
+    }
+  });
   // Get all quiz questions
   app.get("/api/quiz/questions", async (req, res) => {
     try {
@@ -154,7 +392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Save the result
       const quizResult = await storage.createQuizResult({
-        userId: null,
+        userId: req.isAuthenticated() ? req.user.id : null,
         fieryRedScore: fieryRedPercentage,
         sunshineYellowScore: sunshineYellowPercentage,
         earthGreenScore: earthGreenPercentage,
@@ -162,7 +400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dominantColor,
         secondaryColor,
         personalityType,
-        createdAt: new Date().toISOString()
+        title: "Latest Quiz Result"
       });
       
       // Save individual answers
