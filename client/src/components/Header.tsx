@@ -23,7 +23,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Header() {
   const [location] = useLocation();
-  const showRestartButton = location !== "/" && location !== "/auth";
+  const showRestartButton = location === "/quiz" || location.startsWith("/results");
   const { user, logoutMutation } = useAuth();
   
   const getInitials = (name: string) => {
@@ -57,16 +57,30 @@ export default function Header() {
         
         <div className="flex items-center gap-4">
           {showRestartButton && (
-            <Link href="/">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
-              >
-                <RefreshCw className="h-4 w-4 text-indigo-600" />
-                <span className="text-indigo-700">Restart Quiz</span>
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link href="/">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
+                >
+                  <RefreshCw className="h-4 w-4 text-indigo-600" />
+                  <span className="text-indigo-700">Restart Quiz</span>
+                </Button>
+              </Link>
+              {user && (
+                <Link href="/dashboard">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
+                  >
+                    <User className="h-4 w-4 text-indigo-600" />
+                    <span className="text-indigo-700">My Dashboard</span>
+                  </Button>
+                </Link>
+              )}
+            </div>
           )}
           
           {user && (
