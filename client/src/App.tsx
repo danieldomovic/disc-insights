@@ -31,10 +31,10 @@ function AppRoutes() {
           <Route path="/results/:resultId?" component={Results} />
           
           {/* Protected routes */}
+          <ProtectedRoute path="/teams/create" component={TeamCreate} />
           <ProtectedRoute path="/dashboard" component={Dashboard} />
           <ProtectedRoute path="/profile" component={Dashboard} />
           <ProtectedRoute path="/teams" component={Dashboard} />
-          <ProtectedRoute path="/teams/create" component={TeamCreate} />
           <ProtectedRoute path="/reports" component={Dashboard} />
           <ProtectedRoute path="/comparisons" component={Dashboard} />
           

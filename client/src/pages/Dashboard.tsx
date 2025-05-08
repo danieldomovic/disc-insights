@@ -312,19 +312,17 @@ export default function Dashboard() {
                   <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-medium text-lg mb-2">No teams yet</h3>
                   <p className="text-muted-foreground mb-6">Create a team to collaborate and analyze group dynamics.</p>
-                  <Link href="/teams/create">
-                    <Button>
-                      Create a Team
-                    </Button>
-                  </Link>
+                  <Button onClick={() => window.location.href = "/teams/create"}>
+                    Create a Team
+                  </Button>
                 </div>
               )}
             </CardContent>
             {userTeams && userTeams.length > 0 && (
               <CardFooter>
-                <Link href="/teams/create">
-                  <Button variant="outline">Create a New Team</Button>
-                </Link>
+                <Button variant="outline" onClick={() => window.location.href = "/teams/create"}>
+                  Create a New Team
+                </Button>
               </CardFooter>
             )}
           </Card>
