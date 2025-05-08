@@ -9,6 +9,7 @@ import Quiz from "@/pages/Quiz";
 import Results from "@/pages/Results";
 import AuthPage from "@/pages/auth-page";
 import WelcomePage from "@/pages/welcome-page";
+import TeamCreate from "@/pages/TeamCreate";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -33,6 +34,7 @@ function AppRoutes() {
           <ProtectedRoute path="/dashboard" component={Dashboard} />
           <ProtectedRoute path="/profile" component={Dashboard} />
           <ProtectedRoute path="/teams" component={Dashboard} />
+          <ProtectedRoute path="/teams/create" component={TeamCreate} />
           <ProtectedRoute path="/reports" component={Dashboard} />
           <ProtectedRoute path="/comparisons" component={Dashboard} />
           

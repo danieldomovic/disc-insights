@@ -322,7 +322,9 @@ export default function Dashboard() {
             </CardContent>
             {userTeams && userTeams.length > 0 && (
               <CardFooter>
-                <Button variant="outline">Create a New Team</Button>
+                <Link href="/teams/create">
+                  <Button variant="outline">Create a New Team</Button>
+                </Link>
               </CardFooter>
             )}
           </Card>
