@@ -312,9 +312,11 @@ export default function Dashboard() {
                   <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-medium text-lg mb-2">No teams yet</h3>
                   <p className="text-muted-foreground mb-6">Create a team to collaborate and analyze group dynamics.</p>
-                  <Button>
-                    Create a Team
-                  </Button>
+                  <Link href="/teams/create">
+                    <Button>
+                      Create a Team
+                    </Button>
+                  </Link>
                 </div>
               )}
             </CardContent>

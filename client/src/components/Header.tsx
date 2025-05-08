@@ -58,7 +58,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           {showRestartButton && (
             <div className="flex gap-2">
-              <Link href="/">
+              <Link href={user ? "/dashboard" : "/"}>
                 <Button 
                   variant="outline" 
                   size="sm" 
