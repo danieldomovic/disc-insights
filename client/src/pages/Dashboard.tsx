@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,14 +10,40 @@ import {
   Users, 
   PlusCircle, 
   Activity, 
-  LayoutDashboard
+  LayoutDashboard,
+  Trash2,
+  Loader2,
+  AlertTriangle,
+  CheckCircle,
+  MoreVertical
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const [location, navigate] = useLocation();
+  const { toast } = useToast();
+  const [reportToDelete, setReportToDelete] = useState<number | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const [deleteStatus, setDeleteStatus] = useState<'idle' | 'loading' | 'success'>('idle');
   
   // Get tab from URL search params
   const getTabFromURL = () => {
@@ -76,6 +102,77 @@ export default function Dashboard() {
     queryKey: ["/api/comparisons"],
     enabled: !!user
   });
+  
+  // Delete report mutation
+  const deleteReportMutation = useMutation({
+    mutationFn: async (reportId: number) => {
+      setDeleteStatus('loading');
+      const response = await apiRequest("DELETE", `/api/user/results/${reportId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete report");
+      }
+      return true;
+    },
+    onSuccess: () => {
+      setDeleteStatus('success');
+      
+      // Close dialog and show success message after a short delay
+      setTimeout(() => {
+        setIsDeleteDialogOpen(false);
+        setReportToDelete(null);
+        setDeleteStatus('idle');
+        
+        // Refresh reports data
+        queryClient.invalidateQueries({ queryKey: ["/api/user/results"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/comparisons"] }); // Also refresh comparisons as they might reference this report
+        
+        toast({
+          title: "Report deleted",
+          description: "The report has been successfully deleted.",
+        });
+      }, 1000);
+    },
+    onError: (error: Error) => {
+      setDeleteStatus('idle');
+      toast({
+        title: "Failed to delete report",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Function to handle delete confirmation
+  const handleDeleteReport = () => {
+    if (reportToDelete) {
+      deleteReportMutation.mutate(reportToDelete);
+    }
+  };
+  
+  // Function to open delete dialog
+  const openDeleteDialog = (reportId: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setReportToDelete(reportId);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Helper function to get color hex value from color name
+  const getColorHex = (colorName: string): string => {
+    switch (colorName) {
+      case 'fiery-red':
+        return '#E8384F';
+      case 'sunshine-yellow':
+        return '#FDAF17';
+      case 'earth-green':
+        return '#48A43F';
+      case 'cool-blue':
+        return '#3E97C9';
+      default:
+        return '#888888';
+    }
+  };
   
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 md:px-8 max-w-6xl">
@@ -215,20 +312,41 @@ export default function Dashboard() {
               ) : userResults && userResults.length > 0 ? (
                 <div className="space-y-4">
                   {userResults.slice(0, 5).map((result: any) => (
-                    <Link key={result.id} href={`/results/${result.id}`}>
-                      <div className="flex items-center p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                        <div className="flex-1">
-                          <h4 className="font-medium">{result.title || `Assessment on ${new Date(result.createdAt).toLocaleDateString()}`}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {result.personalityType} - Dominant: {result.dominantColor.replace(/-/g, ' ')}
-                          </p>
+                    <div key={result.id} className="relative">
+                      <Link href={`/results/${result.id}`}>
+                        <div className="flex items-center p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
+                          <div className="flex-1">
+                            <h4 className="font-medium">{result.title || `Assessment on ${new Date(result.createdAt).toLocaleDateString()}`}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {result.personalityType} - Dominant: {result.dominantColor.replace(/-/g, ' ')}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex gap-2 mr-2">
+                              <div className="w-4 h-8 rounded-sm" style={{ background: getColorHex(result.dominantColor) }}></div>
+                              <div className="w-4 h-8 rounded-sm" style={{ background: getColorHex(result.secondaryColor) }}></div>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                  <MoreVertical className="h-4 w-4" />
+                                  <span className="sr-only">Open menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  className="text-red-600 focus:text-red-600 cursor-pointer"
+                                  onClick={(e) => openDeleteDialog(result.id, e)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <div className="w-4 h-8 rounded-sm" style={{ background: getColorHex(result.dominantColor) }}></div>
-                          <div className="w-4 h-8 rounded-sm" style={{ background: getColorHex(result.secondaryColor) }}></div>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -270,20 +388,41 @@ export default function Dashboard() {
               ) : userResults && userResults.length > 0 ? (
                 <div className="space-y-4">
                   {userResults.map((result: any) => (
-                    <Link key={result.id} href={`/results/${result.id}`}>
-                      <div className="flex items-center p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
-                        <div className="flex-1">
-                          <h4 className="font-medium">{result.title || `Assessment on ${new Date(result.createdAt).toLocaleDateString()}`}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {result.personalityType} - Dominant: {result.dominantColor.replace(/-/g, ' ')}
-                          </p>
+                    <div key={result.id} className="relative">
+                      <Link href={`/results/${result.id}`}>
+                        <div className="flex items-center p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
+                          <div className="flex-1">
+                            <h4 className="font-medium">{result.title || `Assessment on ${new Date(result.createdAt).toLocaleDateString()}`}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {result.personalityType} - Dominant: {result.dominantColor.replace(/-/g, ' ')}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex gap-2 mr-2">
+                              <div className="w-4 h-8 rounded-sm" style={{ background: getColorHex(result.dominantColor) }}></div>
+                              <div className="w-4 h-8 rounded-sm" style={{ background: getColorHex(result.secondaryColor) }}></div>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                  <MoreVertical className="h-4 w-4" />
+                                  <span className="sr-only">Open menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  className="text-red-600 focus:text-red-600 cursor-pointer"
+                                  onClick={(e) => openDeleteDialog(result.id, e)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          <div className="w-4 h-8 rounded-sm" style={{ background: getColorHex(result.dominantColor) }}></div>
-                          <div className="w-4 h-8 rounded-sm" style={{ background: getColorHex(result.secondaryColor) }}></div>
-                        </div>
-                      </div>
-                    </Link>
+                      </Link>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -400,6 +539,62 @@ export default function Dashboard() {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Delete Report Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Report</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this report? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {deleteStatus === 'error' && (
+              <div className="flex items-center gap-2 text-red-600 mb-4 p-3 rounded bg-red-50">
+                <AlertTriangle className="h-4 w-4" />
+                <p className="text-sm">Failed to delete the report. Please try again.</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setReportToDelete(null);
+                setDeleteStatus('idle');
+              }}
+              disabled={deleteStatus === 'loading'}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteReport}
+              disabled={deleteStatus === 'loading' || deleteStatus === 'success'}
+              className="relative"
+            >
+              {deleteStatus === 'loading' ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : deleteStatus === 'success' ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Deleted
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Report
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
