@@ -37,7 +37,7 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href={user ? "/dashboard" : "/"}>
+        <Link href={user ? "/dashboard?tab=overview" : "/"}>
           <div className="flex items-center space-x-3 cursor-pointer">
             <div className="flex items-center gap-1">
               {/* Fiery Red - top-right rounded */}
@@ -58,7 +58,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           {/* Always show Dashboard link in the main nav when user is logged in */}
           {user && !showRestartButton && (
-            <Link href="/dashboard">
+            <Link href="/dashboard?tab=overview">
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -72,7 +72,7 @@ export default function Header() {
           
           {showRestartButton && (
             <div className="flex gap-2">
-              <Link href={user ? "/dashboard" : "/"}>
+              <Link href={user ? "/dashboard?tab=overview" : "/"}>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -83,7 +83,7 @@ export default function Header() {
                 </Button>
               </Link>
               {user && (
-                <Link href="/dashboard">
+                <Link href="/dashboard?tab=overview">
                   <Button 
                     variant="outline" 
                     size="sm" 

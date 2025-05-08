@@ -43,7 +43,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [reportToDelete, setReportToDelete] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
-  const [deleteStatus, setDeleteStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [deleteStatus, setDeleteStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   
   // Get tab from URL search params
   const getTabFromURL = () => {
@@ -134,7 +134,7 @@ export default function Dashboard() {
       }, 1000);
     },
     onError: (error: Error) => {
-      setDeleteStatus('idle');
+      setDeleteStatus('error');
       toast({
         title: "Failed to delete report",
         description: error.message,

@@ -253,12 +253,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only team leaders can add members" });
       }
       
-      const { userEmail } = req.body;
-      if (!userEmail) {
-        return res.status(400).json({ message: "User email is required" });
+      const { email, username } = req.body;
+      
+      if (!email && !username) {
+        return res.status(400).json({ message: "Either email or username is required" });
       }
       
-      const userToAdd = await storage.getUserByEmail(userEmail);
+      // Try to find user by email or username
+      let userToAdd;
+      if (email) {
+        userToAdd = await storage.getUserByEmail(email);
+      } 
+      
+      if (!userToAdd && username) {
+        userToAdd = await storage.getUserByUsername(username);
+      }
+      
       if (!userToAdd) {
         return res.status(404).json({ message: "User not found" });
       }
