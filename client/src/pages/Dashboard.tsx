@@ -189,7 +189,7 @@ export default function Dashboard() {
                 </p>
               </CardContent>
               <CardFooter className="pt-0">
-                <Link href="/comparisons">
+                <Link href="/comparisons/create">
                   <Button size="sm" variant="outline" className="w-full">
                     <PlusCircle className="h-3.5 w-3.5 mr-2" />
                     Create a Comparison
@@ -386,7 +386,7 @@ export default function Dashboard() {
                   <BarChart2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-medium text-lg mb-2">No comparisons yet</h3>
                   <p className="text-muted-foreground mb-6">Compare your results to understand personality dynamics.</p>
-                  <Button>
+                  <Button onClick={() => navigate("/comparisons/create")}>
                     Create a Comparison
                   </Button>
                 </div>
@@ -394,7 +394,7 @@ export default function Dashboard() {
             </CardContent>
             {userComparisons && userComparisons.length > 0 && (
               <CardFooter>
-                <Button variant="outline">Create a New Comparison</Button>
+                <Button variant="outline" onClick={() => navigate("/comparisons/create")}>Create a New Comparison</Button>
               </CardFooter>
             )}
           </Card>
