@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useRoute, Link } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useRoute, useLocation, Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,9 +10,23 @@ import { ColorProfileDetail } from "@/components/ColorProfile";
 import { colorProfiles, personalityProfiles, ColorType, PersonalityType } from "@/lib/colorProfiles";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import { DownloadIcon, PrinterIcon } from "lucide-react";
+import { DownloadIcon, PrinterIcon, Trash2, AlertCircle } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 interface QuizResultData {
   id: number;
@@ -25,9 +39,47 @@ interface QuizResultData {
 
 export default function Results() {
   const [match, params] = useRoute<{ resultId?: string }>("/results/:resultId?");
+  const [, navigate] = useLocation();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [chartJsLoaded, setChartJsLoaded] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
+  // Delete report mutation
+  const deleteReportMutation = useMutation({
+    mutationFn: async () => {
+      if (!params?.resultId) return;
+      
+      const response = await apiRequest("DELETE", `/api/user/results/${params.resultId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete report");
+      }
+      return true;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Report deleted",
+        description: "Your report has been permanently deleted",
+      });
+      
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["/api/user/results"] });
+      
+      // Navigate back to dashboard
+      navigate("/dashboard?tab=reports");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to delete report",
+        description: error.message,
+        variant: "destructive"
+      });
+      setIsDeleteDialogOpen(false);
+    }
+  });
   
   // Mock result data for when no resultId is provided
   const mockResult: QuizResultData = {
@@ -850,6 +902,7 @@ export default function Results() {
               </>
             )}
           </Button>
+          
           <Button 
             variant="outline" 
             onClick={() => window.print()}
@@ -858,6 +911,51 @@ export default function Results() {
             <PrinterIcon size={18} />
             Print
           </Button>
+          
+          {/* Only show delete button for authenticated users with a real report */}
+          {user && params?.resultId && (
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="text-red-500 border-red-200 hover:bg-red-50 hover:text-red-600 flex items-center gap-2"
+                >
+                  <Trash2 size={18} />
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-red-500" />
+                    Delete this report?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your
+                    personality profile report and all associated data.
+                    {/* Add warning about comparisons */}
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md text-amber-800">
+                      <p className="font-medium">Note:</p> 
+                      <p>If this report is used in any comparisons, you'll need to delete those comparisons first.</p>
+                    </div>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) => {
+                      e.preventDefault();
+                      deleteReportMutation.mutate();
+                    }}
+                    className="bg-red-500 hover:bg-red-600"
+                    disabled={deleteReportMutation.isPending}
+                  >
+                    {deleteReportMutation.isPending ? "Deleting..." : "Delete Report"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
       
