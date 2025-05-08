@@ -32,10 +32,10 @@ interface TeamDetails {
 interface TeamMember {
   id: number;
   userId: number;
-  username: string;
-  fullName: string;
-  email: string;
   isLeader: boolean;
+  username?: string;
+  fullName?: string;
+  email?: string;
 }
 
 export default function TeamView() {
@@ -56,15 +56,9 @@ export default function TeamView() {
     enabled: !!user && !isNaN(teamId),
   });
 
-  // Get initials for avatar
-  const getInitials = (name: string) => {
-    if (!name) return "?";
-    
-    return name
-      .split(' ')
-      .map(part => part.charAt(0))
-      .join('')
-      .toUpperCase();
+  // Helper to display a user identifier
+  const getUserIdentifier = (userId: number) => {
+    return userId.toString().charAt(0).toUpperCase();
   };
 
   // Redirect if not logged in
@@ -195,12 +189,12 @@ export default function TeamView() {
                             <div className="flex items-center gap-4">
                               <Avatar className="h-10 w-10">
                                 <AvatarFallback className="bg-primary">
-                                  {getInitials(member.fullName)}
+                                  {getUserIdentifier(member.userId)}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
                                 <h4 className="font-medium flex items-center gap-2">
-                                  {member.fullName}
+                                  {member.username || `Member ${member.userId}`}
                                   {member.isLeader && (
                                     <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
                                       Leader
@@ -208,7 +202,7 @@ export default function TeamView() {
                                   )}
                                 </h4>
                                 <p className="text-sm text-muted-foreground">
-                                  {member.email}
+                                  User ID: {member.userId}
                                 </p>
                               </div>
                             </div>
