@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { insertQuizResultSchema } from "@shared/schema";
 import { setupAuth, requireAuth } from "./auth";
+import { log } from "./vite";
 
 const answerSchema = z.object({
   questionId: z.number(),
@@ -18,6 +19,43 @@ const submissionSchema = z.object({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
+  
+  // Forgot username endpoint
+  app.post("/api/forgot-username", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      const user = await storage.getUserByEmail(email);
+      
+      // For security, always return a success response even if no user is found
+      // This prevents user enumeration attacks
+      
+      if (user) {
+        // In a real implementation, this would send an email with the user's username
+        log(`Username recovery email would be sent to ${email} with username: ${user.username}`, "auth");
+        
+        // If SendGrid was set up:
+        // await sendEmail(process.env.SENDGRID_API_KEY, {
+        //   to: email,
+        //   from: "support@insightsdiscovery.com",
+        //   subject: "Your Username Recovery",
+        //   text: `Hello ${user.fullName},\n\nYour username is: ${user.username}\n\nIf you did not request this, please ignore this email.`,
+        //   html: `<p>Hello ${user.fullName},</p><p>Your username is: <strong>${user.username}</strong></p><p>If you did not request this, please ignore this email.</p>`
+        // });
+      } else {
+        log(`Username recovery requested for email: ${email}, but no user was found`, "auth");
+      }
+      
+      res.json({ success: true, message: "If an account exists with that email, we've sent the username to that address." });
+    } catch (error) {
+      console.error("Error processing username recovery:", error);
+      res.status(500).json({ message: "Failed to process username recovery request" });
+    }
+  });
   
   // User results endpoints
   app.get("/api/user/results", requireAuth, async (req, res) => {

@@ -61,10 +61,10 @@ export class DatabaseStorage implements IStorage {
   private async initializeQuizQuestions() {
     try {
       // Check if questions already exist
-      const result = await db.execute(
+      const result = await db.execute<{ count: string }>(
         `SELECT COUNT(*) as count FROM quiz_questions`
       );
-      const count = parseInt(result.rows[0].count, 10);
+      const count = parseInt(result.rows[0]?.count || '0', 10);
       
       if (count === 0) {
         console.log('Initializing quiz questions...');
