@@ -82,6 +82,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Delete a quiz result
+  app.delete("/api/user/results/:id", requireAuth, async (req, res) => {
+    try {
+      const resultId = parseInt(req.params.id, 10);
+      if (isNaN(resultId)) {
+        return res.status(400).json({ message: "Invalid result ID" });
+      }
+      
+      const userId = req.user!.id;
+      const result = await storage.getQuizResult(resultId);
+      
+      if (!result) {
+        return res.status(404).json({ message: "Quiz result not found" });
+      }
+      
+      // Verify that the result belongs to the user
+      if (result.userId !== userId) {
+        return res.status(403).json({ message: "You don't have permission to delete this result" });
+      }
+      
+      // Check if the result is referenced in any comparisons
+      const userComparisons = await storage.getUserReportComparisons(userId);
+      const isUsedInComparison = userComparisons.some(
+        comparison => comparison.reportAId === resultId || comparison.reportBId === resultId
+      );
+      
+      if (isUsedInComparison) {
+        return res.status(400).json({ 
+          message: "This result is used in one or more comparisons. Please delete those comparisons first." 
+        });
+      }
+      
+      // Delete all answers associated with this result
+      await storage.deleteQuizAnswersByResultId(resultId);
+      
+      // Delete the result
+      await storage.deleteQuizResult(resultId);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting quiz result:", error);
+      res.status(500).json({ message: "Failed to delete quiz result" });
+    }
+  });
+  
   // Team management endpoints
   app.post("/api/teams", requireAuth, async (req, res) => {
     try {

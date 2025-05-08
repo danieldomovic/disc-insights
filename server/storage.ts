@@ -48,6 +48,8 @@ export interface IStorage {
   // Quiz answer methods
   createQuizAnswer(answer: InsertQuizAnswer): Promise<QuizAnswer>;
   getQuizAnswersByResultId(resultId: number): Promise<QuizAnswer[]>;
+  deleteQuizAnswersByResultId(resultId: number): Promise<void>;
+  deleteQuizResult(resultId: number): Promise<void>;
   
   // Team methods
   createTeam(team: InsertTeam): Promise<Team>;
@@ -197,6 +199,22 @@ export class MemStorage implements IStorage {
     return Array.from(this.quizAnswers.values()).filter(
       (answer) => answer.resultId === resultId
     );
+  }
+  
+  async deleteQuizAnswersByResultId(resultId: number): Promise<void> {
+    // Find all answers for this result
+    const answersToDelete = Array.from(this.quizAnswers.entries())
+      .filter(([_, answer]) => answer.resultId === resultId)
+      .map(([id, _]) => id);
+    
+    // Delete each answer
+    for (const id of answersToDelete) {
+      this.quizAnswers.delete(id);
+    }
+  }
+  
+  async deleteQuizResult(resultId: number): Promise<void> {
+    this.quizResults.delete(resultId);
   }
   
   // Stubbed team methods

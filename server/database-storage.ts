@@ -158,6 +158,14 @@ export class DatabaseStorage implements IStorage {
       .from(quizAnswers)
       .where(eq(quizAnswers.resultId, resultId));
   }
+  
+  async deleteQuizAnswersByResultId(resultId: number): Promise<void> {
+    await db.delete(quizAnswers).where(eq(quizAnswers.resultId, resultId));
+  }
+  
+  async deleteQuizResult(resultId: number): Promise<void> {
+    await db.delete(quizResults).where(eq(quizResults.id, resultId));
+  }
 
   // Team methods
   async createTeam(teamData: InsertTeam): Promise<Team> {
