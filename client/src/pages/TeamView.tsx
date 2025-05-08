@@ -264,9 +264,11 @@ export default function TeamView() {
                         <LinkIcon className="h-4 w-4" />
                         {generateInviteMutation.isPending ? "Generating..." : "Create Invite Link"}
                       </Button>
-                      <Button className="flex items-center gap-2">
+                      <Button 
+                        className="flex items-center gap-2"
+                      >
                         <UserPlus className="h-4 w-4" />
-                        Add Member
+                        Add Member Manually
                       </Button>
                     </div>
                   )}
@@ -318,9 +320,12 @@ export default function TeamView() {
                             : "There are no members in this team yet."}
                         </p>
                         {team.isLeader && (
-                          <Button>
-                            <UserPlus className="h-4 w-4 mr-2" />
-                            Add First Member
+                          <Button
+                            onClick={() => generateInviteMutation.mutate()}
+                            disabled={generateInviteMutation.isPending}
+                          >
+                            <LinkIcon className="h-4 w-4 mr-2" />
+                            {generateInviteMutation.isPending ? "Generating..." : "Create Invite Link"}
                           </Button>
                         )}
                       </div>

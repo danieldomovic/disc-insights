@@ -148,6 +148,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Generate team invite link
+  app.post("/api/teams/:id/invite", requireAuth, async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id, 10);
+      if (isNaN(teamId)) {
+        return res.status(400).json({ message: "Invalid team ID" });
+      }
+      
+      const userId = req.user!.id;
+      const isLeader = await storage.isTeamLeader(userId, teamId);
+      
+      if (!isLeader) {
+        return res.status(403).json({ message: "Only team leaders can generate invite links" });
+      }
+      
+      // Generate a random token for the invite
+      const inviteToken = Math.random().toString(36).substring(2, 15) + 
+                         Math.random().toString(36).substring(2, 15);
+      
+      // In a real implementation, you would store this token in the database
+      // For this implementation, we'll just return it
+      // In production, you'd want to add an expiration date and other security measures
+      
+      res.json({ inviteToken });
+    } catch (error) {
+      console.error("Error generating team invite:", error);
+      res.status(500).json({ message: "Failed to generate team invite" });
+    }
+  });
+  
+  // Handle team join via invite
+  app.get("/api/teams/join/:token", requireAuth, async (req, res) => {
+    try {
+      const { token } = req.params;
+      const userId = req.user!.id;
+      
+      // In a real implementation, you would validate the token and get the team ID
+      // For this implementation, we'll handle it in the frontend
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error joining team:", error);
+      res.status(500).json({ message: "Failed to join team" });
+    }
+  });
+
   app.post("/api/teams/:id/members", requireAuth, async (req, res) => {
     try {
       const teamId = parseInt(req.params.id, 10);
