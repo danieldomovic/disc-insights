@@ -99,13 +99,19 @@ export default function AuthPage() {
   
   const onForgotUsernameSubmit = async (values: ForgotUsernameFormValues) => {
     try {
+      console.log("Starting username recovery for email:", values.email);
       setIsRecovering(true);
       
       // Make an API call to the forgot-username endpoint
-      await apiRequest("POST", "/api/forgot-username", { email: values.email });
+      const response = await apiRequest("POST", "/api/forgot-username", { email: values.email });
+      console.log("Recovery API response:", response.ok);
       
       setForgotUsernameSuccess(true);
+      console.log("Set forgotUsernameSuccess to true");
+      
       setResetMessage(`If an account exists with the email ${values.email}, we've sent the username to that address.`);
+      console.log("Reset message set");
+      
       forgotUsernameForm.reset();
     } catch (error) {
       console.error("Error requesting username recovery:", error);
@@ -344,10 +350,28 @@ export default function AuthPage() {
           </DialogHeader>
           
           {forgotUsernameSuccess ? (
-            <Alert className="mt-4 bg-green-50">
-              <AlertTitle>Username Recovery Email Sent</AlertTitle>
-              <AlertDescription>{resetMessage}</AlertDescription>
-            </Alert>
+            <div className="space-y-4 py-4">
+              <Alert className="mt-4 bg-green-50">
+                <AlertTitle>Username Recovery Email Sent</AlertTitle>
+                <AlertDescription>{resetMessage}</AlertDescription>
+              </Alert>
+              <DialogFooter className="mt-6">
+                <Button 
+                  type="button" 
+                  onClick={() => {
+                    console.log("Closing dialog");
+                    setShowForgotUsername(false);
+                    // Reset the state for next time
+                    setTimeout(() => {
+                      setForgotUsernameSuccess(false);
+                      setResetMessage("");
+                    }, 300);
+                  }}
+                >
+                  Done
+                </Button>
+              </DialogFooter>
+            </div>
           ) : (
             <Form {...forgotUsernameForm}>
               <form onSubmit={forgotUsernameForm.handleSubmit(onForgotUsernameSubmit)} className="space-y-4 py-4">
