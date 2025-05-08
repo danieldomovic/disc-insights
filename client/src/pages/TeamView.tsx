@@ -62,6 +62,10 @@ export default function TeamView() {
   const [inviteLink, setInviteLink] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
   const [showInviteDialog, setShowInviteDialog] = useState<boolean>(false);
+  const [showAddMemberDialog, setShowAddMemberDialog] = useState<boolean>(false);
+  const [newMemberEmail, setNewMemberEmail] = useState<string>("");
+  const [newMemberUsername, setNewMemberUsername] = useState<string>("");
+  const [addMemberStatus, setAddMemberStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   
   // Fetch team details
   const {
@@ -94,6 +98,46 @@ export default function TeamView() {
     onError: (error: Error) => {
       toast({
         title: "Failed to generate invite link",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Add member manually mutation
+  const addMemberMutation = useMutation({
+    mutationFn: async (data: { email?: string; username?: string }) => {
+      setAddMemberStatus("loading");
+      const response = await apiRequest("POST", `/api/teams/${teamId}/members`, data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add team member");
+      }
+      return await response.json();
+    },
+    onSuccess: () => {
+      setAddMemberStatus("success");
+      setNewMemberEmail("");
+      setNewMemberUsername("");
+      
+      // Close dialog and show success message
+      setTimeout(() => {
+        setShowAddMemberDialog(false);
+        setAddMemberStatus("idle");
+        
+        toast({
+          title: "Team member added",
+          description: "The user has been successfully added to your team.",
+        });
+        
+        // Refresh team data
+        queryClient.invalidateQueries({ queryKey: [`/api/teams/${teamId}`] });
+      }, 1500);
+    },
+    onError: (error: Error) => {
+      setAddMemberStatus("error");
+      toast({
+        title: "Failed to add team member",
         description: error.message,
         variant: "destructive",
       });
@@ -266,6 +310,7 @@ export default function TeamView() {
                       </Button>
                       <Button 
                         className="flex items-center gap-2"
+                        onClick={() => setShowAddMemberDialog(true)}
                       >
                         <UserPlus className="h-4 w-4" />
                         Add Member Manually
@@ -408,6 +453,98 @@ export default function TeamView() {
               onClick={() => setShowInviteDialog(false)}
             >
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Add Member Dialog */}
+      <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Team Member</DialogTitle>
+            <DialogDescription>
+              Add a user to your team by email or username.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="member-email">Email</Label>
+              <Input
+                id="member-email"
+                placeholder="user@example.com"
+                type="email"
+                value={newMemberEmail}
+                onChange={(e) => setNewMemberEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="member-username">Username</Label>
+                <span className="text-xs text-muted-foreground">Optional</span>
+              </div>
+              <Input
+                id="member-username"
+                placeholder="username"
+                value={newMemberUsername}
+                onChange={(e) => setNewMemberUsername(e.target.value)}
+              />
+            </div>
+            <div className="text-sm text-muted-foreground mt-2">
+              {addMemberStatus === "error" ? (
+                <p className="text-red-500">Failed to add member. The user may not exist or is already in the team.</p>
+              ) : (
+                <p>At least one of email or username must be provided.</p>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="flex items-center gap-3">
+            <Button 
+              variant="secondary" 
+              onClick={() => {
+                setShowAddMemberDialog(false);
+                setNewMemberEmail("");
+                setNewMemberUsername("");
+                setAddMemberStatus("idle");
+              }}
+              disabled={addMemberStatus === "loading" || addMemberStatus === "success"}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                if (newMemberEmail || newMemberUsername) {
+                  addMemberMutation.mutate({
+                    email: newMemberEmail || undefined,
+                    username: newMemberUsername || undefined
+                  });
+                } else {
+                  toast({
+                    title: "Missing information",
+                    description: "Please provide either an email or a username.",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              disabled={addMemberStatus === "loading" || addMemberStatus === "success" || (!newMemberEmail && !newMemberUsername)}
+              className="relative"
+            >
+              {addMemberStatus === "loading" ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Adding Member...
+                </>
+              ) : addMemberStatus === "success" ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Member Added!
+                </>
+              ) : (
+                <>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Add Member
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
