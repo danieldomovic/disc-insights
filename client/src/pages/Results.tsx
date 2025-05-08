@@ -450,7 +450,7 @@ export default function Results() {
           <CardContent className="p-6">
             <h3 className="text-xl font-bold mb-4">Your {colorProfiles[result.dominantColor].name} Energy</h3>
             <div className="space-y-4">
-              <ColorProfileDetail colorType={result.dominantColor} />
+              <ColorProfileDetail color={result.dominantColor} />
             </div>
           </CardContent>
         </Card>
@@ -460,7 +460,7 @@ export default function Results() {
           <CardContent className="p-6">
             <h3 className="text-xl font-bold mb-4">Your {colorProfiles[result.secondaryColor].name} Energy</h3>
             <div className="space-y-4">
-              <ColorProfileDetail colorType={result.secondaryColor} />
+              <ColorProfileDetail color={result.secondaryColor} />
             </div>
           </CardContent>
         </Card>

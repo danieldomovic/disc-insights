@@ -56,6 +56,20 @@ export default function Header() {
         </Link>
         
         <div className="flex items-center gap-4">
+          {/* Always show Dashboard link in the main nav when user is logged in */}
+          {user && !showRestartButton && (
+            <Link href="/dashboard">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
+              >
+                <BarChart2 className="h-4 w-4 text-indigo-600" />
+                <span className="text-indigo-700">Dashboard</span>
+              </Button>
+            </Link>
+          )}
+          
           {showRestartButton && (
             <div className="flex gap-2">
               <Link href={user ? "/dashboard" : "/"}>
@@ -75,8 +89,8 @@ export default function Header() {
                     size="sm" 
                     className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
                   >
-                    <User className="h-4 w-4 text-indigo-600" />
-                    <span className="text-indigo-700">My Dashboard</span>
+                    <BarChart2 className="h-4 w-4 text-indigo-600" />
+                    <span className="text-indigo-700">Dashboard</span>
                   </Button>
                 </Link>
               )}
@@ -101,21 +115,45 @@ export default function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => window.location.href = "/dashboard?tab=profile"}>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">
+                      <div className="flex items-center w-full">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </div>
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.location.href = "/dashboard?tab=reports"}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    <span>My Reports</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard?tab=overview">
+                      <div className="flex items-center w-full">
+                        <BarChart2 className="mr-2 h-4 w-4" />
+                        <span>Dashboard</span>
+                      </div>
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.location.href = "/dashboard?tab=teams"}>
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>My Teams</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard?tab=reports">
+                      <div className="flex items-center w-full">
+                        <FileText className="mr-2 h-4 w-4" />
+                        <span>My Reports</span>
+                      </div>
+                    </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => window.location.href = "/dashboard?tab=comparisons"}>
-                    <BarChart2 className="mr-2 h-4 w-4" />
-                    <span>Comparisons</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard?tab=teams">
+                      <div className="flex items-center w-full">
+                        <Users className="mr-2 h-4 w-4" />
+                        <span>My Teams</span>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard?tab=comparisons">
+                      <div className="flex items-center w-full">
+                        <BarChart2 className="mr-2 h-4 w-4" />
+                        <span>Comparisons</span>
+                      </div>
+                    </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

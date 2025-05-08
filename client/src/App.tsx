@@ -14,6 +14,7 @@ import TeamView from "@/pages/TeamView";
 import TeamJoin from "@/pages/TeamJoin";
 import ComparisonCreate from "@/pages/ComparisonCreate";
 import ComparisonView from "@/pages/ComparisonView";
+import Profile from "@/pages/Profile";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -41,7 +42,7 @@ function AppRoutes() {
           <ProtectedRoute path="/comparisons/create" component={ComparisonCreate} />
           <ProtectedRoute path="/comparisons/:id" component={ComparisonView} />
           <ProtectedRoute path="/dashboard" component={Dashboard} />
-          <ProtectedRoute path="/profile" component={Dashboard} />
+          <ProtectedRoute path="/profile" component={Profile} />
           <ProtectedRoute path="/teams" component={Dashboard} />
           <ProtectedRoute path="/reports" component={Dashboard} />
           <ProtectedRoute path="/comparisons" component={Dashboard} />
