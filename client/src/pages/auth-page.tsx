@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,9 @@ import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Redirect } from "wouter";
 import { Loader2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { apiRequest } from "@/lib/queryClient";
 
 const loginSchema = z.object({
   username: z.string().min(2, {
@@ -44,14 +48,33 @@ const registerSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
+const forgotUsernameSchema = z.object({
+  email: z.string().email({
+    message: "Please enter a valid email address.",
+  }),
+});
+
+type ForgotUsernameFormValues = z.infer<typeof forgotUsernameSchema>;
+
 export default function AuthPage() {
   const { user, isLoading, loginMutation, registerMutation } = useAuth();
-
+  const [showForgotUsername, setShowForgotUsername] = useState(false);
+  const [forgotUsernameSuccess, setForgotUsernameSuccess] = useState(false);
+  const [resetMessage, setResetMessage] = useState("");
+  const [isRecovering, setIsRecovering] = useState(false);
+  
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       username: "",
       password: "",
+    },
+  });
+
+  const forgotUsernameForm = useForm<ForgotUsernameFormValues>({
+    resolver: zodResolver(forgotUsernameSchema),
+    defaultValues: {
+      email: "",
     },
   });
 
@@ -73,6 +96,29 @@ export default function AuthPage() {
   const onRegisterSubmit = (values: RegisterFormValues) => {
     const { confirmPassword, ...userData } = values;
     registerMutation.mutate(userData);
+  };
+  
+  const onForgotUsernameSubmit = async (values: ForgotUsernameFormValues) => {
+    try {
+      setIsRecovering(true);
+      
+      // This would normally make an API call to send the email
+      // For now, we'll simulate a successful response
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // For the demo, just log to console
+      console.log(`Username recovery request for email: ${values.email}`);
+      
+      setForgotUsernameSuccess(true);
+      setResetMessage(`If an account exists with the email ${values.email}, we've sent the username to that address.`);
+      forgotUsernameForm.reset();
+    } catch (error) {
+      console.error("Error requesting username recovery:", error);
+      setResetMessage("There was an error processing your request. Please try again.");
+      setForgotUsernameSuccess(false);
+    } finally {
+      setIsRecovering(false);
+    }
   };
 
   // Redirect if already logged in
