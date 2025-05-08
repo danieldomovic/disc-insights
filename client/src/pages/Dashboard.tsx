@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [, navigate] = useLocation();
   
   interface Result {
     id: number;
@@ -139,12 +140,15 @@ export default function Dashboard() {
                 </p>
               </CardContent>
               <CardFooter className="pt-0">
-                <Link href="/teams">
-                  <Button size="sm" variant="outline" className="w-full">
-                    <PlusCircle className="h-3.5 w-3.5 mr-2" />
-                    Create a New Team
-                  </Button>
-                </Link>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate("/teams/create")}
+                >
+                  <PlusCircle className="h-3.5 w-3.5 mr-2" />
+                  Create a New Team
+                </Button>
               </CardFooter>
             </Card>
             
@@ -312,7 +316,7 @@ export default function Dashboard() {
                   <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-medium text-lg mb-2">No teams yet</h3>
                   <p className="text-muted-foreground mb-6">Create a team to collaborate and analyze group dynamics.</p>
-                  <Button onClick={() => window.location.href = "/teams/create"}>
+                  <Button onClick={() => navigate("/teams/create")}>
                     Create a Team
                   </Button>
                 </div>
@@ -320,7 +324,7 @@ export default function Dashboard() {
             </CardContent>
             {userTeams && userTeams.length > 0 && (
               <CardFooter>
-                <Button variant="outline" onClick={() => window.location.href = "/teams/create"}>
+                <Button variant="outline" onClick={() => navigate("/teams/create")}>
                   Create a New Team
                 </Button>
               </CardFooter>
