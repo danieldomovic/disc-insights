@@ -17,7 +17,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
+  
+  // Get tab from URL search params
+  const getTabFromURL = () => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      return tab === 'profile' || tab === 'reports' || tab === 'teams' || tab === 'comparisons' 
+        ? tab 
+        : 'overview';
+    }
+    return 'overview';
+  };
   
   interface Result {
     id: number;
@@ -74,7 +86,15 @@ export default function Dashboard() {
         </p>
       </header>
       
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs 
+        defaultValue={getTabFromURL()} 
+        className="space-y-6"
+        onValueChange={(value) => {
+          // Update URL when tab changes
+          const url = new URL(window.location.href);
+          url.searchParams.set('tab', value);
+          window.history.pushState({}, '', url);
+        }}>
         <TabsList>
           <TabsTrigger value="overview" className="flex items-center gap-2">
             <LayoutDashboard className="h-4 w-4" />

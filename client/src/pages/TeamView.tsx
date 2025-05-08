@@ -1,10 +1,21 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Redirect, useLocation, useParams, Link } from "wouter";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { 
   Users, 
   UserPlus, 
@@ -12,13 +23,17 @@ import {
   Settings, 
   BarChart2, 
   CircleUserRound,
-  Loader2
+  Loader2,
+  Copy,
+  Link as LinkIcon,
+  CheckCircle
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface TeamDetails {
   id: number;
@@ -44,6 +59,9 @@ export default function TeamView() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const teamId = parseInt(params.id, 10);
+  const [inviteLink, setInviteLink] = useState<string>("");
+  const [copied, setCopied] = useState<boolean>(false);
+  const [showInviteDialog, setShowInviteDialog] = useState<boolean>(false);
   
   // Fetch team details
   const {
@@ -55,6 +73,71 @@ export default function TeamView() {
     queryKey: [`/api/teams/${teamId}`],
     enabled: !!user && !isNaN(teamId),
   });
+  
+  // Generate invite link mutation
+  const generateInviteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", `/api/teams/${teamId}/invite`, {});
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      // Create an invite link using the invite token
+      const baseUrl = window.location.origin;
+      const link = `${baseUrl}/teams/join/${data.inviteToken}`;
+      setInviteLink(link);
+      setShowInviteDialog(true);
+      toast({
+        title: "Invite link generated!",
+        description: "Share this link with your team members to join.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to generate invite link",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Handle copy to clipboard
+  const copyToClipboard = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(inviteLink)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 3000);
+        })
+        .catch(() => {
+          toast({
+            title: "Failed to copy",
+            description: "Please copy the link manually",
+            variant: "destructive",
+          });
+        });
+    } else {
+      // Fallback for browsers that don't support clipboard API
+      const textarea = document.createElement('textarea');
+      textarea.value = inviteLink;
+      textarea.style.position = 'fixed';
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        document.execCommand('copy');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
+      } catch (err) {
+        toast({
+          title: "Failed to copy",
+          description: "Please copy the link manually",
+          variant: "destructive",
+        });
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+  };
 
   // Helper to display a user identifier
   const getUserIdentifier = (userId: number) => {
@@ -103,7 +186,7 @@ export default function TeamView() {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto py-10 px-4 sm:px-6">
+    <div className="container max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <Button 
         variant="ghost" 
         className="mb-6 pl-0 flex items-center gap-2"
@@ -171,10 +254,21 @@ export default function TeamView() {
                     </CardDescription>
                   </div>
                   {team.isLeader && (
-                    <Button className="flex items-center gap-2">
-                      <UserPlus className="h-4 w-4" />
-                      Add Member
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline"
+                        className="flex items-center gap-2"
+                        onClick={() => generateInviteMutation.mutate()}
+                        disabled={generateInviteMutation.isPending}
+                      >
+                        <LinkIcon className="h-4 w-4" />
+                        {generateInviteMutation.isPending ? "Generating..." : "Create Invite Link"}
+                      </Button>
+                      <Button className="flex items-center gap-2">
+                        <UserPlus className="h-4 w-4" />
+                        Add Member
+                      </Button>
+                    </div>
                   )}
                 </CardHeader>
                 <CardContent>
@@ -267,6 +361,52 @@ export default function TeamView() {
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       )}
+      
+      {/* Invite Link Dialog */}
+      <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Team Invite Link</DialogTitle>
+            <DialogDescription>
+              Share this link with your team members to join the team.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2 mt-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="invite-link" className="sr-only">Invite Link</Label>
+              <Input
+                id="invite-link"
+                value={inviteLink}
+                readOnly
+                className="font-mono text-sm"
+              />
+            </div>
+            <Button 
+              type="button" 
+              size="icon" 
+              variant="outline"
+              className="px-3"
+              onClick={copyToClipboard}
+            >
+              {copied ? (
+                <CheckCircle className="h-4 w-4 text-green-600" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+              <span className="sr-only">Copy</span>
+            </Button>
+          </div>
+          <DialogFooter className="sm:justify-start mt-4">
+            <Button 
+              type="button" 
+              variant="secondary"
+              onClick={() => setShowInviteDialog(false)}
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
