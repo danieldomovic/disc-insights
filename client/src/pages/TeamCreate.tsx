@@ -76,26 +76,26 @@ export default function TeamCreate() {
   }
   
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-2xl mx-auto py-10 px-4 sm:px-6">
       <Button 
         variant="ghost" 
-        className="mb-6 pl-0 flex items-center gap-2"
+        className="mb-8 pl-0 flex items-center gap-2"
         onClick={() => window.history.back()}
       >
         <ArrowLeft className="h-4 w-4" />
         Back
       </Button>
       
-      <Card>
-        <CardHeader>
-          <CardTitle>Create a New Team</CardTitle>
-          <CardDescription>
+      <Card className="shadow-md">
+        <CardHeader className="text-center pb-6">
+          <CardTitle className="text-2xl font-bold">Create a New Team</CardTitle>
+          <CardDescription className="max-w-md mx-auto mt-2">
             Create a team to invite team members and analyze group personality dynamics
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-6 sm:px-10">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
                 name="name"
@@ -103,7 +103,7 @@ export default function TeamCreate() {
                   <FormItem>
                     <FormLabel>Team Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Marketing Team" {...field} />
+                      <Input placeholder="Marketing Team" className="py-6" {...field} />
                     </FormControl>
                     <FormDescription>
                       Enter a descriptive name for your team
@@ -122,7 +122,7 @@ export default function TeamCreate() {
                     <FormControl>
                       <Textarea 
                         placeholder="A brief description of your team and its purpose" 
-                        className="min-h-[120px]"
+                        className="min-h-[150px] resize-none"
                         {...field} 
                       />
                     </FormControl>
@@ -134,20 +134,23 @@ export default function TeamCreate() {
                 )}
               />
               
-              <Button 
-                type="submit" 
-                className="min-w-[120px]"
-                disabled={createTeamMutation.isPending}
-              >
-                {createTeamMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  "Create Team"
-                )}
-              </Button>
+              <div className="flex justify-center mt-8 pt-4">
+                <Button 
+                  type="submit" 
+                  className="min-w-[160px] py-6"
+                  size="lg"
+                  disabled={createTeamMutation.isPending}
+                >
+                  {createTeamMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    "Create Team"
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
