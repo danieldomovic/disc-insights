@@ -172,6 +172,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Not a member of this team" });
       }
       
+      // Check if the current user is a team leader
+      const isLeader = await storage.isTeamLeader(userId, teamId);
+      console.log(`User ${userId} is team leader for team ${teamId}: ${isLeader}`);
+      
       const team = await storage.getTeam(teamId);
       if (!team) {
         return res.status(404).json({ message: "Team not found" });
@@ -179,8 +183,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const members = await storage.getTeamMembers(teamId);
       
-      res.json({
+      // Add isLeader flag explicitly to the response
+      const response = {
         ...team,
+        isLeader: isLeader, // Set this explicitly based on the query
         members: members.map(m => ({
           id: m.id,
           userId: m.userId,
@@ -189,7 +195,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           fullName: m.fullName, 
           email: m.email
         }))
+      };
+      
+      console.log("Team response:", {
+        id: response.id, 
+        name: response.name, 
+        isLeader: response.isLeader,
+        memberCount: response.members.length
       });
+      
+      res.json(response);
     } catch (error) {
       console.error("Error fetching team:", error);
       res.status(500).json({ message: "Failed to fetch team" });

@@ -75,14 +75,7 @@ export default function TeamView() {
     error
   } = useQuery<TeamDetails>({
     queryKey: [`/api/teams/${teamId}`],
-    enabled: !!user && !isNaN(teamId),
-    onSuccess: (data) => {
-      console.log("Team data loaded:", data);
-      console.log("Is user team leader?", data.isLeader);
-    },
-    onError: (err) => {
-      console.error("Error loading team:", err);
-    }
+    enabled: !!user && !isNaN(teamId)
   });
   
   // Generate invite link mutation
