@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { Breadcrumbs } from "@/components/ui/breadcrumb";
 
 interface QuizResultData {
   id: number;
@@ -236,6 +237,14 @@ export default function Results() {
   if (isLoading) {
     return (
       <div className="container max-w-4xl mx-auto py-8 px-4">
+        <Breadcrumbs 
+          items={[
+            { href: "/dashboard", label: "Dashboard" },
+            { href: "/reports", label: "Reports" },
+            { label: "Profile Results" }
+          ]}
+          className="mb-6"
+        />
         <h1 className="text-3xl font-bold text-gray-800 mb-8">Insights Discovery Profile</h1>
         <Card>
           <CardContent className="p-8">
@@ -274,6 +283,15 @@ export default function Results() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      <Breadcrumbs 
+        items={[
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/reports", label: "Reports" },
+          { label: "Profile Results" }
+        ]}
+        className="mb-6"
+      />
+      
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Insights Discovery Profile</h1>
         <div className="flex gap-3">

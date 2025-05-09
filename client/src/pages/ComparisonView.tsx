@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Breadcrumbs } from "@/components/ui/breadcrumb";
 import {
   ChevronLeft,
   Loader2,
@@ -133,14 +134,14 @@ export default function ComparisonView() {
   if (isLoading) {
     return (
       <div className="container max-w-4xl mx-auto py-12 px-4">
-        <Button 
-          variant="ghost" 
-          className="mb-6 pl-0 flex items-center gap-2"
-          onClick={() => navigate("/dashboard?tab=comparisons")}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back to Comparisons
-        </Button>
+        <Breadcrumbs 
+          items={[
+            { href: "/dashboard", label: "Dashboard" },
+            { href: "/comparisons", label: "Comparisons" },
+            { label: "Comparison Details" }
+          ]}
+          className="mb-6"
+        />
         
         <div className="flex justify-center items-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -153,14 +154,14 @@ export default function ComparisonView() {
   if (isError || !comparison) {
     return (
       <div className="container max-w-4xl mx-auto py-12 px-4">
-        <Button 
-          variant="ghost" 
-          className="mb-6 pl-0 flex items-center gap-2"
-          onClick={() => navigate("/dashboard?tab=comparisons")}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back to Comparisons
-        </Button>
+        <Breadcrumbs 
+          items={[
+            { href: "/dashboard", label: "Dashboard" },
+            { href: "/comparisons", label: "Comparisons" },
+            { label: "Comparison Details" }
+          ]}
+          className="mb-6"
+        />
         
         <Card className="text-center py-12">
           <CardContent>
@@ -187,14 +188,14 @@ export default function ComparisonView() {
   
   return (
     <div className="container max-w-5xl mx-auto py-12 px-4">
-      <Button 
-        variant="ghost" 
-        className="mb-6 pl-0 flex items-center gap-2"
-        onClick={() => navigate("/dashboard?tab=comparisons")}
-      >
-        <ChevronLeft className="h-4 w-4" />
-        Back to Comparisons
-      </Button>
+      <Breadcrumbs 
+        items={[
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/dashboard?tab=comparisons", label: "Comparisons" },
+          { label: comparison.title || "Comparison Details" }
+        ]}
+        className="mb-6"
+      />
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
