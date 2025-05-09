@@ -269,10 +269,20 @@ export default function TeamView() {
             </div>
             
             {team.isLeader && (
-              <Button variant="outline" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Team Settings
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="default" 
+                  className="flex items-center gap-2"
+                  onClick={() => setShowAddMemberDialog(true)}
+                >
+                  <UserPlus className="h-4 w-4" />
+                  Add Member Manually
+                </Button>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Team Settings
+                </Button>
+              </div>
             )}
           </div>
           
