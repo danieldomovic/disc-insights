@@ -7,9 +7,9 @@ import { motion } from "framer-motion";
 export default function WelcomePage() {
   const { user } = useAuth();
   
-  // If user is already logged in, redirect to home dashboard
+  // If user is already logged in, redirect to dashboard
   if (user) {
-    return <Redirect to="/" />;
+    return <Redirect to="/dashboard" />;
   }
   
   return (
