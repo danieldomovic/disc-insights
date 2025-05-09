@@ -38,6 +38,8 @@ export function useQuiz() {
     hasTwoMiddleValues: false,
     allOptionsSelected: false
   });
+  // Track which phase we're in (conscious or unconscious)
+  const [isConsciousPhase, setIsConsciousPhase] = useState(true);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -259,7 +261,8 @@ export function useQuiz() {
       return {
         questionId: currentQuestion.id,
         selectedColor: option.color,
-        rating: rating
+        rating: rating,
+        isConsciousResponse: isConsciousPhase
       };
     });
     
@@ -275,8 +278,18 @@ export function useQuiz() {
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // Submit the quiz
-      submitMutation.mutate([...answers, ...newAnswers]);
+      // If we've completed the conscious phase, switch to unconscious
+      if (isConsciousPhase) {
+        setIsConsciousPhase(false);
+        setCurrentQuestionIndex(0);
+        toast({
+          title: "Conscious Profile Complete",
+          description: "Now we'll assess how you perceive yourself when you're not adapting to others - your unconscious self.",
+        });
+      } else {
+        // If we've completed both phases, submit the quiz
+        submitMutation.mutate([...answers, ...newAnswers]);
+      }
     }
   };
   
@@ -284,6 +297,7 @@ export function useQuiz() {
     setCurrentQuestionIndex(0);
     setAnswers([]);
     setSelectedOptions({});
+    setIsConsciousPhase(true); // Reset to conscious phase
     setValidationErrors({
       hasL: false,
       hasM: false,
@@ -305,6 +319,7 @@ export function useQuiz() {
     restartQuiz,
     isLoadingQuestions,
     isSubmitting: submitMutation.isPending,
-    validationErrors
+    validationErrors,
+    isConsciousPhase
   };
 }

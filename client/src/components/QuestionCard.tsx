@@ -15,6 +15,7 @@ interface QuestionCardProps {
   isLastQuestion: boolean;
   isSubmitting: boolean;
   validationErrors: ValidationError;
+  isConsciousPhase?: boolean;
 }
 
 export default function QuestionCard({ 
@@ -25,7 +26,8 @@ export default function QuestionCard({
   onNext, 
   isLastQuestion,
   isSubmitting,
-  validationErrors
+  validationErrors,
+  isConsciousPhase = true
 }: QuestionCardProps) {
   // Rating options
   const ratingOptions = ['L', '1', '2', '3', '4', '5', 'M'];
@@ -83,11 +85,22 @@ export default function QuestionCard({
           {question.text}
         </h2>
         <p className="text-xs md:text-sm mb-2 text-gray-700">
-          Please select one M (Most like me), one L (Least like me), and two different values (1-5) in between.
+          {isConsciousPhase 
+            ? "Please select one M (Most like me), one L (Least like me), and two different values (1-5) for how others would describe you."
+            : "Now select which descriptors reflect your instinctive self - how you are when not adapting to your environment."
+          }
         </p>
-        <p className="text-xs mb-2 text-gray-500 italic">
-          All rows must be complete before proceeding.
+        <p className={`text-xs mb-2 ${isConsciousPhase ? 'text-gray-500' : 'text-purple-700'} italic`}>
+          {isConsciousPhase
+            ? "All rows must be complete before proceeding."
+            : "Focus on your natural tendencies, not how you adapt to different situations."
+          }
         </p>
+        {!isConsciousPhase && (
+          <div className="bg-purple-50 p-3 rounded-md mb-4 text-sm text-purple-800 border border-purple-200">
+            For this section, rate the behaviors based on how you naturally are, not how you behave in your work or social environment.
+          </div>
+        )}
         
         <div className="space-y-2">
           {question.options.map((option, index) => {

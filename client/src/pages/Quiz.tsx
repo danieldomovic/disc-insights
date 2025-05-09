@@ -19,7 +19,8 @@ export default function Quiz() {
     goToNextQuestion,
     isLoadingQuestions,
     isSubmitting,
-    validationErrors
+    validationErrors,
+    isConsciousPhase
   } = useQuiz();
   
   const { toast } = useToast();
@@ -74,11 +75,27 @@ export default function Quiz() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <ProgressBar 
-        currentQuestion={currentQuestionIndex}
-        totalQuestions={totalQuestions}
-        progress={progress}
-      />
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-medium text-gray-800">
+            {isConsciousPhase ? "Conscious Profile Assessment" : "Unconscious Profile Assessment"}
+          </h2>
+          <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+            isConsciousPhase 
+              ? "bg-blue-100 text-blue-800" 
+              : "bg-purple-100 text-purple-800"
+          }`}>
+            {isConsciousPhase 
+              ? "How others see you" 
+              : "Your instinctive self"}
+          </div>
+        </div>
+        <ProgressBar 
+          currentQuestion={currentQuestionIndex}
+          totalQuestions={totalQuestions}
+          progress={progress}
+        />
+      </div>
       
       <QuestionCard 
         question={currentQuestion}
