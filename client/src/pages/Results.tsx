@@ -835,6 +835,12 @@ export default function Results() {
                   <p className="mb-4 text-gray-700">
                     {profile.description}
                   </p>
+                  
+                  <p className="mb-4 text-gray-700">
+                    This profile represents your natural preferences and behavioral tendencies based on the Insights Discovery methodology. 
+                    Your responses to the assessment questions reveal your unique combination of color energies and how they shape your 
+                    approach to work, communication, and relationships.
+                  </p>
                 </div>
                 
                 <div 
@@ -857,6 +863,21 @@ export default function Results() {
                         </span>
                       );
                     })}
+                  </p>
+                  
+                  <p className="mt-3 text-gray-700">
+                    Your color energy preferences influence how you naturally approach situations, make decisions, 
+                    and interact with others. While everyone has all four color energies, your particular 
+                    distribution shapes your unique personality profile.
+                  </p>
+                </div>
+                
+                <div className="mt-6 p-4 bg-gray-50 rounded-md">
+                  <h4 className="font-semibold mb-2">Understanding Your Results</h4>
+                  <p className="text-gray-700 text-sm">
+                    This profile isn't about placing you in a fixed box, but rather understanding your natural 
+                    preferences and tendencies. With awareness, you can adapt your approach to different situations 
+                    and leverage your strengths while developing in areas that may not come as naturally to you.
                   </p>
                 </div>
               </div>
@@ -1063,14 +1084,39 @@ export default function Results() {
         <Card>
           <CardContent className="p-6">
             <h3 className="text-xl font-semibold mb-4">Stress Response Patterns</h3>
-            <p className="text-gray-700">
-              {colorProfiles[result.dominantColor].stressResponse}
-            </p>
-            <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
-              <h4 className="font-semibold text-amber-800 mb-2">Managing Your Stress</h4>
-              <p className="text-amber-800">
-                Recognize these patterns when they emerge and create space for self-awareness and regulation. Remember that different color energies require different stress management approaches.
-              </p>
+            <div className="space-y-4">
+              <div
+                className="p-4 rounded-md"
+                style={{ 
+                  backgroundColor: `${colorProfiles[result.dominantColor].bgColor}15`, 
+                  borderLeft: `4px solid ${colorProfiles[result.dominantColor].bgColor}` 
+                }}
+              >
+                <p className="font-semibold mb-2">Under Stress, You May:</p>
+                <p className="text-gray-700">{colorProfiles[result.dominantColor].stressResponse}</p>
+              </div>
+              
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-md">
+                <h4 className="font-semibold text-amber-800 mb-2">Managing Your Stress</h4>
+                <p className="text-amber-800 mb-3">
+                  Recognizing your stress response patterns is the first step toward effective management. When you notice these behaviors emerging, 
+                  try to pause and create space for self-awareness.
+                </p>
+                <p className="text-amber-800 mb-3">
+                  Your {colorProfiles[result.dominantColor].name} energy has specific stress triggers and response patterns. 
+                  Under pressure, this energy may become exaggerated or distorted, manifesting as the behaviors described above.
+                </p>
+                <p className="font-medium text-amber-800 mb-2">Effective strategies for your color energy might include:</p>
+                <ul className="list-disc list-inside text-amber-800 pl-4 space-y-1">
+                  <li>Taking short breaks to regain perspective</li>
+                  <li>Communicating your needs clearly to others</li>
+                  <li>Engaging in activities that naturally balance your dominant energy</li>
+                  <li>Practicing mindfulness techniques to recognize when you're becoming stressed</li>
+                </ul>
+                <p className="text-amber-800 mt-3">
+                  Remember that different color energies require different stress management approaches, and what works for others may not be effective for you.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -1079,35 +1125,118 @@ export default function Results() {
         <Card>
           <CardContent className="p-6">
             <h3 className="text-xl font-semibold mb-4">Decision-Making Tendencies</h3>
-            <p className="text-gray-700 mb-4">
-              {colorProfiles[result.dominantColor].decisionMaking}
-            </p>
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="p-4 bg-slate-50 rounded-md">
-                <h4 className="font-semibold mb-2">Strengths</h4>
-                <ul className="list-disc list-inside text-gray-700">
-                  <li>{colorProfiles[result.dominantColor].name === "Fiery Red" ? "Quick and efficient" : 
-                      colorProfiles[result.dominantColor].name === "Sunshine Yellow" ? "Creative and inclusive" :
-                      colorProfiles[result.dominantColor].name === "Earth Green" ? "Considerate and harmonious" :
-                      "Thorough and logical"}</li>
-                  <li>{colorProfiles[result.dominantColor].name === "Fiery Red" ? "Action-oriented" : 
-                      colorProfiles[result.dominantColor].name === "Sunshine Yellow" ? "Enthusiastic" :
-                      colorProfiles[result.dominantColor].name === "Earth Green" ? "Values relationships" :
-                      "Detail-oriented"}</li>
-                </ul>
+            <div className="space-y-4">
+              <div 
+                className="p-4 rounded-md"
+                style={{ 
+                  backgroundColor: `${colorProfiles[result.dominantColor].bgColor}15`, 
+                  borderLeft: `4px solid ${colorProfiles[result.dominantColor].bgColor}` 
+                }}
+              >
+                <p className="font-semibold mb-2">How You Make Decisions:</p>
+                <p className="text-gray-700">
+                  {colorProfiles[result.dominantColor].decisionMaking}
+                </p>
+                
+                <p className="text-gray-700 mt-3">
+                  With your {colorProfiles[result.dominantColor].name} energy preference, 
+                  you tend to make decisions that align with your natural tendencies toward 
+                  {result.dominantColor === 'fiery-red' 
+                    ? ' quick action and tangible results.' 
+                    : result.dominantColor === 'sunshine-yellow' 
+                      ? ' innovation and involving others in the process.' 
+                      : result.dominantColor === 'earth-green' 
+                        ? ' harmony and maintaining positive relationships.' 
+                        : ' thorough analysis and careful consideration of options.'}
+                </p>
               </div>
-              <div className="p-4 bg-slate-50 rounded-md">
-                <h4 className="font-semibold mb-2">Watch out for</h4>
-                <ul className="list-disc list-inside text-gray-700">
-                  <li>{colorProfiles[result.dominantColor].name === "Fiery Red" ? "Being too impulsive" : 
-                      colorProfiles[result.dominantColor].name === "Sunshine Yellow" ? "Overlooking details" :
-                      colorProfiles[result.dominantColor].name === "Earth Green" ? "Avoiding difficult decisions" :
-                      "Analysis paralysis"}</li>
-                  <li>{colorProfiles[result.dominantColor].name === "Fiery Red" ? "Disregarding input from others" : 
-                      colorProfiles[result.dominantColor].name === "Sunshine Yellow" ? "Changing course too often" :
-                      colorProfiles[result.dominantColor].name === "Earth Green" ? "Difficulty saying no" :
-                      "Being overly critical"}</li>
-                </ul>
+              
+              <div className="grid md:grid-cols-2 gap-4 mt-4">
+                <div 
+                  className="p-4 rounded-md"
+                  style={{ 
+                    backgroundColor: `${colorProfiles[result.dominantColor].bgColor}15`, 
+                    borderLeft: `4px solid ${colorProfiles[result.dominantColor].bgColor}` 
+                  }}
+                >
+                  <h4 className="font-semibold mb-2">Your Decision-Making Strengths</h4>
+                  <ul className="list-disc list-inside text-gray-700 pl-2 space-y-2">
+                    {result.dominantColor === 'fiery-red' ? (
+                      <>
+                        <li>Quick and efficient in your approach</li>
+                        <li>Action-oriented, moving decisively</li>
+                        <li>Focused on achieving outcomes</li>
+                        <li>Decisive and direct when needed</li>
+                      </>
+                    ) : result.dominantColor === 'sunshine-yellow' ? (
+                      <>
+                        <li>Creative and inclusive in your thinking</li>
+                        <li>Enthusiastic about exploring options</li>
+                        <li>Considering multiple possibilities</li>
+                        <li>Bringing energy to decision processes</li>
+                      </>
+                    ) : result.dominantColor === 'earth-green' ? (
+                      <>
+                        <li>Considerate and harmonious in approach</li>
+                        <li>Valuing relationship impacts</li>
+                        <li>Patient and thoughtful deliberation</li>
+                        <li>Including others' perspectives</li>
+                      </>
+                    ) : (
+                      <>
+                        <li>Thorough and logical analysis</li>
+                        <li>Detail-oriented examination</li>
+                        <li>Analytical and precise evaluation</li>
+                        <li>Research-based approach</li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+                
+                <div className="p-4 rounded-md bg-slate-50 border border-slate-200">
+                  <h4 className="font-semibold mb-2">Potential Challenges to Watch For</h4>
+                  <ul className="list-disc list-inside text-gray-700 pl-2 space-y-2">
+                    {result.dominantColor === 'fiery-red' ? (
+                      <>
+                        <li>Being too impulsive with decisions</li>
+                        <li>Disregarding input from others</li>
+                        <li>Overlooking important details</li>
+                        <li>Becoming impatient with slower processes</li>
+                      </>
+                    ) : result.dominantColor === 'sunshine-yellow' ? (
+                      <>
+                        <li>Overlooking critical details</li>
+                        <li>Changing course too frequently</li>
+                        <li>Getting distracted by new ideas</li>
+                        <li>Avoiding tough or unpopular choices</li>
+                      </>
+                    ) : result.dominantColor === 'earth-green' ? (
+                      <>
+                        <li>Avoiding necessary difficult decisions</li>
+                        <li>Difficulty saying no to requests</li>
+                        <li>Prioritizing harmony over outcomes</li>
+                        <li>Resisting change to maintain stability</li>
+                      </>
+                    ) : (
+                      <>
+                        <li>Analysis paralysis from over-thinking</li>
+                        <li>Being overly critical of options</li>
+                        <li>Focusing too much on potential problems</li>
+                        <li>Delaying decisions for more information</li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="p-4 bg-gray-50 rounded-md mt-2">
+                <h4 className="font-semibold mb-2">Balancing Your Approach</h4>
+                <p className="text-gray-700">
+                  Being aware of both your natural decision-making strengths and potential blind spots allows you to 
+                  consciously adapt your approach when needed. For important decisions, consider whether your natural 
+                  style is the most appropriate for the specific situation, or if you should deliberately incorporate 
+                  elements from other color energies.
+                </p>
               </div>
             </div>
           </CardContent>
@@ -1117,26 +1246,61 @@ export default function Results() {
         <Card>
           <CardContent className="p-6">
             <h3 className="text-xl font-semibold mb-4">Team Role Recommendations</h3>
-            <p className="text-gray-700 mb-4">
-              Based on your color energy preferences, you naturally excel in these team roles:
-            </p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {colorProfiles[result.dominantColor].teamRoles.map((role, index) => (
-                <span 
-                  key={index} 
-                  className="px-3 py-1 rounded-full text-sm font-medium"
-                  style={{ 
-                    backgroundColor: `${colorProfiles[result.dominantColor].bgColor}`,
-                    color: colorProfiles[result.dominantColor].textColor
-                  }}
-                >
-                  {role}
-                </span>
-              ))}
+            <div className="space-y-4">
+              <p className="text-gray-700">
+                Based on your color energy preferences, you naturally excel in these team roles:
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {colorProfiles[result.dominantColor].teamRoles.map((role, index) => (
+                  <span 
+                    key={index} 
+                    className="px-3 py-1 rounded-full text-sm font-medium"
+                    style={{ 
+                      backgroundColor: `${colorProfiles[result.dominantColor].bgColor}`,
+                      color: colorProfiles[result.dominantColor].textColor
+                    }}
+                  >
+                    {role}
+                  </span>
+                ))}
+              </div>
+              
+              <div 
+                className="p-4 rounded-md mt-2"
+                style={{ 
+                  backgroundColor: `${colorProfiles[result.dominantColor].bgColor}15`, 
+                  borderLeft: `4px solid ${colorProfiles[result.dominantColor].bgColor}` 
+                }}
+              >
+                <p className="font-semibold mb-2">Understanding Your Team Contributions:</p>
+                <p className="text-gray-700 mb-3">
+                  These roles align with your {colorProfiles[result.dominantColor].name} energy's natural strengths and behavioral tendencies. 
+                  Understanding how your color energy manifests in team dynamics can help you position yourself effectively and identify 
+                  which responsibilities will come naturally to you.
+                </p>
+                
+                <p className="font-medium mb-2">How to leverage this knowledge:</p>
+                <ul className="list-disc list-inside text-gray-700 pl-4 space-y-2">
+                  <li>Position yourself in roles where you can contribute most effectively</li>
+                  <li>Recognize which responsibilities will come naturally to you</li>
+                  <li>Identify areas where you might need to consciously adapt or develop</li>
+                  <li>Communicate your strengths and preferences to team members and leaders</li>
+                </ul>
+              </div>
+              
+              <div className="p-4 bg-gray-50 rounded-md">
+                <h4 className="font-semibold mb-2">Complementary Team Dynamics</h4>
+                <p className="text-gray-700 mb-3">
+                  Your natural tendencies don't limit you—they simply highlight where your innate preferences lie. 
+                  With awareness and development, you can excel in other roles as well, especially those that align 
+                  with your secondary {colorProfiles[result.secondaryColor].name} energy.
+                </p>
+                <p className="text-gray-700">
+                  A well-balanced team has representation from all four color energies. Consider how you might adapt your style 
+                  when working with colleagues whose dominant energies differ from yours.
+                </p>
+              </div>
             </div>
-            <p className="text-gray-700 mt-4">
-              Understanding these natural tendencies can help you position yourself effectively within teams and recognize when to adapt your approach to fill other roles when needed.
-            </p>
           </CardContent>
         </Card>
         
