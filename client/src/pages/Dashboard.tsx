@@ -174,6 +174,15 @@ export default function Dashboard() {
     }
   };
   
+  // Format report title with standardized format: "Report #ID - Month Day, Year"
+  const formatReportTitle = (result: { id: number, createdAt: string }): string => {
+    return `Report #${result.id} - ${new Date(result.createdAt).toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    })}`;
+  };
+  
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 md:px-8 max-w-6xl">
       <header className="mb-8">
