@@ -137,27 +137,63 @@ export default function Results() {
 
   // Function to generate and download a professionally designed PDF
   const generatePDF = async () => {
-    if (!reportRef.current) return;
-    
+    if (isPdfGenerating) return;
     setIsPdfGenerating(true);
-    
+
     try {
-      // A4 dimensions in mm
+      // Create a new jsPDF instance with A4 dimensions in mm
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       });
       
+      // Page dimensions
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const margin = 15; // mm
+      const margin = 20; // Wider margins for better readability
       const contentWidth = pdfWidth - (margin * 2);
       
-      // Helper function to add text with word wrapping
-      const addWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number, fontStyle: string = 'normal') => {
+      // Utility function to convert hex to RGB
+      const hexToRgb = (hex: string) => {
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : {r: 0, g: 0, b: 0};
+      };
+      
+      // Modern color palette based on user's dominant color
+      const primaryColor = hexToRgb(colorProfiles[result.dominantColor].bgColor);
+      const primaryLight = {
+        r: Math.min(255, primaryColor.r + 90),
+        g: Math.min(255, primaryColor.g + 90),
+        b: Math.min(255, primaryColor.b + 90)
+      };
+      
+      const colors = {
+        primary: primaryColor,
+        secondary: hexToRgb(colorProfiles[result.secondaryColor].bgColor),
+        darkText: {r: 33, g: 37, b: 41},
+        mediumText: {r: 73, g: 80, b: 87},
+        lightText: {r: 108, g: 117, b: 125},
+        bgLight: {r: 248, g: 249, b: 250},
+        bgMedium: {r: 233, g: 236, b: 239},
+        success: {r: 40, g: 167, b: 69},
+        warning: {r: 255, g: 193, b: 7},
+        blue: {r: 72, g: 133, b: 237},
+        lightBlue: {r: 240, g: 245, b: 255}
+      };
+
+      // Helper function to add text with word wrapping and modern styling
+      const addWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number, 
+                              color = colors.mediumText, fontStyle: string = 'normal') => {
         pdf.setFontSize(fontSize);
         pdf.setFont('helvetica', fontStyle);
+        pdf.setTextColor(color.r, color.g, color.b);
         
         const lines = pdf.splitTextToSize(text, maxWidth);
         pdf.text(lines, x, y);
@@ -165,266 +201,351 @@ export default function Results() {
         return lines.length * (fontSize * 0.352778); // Approximate height of text block
       };
       
-      // Helper to create page header
-      const addHeader = (pageTitle: string, pageNumber?: number) => {
-        // Add gradient header
-        pdf.setFillColor(65, 105, 225); // Royal blue
-        pdf.rect(0, 0, pdfWidth, 25, 'F');
+      // Helper to create a modern page header with logo effect
+      const addHeader = (pageTitle: string, pageNumber: number) => {
+        // Add colored banner header
+        pdf.setFillColor(primaryColor.r, primaryColor.g, primaryColor.b);
+        pdf.rect(0, 0, pdfWidth, 18, 'F');
         
-        pdf.setFillColor(25, 25, 112); // Midnight blue
-        pdf.rect(pdfWidth/2, 0, pdfWidth/2, 25, 'F');
+        // Add title with a logo effect
+        pdf.setFillColor(255, 255, 255);
+        pdf.circle(margin - 2, 9, 5, 'F');
         
-        // Add title
+        pdf.setFillColor(primaryColor.r, primaryColor.g, primaryColor.b);
+        pdf.circle(margin - 2, 9, 3, 'F');
+        
+        // Title text
         pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(16);
+        pdf.setFontSize(14);
         pdf.setFont('helvetica', 'bold');
-        pdf.text("Insights Discovery Profile", margin, 13);
+        pdf.text("Insights Discovery Profile", margin + 6, 9.5);
         
-        // Add page subtitle
-        pdf.setFontSize(12);
+        // Add subtle page number indicator at the bottom of the page
+        pdf.setTextColor(colors.lightText.r, colors.lightText.g, colors.lightText.b);
+        pdf.setFontSize(8);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(pageTitle, margin, 20);
+        pdf.text(`Page ${pageNumber}`, pdfWidth - margin - 10, pdfHeight - 8);
         
-        // Add report title on right
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(10);
-        const titleText = reportTitle;
-        pdf.text(titleText, pdfWidth - margin - pdf.getTextWidth(titleText), 13);
-        
-        // Add page number if provided
-        if (pageNumber) {
-          pdf.text(`Page ${pageNumber}`, pdfWidth - margin - pdf.getTextWidth(`Page ${pageNumber}`), 20);
-        }
-        
-        // Bottom border
-        pdf.setDrawColor(200, 200, 200);
-        pdf.line(margin, 30, pdfWidth - margin, 30);
+        // Add date at the bottom of the page
+        pdf.text(`Generated: ${new Date().toLocaleDateString()}`, margin, pdfHeight - 8);
       };
       
-      // Function to add section title with styling
+      // Function to add a modern section title with accent bar
       const addSectionTitle = (title: string, yPosition: number) => {
-        pdf.setFillColor(240, 240, 240);
-        pdf.rect(margin, yPosition - 6, contentWidth, 8, 'F');
+        // Accent bar
+        pdf.setFillColor(primaryColor.r, primaryColor.g, primaryColor.b);
+        pdf.rect(margin, yPosition, 5, 12, 'F');
         
-        pdf.setTextColor(0, 0, 0);
+        // Title text
+        pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title, margin + 8, yPosition + 9);
+        
+        return yPosition + 18; // Return next Y position
+      };
+      
+      // Function to add a modern card with colored header
+      const addCard = (title: string, content: string, yPosition: number, height: number, 
+                       headerColor = primaryColor, bgColor = colors.bgLight) => {
+        // Card background with shadow effect
+        pdf.setDrawColor(220, 220, 220);
+        pdf.setFillColor(bgColor.r, bgColor.g, bgColor.b);
+        pdf.roundedRect(margin, yPosition, contentWidth, height, 3, 3, 'FD');
+        
+        // Card header
+        pdf.setFillColor(headerColor.r, headerColor.g, headerColor.b);
+        pdf.roundedRect(margin, yPosition, contentWidth, 10, 3, 3, 'F');
+        
+        // Title
+        pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(title, margin + 2, yPosition);
+        pdf.text(title, margin + 6, yPosition + 6.5);
         
-        return yPosition + 10;
+        // Content
+        const contentY = yPosition + 15;
+        const contentLines = pdf.splitTextToSize(content, contentWidth - 12);
+        pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(contentLines, margin + 6, contentY);
+        
+        return yPosition + height + 6; // Return next Y position with spacing
       };
       
       // Add content to the PDF
-      let yPosition = 40;
+      // First page - Cover page with profile summary
+      addHeader("Insights Discovery Profile", 1);
+      let yPosition = 30;
       
-      // Section 1: Overview and Introduction
-      yPosition = addSectionTitle("Overview", yPosition);
-      yPosition += addWrappedText(
-        `Your Insights Discovery profile reveals that your dominant energy is ${colorProfiles[result.dominantColor].name} with ${colorProfiles[result.secondaryColor].name} as your secondary energy. This makes you a ${profile.name} type.`,
-        margin, yPosition, contentWidth, 10
-      ) + 5;
+      // Create a profile header card with user's type
+      pdf.setDrawColor(colors.bgMedium.r, colors.bgMedium.g, colors.bgMedium.b);
+      pdf.setFillColor(255, 255, 255);
+      pdf.roundedRect(margin, yPosition, contentWidth, 40, 4, 4, 'FD');
       
-      yPosition += addWrappedText(
-        `${profile.description} This report provides insights into your unique personality preferences, strengths, and potential areas for development.`,
-        margin, yPosition, contentWidth, 10
-      ) + 10;
+      // User's type and personalized title
+      pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`${profile.name} Type`, margin + 10, yPosition + 18);
       
-      // Section 2: Color Energies Summary
-      yPosition = addSectionTitle("Your Color Energy Preferences", yPosition);
+      // Subtitle with color energies
+      pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${colorProfiles[result.dominantColor].name} + ${colorProfiles[result.secondaryColor].name}`, 
+                margin + 10, yPosition + 30);
+              
+      // Report title 
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'italic');
+      pdf.setTextColor(colors.lightText.r, colors.lightText.g, colors.lightText.b);
+      pdf.text(reportTitle, margin + 10, yPosition + 38);
       
-      // Add a brief description of each color energy the person possesses
-      Object.entries(result.scores).sort((a, b) => b[1] - a[1]).forEach(([color, score]) => {
-        const colorKey = color as ColorType;
-        if (score > 0) {
-          yPosition += 5;
-          pdf.setFontSize(10);
-          pdf.setFont('helvetica', 'bold');
-          pdf.setTextColor(0, 0, 0);
-          pdf.text(`${colorProfiles[colorKey].name}: ${score}%`, margin, yPosition);
-          yPosition += 5;
-          
-          pdf.setFont('helvetica', 'normal');
-          yPosition += addWrappedText(
-            colorProfiles[colorKey].description,
-            margin, yPosition, contentWidth, 9
-          ) + 3;
+      yPosition += 50;
+      
+      // Color bars visualization - modern and easier to read than pie charts
+      yPosition = addSectionTitle("Your Color Energy Distribution", yPosition);
+      
+      // Modern horizontal bar chart
+      const barHeight = 16;
+      const barSpacing = 8;
+      const maxBarWidth = contentWidth - 60;
+      
+      // Get colors sorted by score
+      const colorBars = Object.entries(result.scores)
+        .sort((a, b) => b[1] - a[1])
+        .map(([colorName, score]) => ({ 
+          color: colorName as ColorType, 
+          score 
+        }));
+      
+      // Draw background container
+      pdf.setFillColor(colors.bgLight.r, colors.bgLight.g, colors.bgLight.b);
+      pdf.roundedRect(margin, yPosition, contentWidth, 
+                      colorBars.length * (barHeight + barSpacing) + 10, 3, 3, 'F');
+      
+      // Draw bars
+      colorBars.forEach((item, index) => {
+        const barY = yPosition + 10 + (index * (barHeight + barSpacing));
+        const barWidth = (item.score / 100) * maxBarWidth;
+        const rgb = hexToRgb(colorProfiles[item.color].bgColor);
+        
+        // Label
+        pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(colorProfiles[item.color].name, margin + 5, barY + 4);
+        
+        // Background bar
+        pdf.setFillColor(240, 240, 240);
+        pdf.roundedRect(margin + 55, barY - 5, maxBarWidth, barHeight, 3, 3, 'F');
+        
+        // Colored score bar
+        pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+        if (barWidth > 0) {
+          pdf.roundedRect(margin + 55, barY - 5, barWidth, barHeight, 3, 3, 'F');
+        }
+        
+        // Score label
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(9);
+        
+        // If bar is wide enough, put text inside with white color
+        if (barWidth > 25) {
+          pdf.setTextColor(255, 255, 255);
+          pdf.text(`${item.score}%`, margin + 60, barY + 4);
+        } else {
+          // Otherwise put it after the bar
+          pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+          pdf.text(`${item.score}%`, margin + 55 + barWidth + 5, barY + 4);
         }
       });
       
-      yPosition += 10;
+      yPosition += (colorBars.length * (barHeight + barSpacing)) + 20;
       
-      // Section 3: Personal Strengths
-      yPosition = addSectionTitle("Your Key Strengths", yPosition);
-      yPosition += addWrappedText(
+      // Overview card with profile summary
+      yPosition = addSectionTitle("Profile Overview", yPosition);
+      
+      // Add profile description in a modern card
+      yPosition = addCard(
+        "About Your Personality Type",
+        profile.description,
+        yPosition,
+        60, // Approximate height
+        colors.primary
+      );
+      
+      // Key strengths card
+      yPosition = addCard(
+        "Key Strengths",
         profile.strengths,
-        margin, yPosition, contentWidth, 10
-      ) + 10;
+        yPosition,
+        60, // Approximate height
+        colors.success
+      );
       
-      // Start a new page for the rest of the content
+      // Add a new page
       pdf.addPage();
       addHeader("Insights Discovery Profile", 2);
-      yPosition = 40;
+      yPosition = 30;
       
-      // Section 4: Communication Style
+      // Behavior patterns with modern cards
+      yPosition = addSectionTitle("Behavior Patterns", yPosition);
+      
+      // Create a combined content card
+      const behaviorContent = `On Your Best Days:\n• ${profile.onGoodDay.join('\n• ')}\n\nOn Your Challenging Days:\n• ${profile.onBadDay.join('\n• ')}`;
+      
+      // Use a single card for consistency
+      yPosition = addCard(
+        "Your Behavior Patterns",
+        behaviorContent,
+        yPosition,
+        90,
+        colors.primary
+      );
+      
+      yPosition += 10;
+      
+      // Communication style section
       yPosition = addSectionTitle("Communication Style", yPosition);
       
-      // Add communication preferences based on dominant color
-      const dominantColorProfile = colorProfiles[result.dominantColor];
+      // Add communication card with content
+      const communicationContent = 
+        `As someone with a preference for ${colorProfiles[result.dominantColor].name} energy, you tend to communicate in a way that is ${colorProfiles[result.dominantColor].appears.toLowerCase()}. You value being ${colorProfiles[result.dominantColor].likesYouToBe.toLowerCase()} in interactions.\n\nWhen communicating with you, others should be aware that you may become irritated by ${colorProfiles[result.dominantColor].canBeIrritatedBy.toLowerCase()}. Under pressure, you may ${colorProfiles[result.dominantColor].underPressureMay.toLowerCase()}.`;
       
-      yPosition += addWrappedText(
-        `As someone with a preference for ${dominantColorProfile.name} energy, you tend to communicate in a way that is ${dominantColorProfile.appears.toLowerCase()}. You value being ${dominantColorProfile.likesYouToBe.toLowerCase()} in interactions.`,
-        margin, yPosition, contentWidth, 10
-      ) + 5;
+      yPosition = addCard(
+        "Your Communication Preferences",
+        communicationContent,
+        yPosition,
+        60,
+        colors.blue
+      );
       
-      yPosition += addWrappedText(
-        `When communicating with you, others should be aware that you may become irritated by ${dominantColorProfile.canBeIrritatedBy.toLowerCase()}. Under pressure, you may ${dominantColorProfile.underPressureMay.toLowerCase()}.`,
-        margin, yPosition, contentWidth, 10
-      ) + 10;
+      // Work preferences section
+      yPosition = addSectionTitle("Work Style & Preferences", yPosition);
       
-      // Section 5: Work Style & Contributions
-      yPosition = addSectionTitle("Work Style & Contributions to Teams", yPosition);
+      // Combined work preferences content
+      const workContent = 
+        `Your work style is characterized by these positive qualities: ${profile.onGoodDay.join(", ")}.\n\nYou particularly enjoy and excel at work that involves ${profile.likes.join(" and ")}.\n\nYour professional goals often center around ${profile.goals.join(" and ")}.`;
       
-      // Add work style based on personality type
-      yPosition += addWrappedText(
-        `On your best days, you bring these positive qualities to your work: ${profile.onGoodDay.join(", ")}.`,
-        margin, yPosition, contentWidth, 10
-      ) + 5;
+      yPosition = addCard(
+        "Your Work Preferences",
+        workContent,
+        yPosition,
+        70,
+        colors.primary
+      );
       
-      yPosition += addWrappedText(
-        `You particularly enjoy and excel at work that involves ${profile.likes.join(" and ")}.`,
-        margin, yPosition, contentWidth, 10
-      ) + 5;
-      
-      yPosition += addWrappedText(
-        `Your goals often center around ${profile.goals.join(" and ")}.`,
-        margin, yPosition, contentWidth, 10
-      ) + 10;
-      
-      // Section 6: Potential Challenges
-      yPosition = addSectionTitle("Potential Challenges", yPosition);
-      
-      yPosition += addWrappedText(
-        `When under stress or pressure, you may exhibit these less effective behaviors: ${profile.onBadDay.join(", ")}.`,
-        margin, yPosition, contentWidth, 10
-      ) + 5;
-      
-      yPosition += addWrappedText(
-        `You may find it challenging to work with people who don't appreciate your approach or who demonstrate opposite preferences to yours.`,
-        margin, yPosition, contentWidth, 10
-      ) + 5;
-      
-      yPosition += addWrappedText(
-        `In difficult situations, be aware that you may fear ${profile.fears.join(" and ")}.`,
-        margin, yPosition, contentWidth, 10
-      ) + 10;
-      
-      // Section 7: Learning Style
-      yPosition = addSectionTitle("Learning Style Preferences", yPosition);
-      
-      yPosition += addWrappedText(
-        colorProfiles[result.dominantColor].learningStyle,
-        margin, yPosition, contentWidth, 10
-      ) + 10;
-      
-      // Section 8: Communication Guidelines
-      yPosition = addSectionTitle("Communication Guidelines", yPosition);
-      
-      yPosition += addWrappedText(
-        "When communicating with you, others are most effective when they:",
-        margin, yPosition, contentWidth, 10
-      ) + 5;
-      
-      colorProfiles[result.dominantColor].communicationGuidelines.forEach(guideline => {
-        yPosition += 5;
-        pdf.setFontSize(10);
-        pdf.text(`• ${guideline}`, margin + 5, yPosition);
-      });
-      
-      yPosition += 10;
-      
-      // Add a new page for the remaining content
+      // Add a new page
       pdf.addPage();
       addHeader("Insights Discovery Profile", 3);
-      yPosition = 40;
+      yPosition = 30;
       
-      // Section 9: Career Alignment
+      // Learning Style section
+      yPosition = addSectionTitle("Learning Style Preferences", yPosition);
+      yPosition = addCard(
+        "How You Learn Best",
+        colorProfiles[result.dominantColor].learningStyle,
+        yPosition,
+        55,
+        colors.blue
+      );
+      
+      // Communication Guidelines section
+      yPosition = addSectionTitle("Communication Guidelines", yPosition);
+      
+      // Create content for communication guidelines
+      const commGuideContent = `Others communicate most effectively with you when they:\n\n${colorProfiles[result.dominantColor].communicationGuidelines.map(g => `• ${g}`).join('\n')}`;
+      
+      // Use the card function for consistency
+      yPosition = addCard(
+        "Effective Communication With You",
+        commGuideContent,
+        yPosition,
+        75,
+        colors.blue
+      );
+      
+      // Career Alignment section
       yPosition = addSectionTitle("Career Alignment", yPosition);
       
-      yPosition += addWrappedText(
-        `Your ${colorProfiles[result.dominantColor].name} energy tends to align well with these career paths:`,
-        margin, yPosition, contentWidth, 10
-      ) + 5;
+      // Career content text
+      const careerText = `Your ${colorProfiles[result.dominantColor].name} energy tends to align well with these career paths: ${colorProfiles[result.dominantColor].careerAlignment.join(", ")}.\n\nThese roles often leverage your natural strengths and preferences, though your unique combination of color energies may make you well-suited for a variety of positions.`;
       
-      // List career paths
-      colorProfiles[result.dominantColor].careerAlignment.forEach(career => {
-        yPosition += 5;
-        pdf.setFontSize(10);
-        pdf.text(`• ${career}`, margin + 5, yPosition);
-      });
+      // Use the card function for consistency
+      yPosition = addCard(
+        `Career Paths for ${colorProfiles[result.dominantColor].name} Energy`,
+        careerText,
+        yPosition,
+        70,
+        colors.primary
+      );
       
-      yPosition += 5;
-      yPosition += addWrappedText(
-        "These roles often leverage your natural strengths and preferences, though your unique combination of color energies may make you well-suited for a variety of positions.",
-        margin, yPosition, contentWidth, 10
-      ) + 10;
+      // Add a new page
+      pdf.addPage();
+      addHeader("Insights Discovery Profile", 4);
+      yPosition = 30;
       
-      // Section 10: Stress Response
+      // Stress Response section
       yPosition = addSectionTitle("Stress Response Patterns", yPosition);
       
-      yPosition += addWrappedText(
+      // Stress response card
+      yPosition = addCard(
+        "Under Stress, You May",
         colorProfiles[result.dominantColor].stressResponse,
-        margin, yPosition, contentWidth, 10
-      ) + 5;
+        yPosition,
+        60,
+        colors.warning
+      );
       
-      // Add stress management advice
-      pdf.setFillColor(255, 248, 220);
-      pdf.rect(margin, yPosition, contentWidth, 20, 'F');
+      // Add stress management advice card
+      pdf.setDrawColor(colors.bgMedium.r, colors.bgMedium.g, colors.bgMedium.b);
+      pdf.setFillColor(255, 250, 230); // Very light yellow
+      pdf.roundedRect(margin, yPosition, contentWidth, 35, 3, 3, 'FD');
       
-      pdf.setTextColor(139, 69, 19);
-      pdf.setFontSize(11);
+      // Advice icon
+      pdf.setFillColor(colors.warning.r, colors.warning.g, colors.warning.b);
+      pdf.circle(margin + 10, yPosition + 10, 4, 'F');
+      
+      // Light bulb icon representation
+      pdf.setFillColor(255, 255, 255);
+      pdf.setLineWidth(0.5);
+      pdf.line(margin + 10, yPosition + 8, margin + 10, yPosition + 12);
+      
+      // Title
+      pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+      pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.text("Managing Your Stress", margin + 5, yPosition + 5);
+      pdf.text("Managing Your Stress", margin + 20, yPosition + 11);
       
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      yPosition += 5;
+      // Advice content
       const stressAdvice = "Recognize these patterns when they emerge and create space for self-awareness and regulation. Remember that different color energies require different stress management approaches.";
       
-      yPosition += addWrappedText(
-        stressAdvice,
-        margin + 5, yPosition + 5, contentWidth - 10, 10
-      ) + 10;
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
+      const splitStressAdvice = pdf.splitTextToSize(stressAdvice, contentWidth - 16);
+      pdf.text(splitStressAdvice, margin + 8, yPosition + 22);
       
-      // Section 11: Decision-Making
+      yPosition += 45;
+      
+      // Decision-Making section with modern split cards
       yPosition = addSectionTitle("Decision-Making Tendencies", yPosition);
       
-      yPosition += addWrappedText(
+      // Main content card
+      yPosition = addCard(
+        "How You Make Decisions",
         colorProfiles[result.dominantColor].decisionMaking,
-        margin, yPosition, contentWidth, 10
-      ) + 10;
+        yPosition,
+        45,
+        colors.primary
+      );
       
-      // Create a 2-column table for strengths and watch-outs
-      const colWidth = (contentWidth - 5) / 2;
-      
-      // Left column title - Strengths
-      pdf.setFillColor(240, 240, 240);
-      pdf.rect(margin, yPosition, colWidth, 7, 'F');
-      pdf.setTextColor(0, 0, 0);
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("Strengths", margin + 5, yPosition + 5);
-      
-      // Right column title - Watch out for
-      pdf.setFillColor(240, 240, 240);
-      pdf.rect(margin + colWidth + 5, yPosition, colWidth, 7, 'F');
-      pdf.text("Watch out for", margin + colWidth + 10, yPosition + 5);
-      
-      // Move down for content
-      yPosition += 10;
-      
-      // Define strength and weakness content based on color
-      let strengths = [];
-      let weaknesses = [];
+      // Get decision-making strengths and weaknesses based on color
+      let strengths: string[] = [];
+      let weaknesses: string[] = [];
       
       if (colorProfiles[result.dominantColor].name === "Fiery Red") {
         strengths = ["Quick and efficient", "Action-oriented"];
@@ -440,59 +561,87 @@ export default function Results() {
         weaknesses = ["Analysis paralysis", "Being overly critical"];
       }
       
-      // Add strengths and weaknesses to columns
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
+      // Combined decision-making strengths and cautions
+      const decisionContent = 
+        `Strengths:\n• ${strengths.join('\n• ')}\n\nPotential Challenges:\n• ${weaknesses.join('\n• ')}`;
       
-      // Strengths column content
-      let contentY = yPosition;
-      strengths.forEach((strength, index) => {
-        pdf.text(`• ${strength}`, margin + 5, contentY);
-        contentY += 6;
-      });
+      // Use a single card for decision-making strengths and cautions
+      yPosition = addCard(
+        "Decision-Making Profile",
+        decisionContent,
+        yPosition,
+        70,
+        colors.primary
+      );
       
-      // Weaknesses column content
-      contentY = yPosition;
-      weaknesses.forEach((weakness, index) => {
-        pdf.text(`• ${weakness}`, margin + colWidth + 10, contentY);
-        contentY += 6;
-      });
+      yPosition += 10;
       
-      yPosition = contentY + 5;
-      
-      // Section 12: Team Roles
+      // Team Roles section
       yPosition = addSectionTitle("Team Role Recommendations", yPosition);
       
-      yPosition += addWrappedText(
-        "Based on your color energy preferences, you naturally excel in these team roles:",
-        margin, yPosition, contentWidth, 10
-      ) + 5;
+      // Team roles card with modern tag display
+      pdf.setDrawColor(colors.bgMedium.r, colors.bgMedium.g, colors.bgMedium.b);
+      pdf.setFillColor(255, 255, 255);
+      pdf.roundedRect(margin, yPosition, contentWidth, 65, 3, 3, 'FD');
       
-      // List team roles
-      colorProfiles[result.dominantColor].teamRoles.forEach(role => {
-        yPosition += 5;
-        pdf.setFontSize(10);
-        pdf.text(`• ${role}`, margin + 5, yPosition);
+      // Card heading
+      pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Your Natural Team Roles", margin + 6, yPosition + 10);
+      
+      // Explanation text
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
+      pdf.text("Based on your color energy preferences, you naturally excel in these roles:", margin + 6, yPosition + 20);
+      
+      // Role tags in primary color
+      const roles = colorProfiles[result.dominantColor].teamRoles;
+      const roleWidth = contentWidth / 2 - 12;
+      
+      roles.forEach((role, index) => {
+        const row = Math.floor(index / 2);
+        const col = index % 2;
+        const roleX = margin + 6 + (col * (roleWidth + 10));
+        const roleY = yPosition + 30 + (row * 12);
+        
+        // Tag with primary color
+        pdf.setFillColor(primaryColor.r, primaryColor.g, primaryColor.b);
+        pdf.roundedRect(roleX, roleY, roleWidth, 8, 2, 2, 'F');
+        
+        // Role text in white
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        
+        // Center text in tag
+        const roleTextWidth = pdf.getTextWidth(role);
+        const textX = roleX + (roleWidth / 2) - (roleTextWidth / 2);
+        pdf.text(role, textX, roleY + 5.5);
       });
       
-      yPosition += 5;
-      yPosition += addWrappedText(
-        "Understanding these natural tendencies can help you position yourself effectively within teams and recognize when to adapt your approach to fill other roles when needed.",
-        margin, yPosition, contentWidth, 10
-      ) + 10;
+      // Add note at bottom
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'italic');
+      pdf.setTextColor(colors.lightText.r, colors.lightText.g, colors.lightText.b);
+      pdf.text("Understanding these natural tendencies helps you position yourself effectively in teams.", 
+              margin + 6, yPosition + 60);
       
-      // Section 13: Development Suggestions
-      yPosition = addSectionTitle("Development Suggestions", yPosition);
-      
-      yPosition += addWrappedText(
+      // Development Suggestions section
+      yPosition = addSectionTitle("Development Suggestions", yPosition + 70);
+      yPosition = addCard(
+        "Growth Opportunities",
         profile.development,
-        margin, yPosition, contentWidth, 10
-      ) + 10;
-      
-      // Add a new page for the action plan
+        yPosition,
+        75,
+        colors.primary
+      );
+              
+      // Add a new page for action plan
       pdf.addPage();
-      addHeader("Insights Discovery Profile", 4);
-      yPosition = 40;
+      addHeader("Insights Discovery Profile", 5);
+      yPosition = 30;
       
       // Section 14: Action Plan
       yPosition = addSectionTitle("Personal Action Plan", yPosition);
