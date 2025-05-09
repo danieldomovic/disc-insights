@@ -121,6 +121,9 @@ export default function Results() {
         month: 'long',
         year: 'numeric'
       });
+      
+  // Create formatted report title
+  const reportTitle = `Report #${result.id} - ${formattedDate}`;
   
   useEffect(() => {
     // Add Chart.js script
@@ -188,11 +191,11 @@ export default function Results() {
         pdf.setFont('helvetica', 'normal');
         pdf.text(pageTitle, margin, 20);
         
-        // Add date on right
+        // Add report title on right
         pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(10);
-        const dateText = formattedDate;
-        pdf.text(dateText, pdfWidth - margin - pdf.getTextWidth(dateText), 13);
+        const titleText = reportTitle;
+        pdf.text(titleText, pdfWidth - margin - pdf.getTextWidth(titleText), 13);
         
         // Add page number if provided
         if (pageNumber) {
@@ -218,7 +221,7 @@ export default function Results() {
       };
       
       // Get final PDF filename
-      const filename = `Insights_Discovery_Profile_${formattedDate.replace(/,|\s+/g, '_')}.pdf`;
+      const filename = `Insights_Discovery_${reportTitle.replace(/[#:,\s]/g, '_')}.pdf`;
       
       // Save the PDF
       pdf.save(filename);
@@ -374,7 +377,7 @@ export default function Results() {
                 <p className="text-xl opacity-90">Personal Profile Report</p>
               </div>
               <div className="text-right">
-                <p className="text-lg">{formattedDate}</p>
+                <p className="text-lg">{reportTitle}</p>
                 <p className="opacity-80 mt-1">Generated from your quiz responses</p>
               </div>
             </div>
