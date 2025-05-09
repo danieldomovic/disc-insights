@@ -1,0 +1,195 @@
+6772-956566e71b87d5df.js:1 Replit version 64e890ab, pid2 version 0.0.1286
+_app-bff8cc23c9f6def3.js:13 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+content-script.9e795743.js:11 initializing port
+_app-bff8cc23c9f6def3.js:13 [LaunchDarkly] LaunchDarkly client initialized
+InsightsPersonalityQuiz:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'battery'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-bc06e5500c469f35.js:1
+framework-bc06e5500c469f35.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-bc06e5500c469f35.js:1
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'ambient-light-sensor'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'battery'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'execution-while-not-rendered'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'layout-animations'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'legacy-image-formats'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'navigation-override'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'oversized-images'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'publickey-credentials'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'speaker-selection'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'unoptimized-images'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Unrecognized feature: 'unsized-media'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Allow attribute will take precedence over 'allowfullscreen'.
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Arju%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/teams/1:1 
+            
+            
+           Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/quiz:1 Form submission canceled because the form is not connected
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/api/user:1 
+            
+            
+           Failed to load resource: the server responded with a status of 401 (Unauthorized)
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port

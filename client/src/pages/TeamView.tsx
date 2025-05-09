@@ -229,6 +229,12 @@ export default function TeamView() {
     );
   }
 
+  // Force add a button to add team members for debugging
+  const forceAddMemberButton = () => {
+    console.log("Opening Add Member dialog");
+    setShowAddMemberDialog(true);
+  };
+
   return (
     <div className="container max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <Button 
@@ -239,6 +245,17 @@ export default function TeamView() {
         <ChevronLeft className="h-4 w-4" />
         Back to Teams
       </Button>
+      
+      <div className="mb-4">
+        <Button 
+          variant="default"
+          className="flex items-center gap-2"
+          onClick={forceAddMemberButton}
+        >
+          <UserPlus className="h-4 w-4" />
+          Add Member Manually (Force Enabled)
+        </Button>
+      </div>
       
       {isLoading ? (
         <div className="space-y-6">
