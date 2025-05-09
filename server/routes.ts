@@ -6,6 +6,15 @@ import { insertQuizResultSchema } from "@shared/schema";
 import { setupAuth, requireAuth } from "./auth";
 import { log } from "./vite";
 
+// Declare global teamInvites for storing invite tokens
+declare global {
+  var teamInvites: Map<string, {
+    teamId: number;
+    teamName: string;
+    createdAt: Date;
+  }>;
+}
+
 const answerSchema = z.object({
   questionId: z.number(),
   selectedColor: z.string(),
@@ -226,13 +235,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only team leaders can generate invite links" });
       }
       
+      // Get team info to include in the token
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
       // Generate a random token for the invite
       const inviteToken = Math.random().toString(36).substring(2, 15) + 
                          Math.random().toString(36).substring(2, 15);
       
       // In a real implementation, you would store this token in the database
-      // For this implementation, we'll just return it
+      // For this simulation, we'll encode the teamId in the token
       // In production, you'd want to add an expiration date and other security measures
+      
+      // Store token in memory with teamId for validation (in a real app, store in DB)
+      // This is a simplified implementation for demonstration
+      global.teamInvites = global.teamInvites || new Map();
+      global.teamInvites.set(inviteToken, {
+        teamId,
+        teamName: team.name,
+        createdAt: new Date()
+      });
+      
+      console.log(`Created team invite token ${inviteToken} for team ${teamId}`);
       
       res.json({ inviteToken });
     } catch (error) {
@@ -241,16 +267,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Handle team join via invite
-  app.get("/api/teams/join/:token", requireAuth, async (req, res) => {
+  // Handle team join via invite token
+  app.post("/api/teams/join", requireAuth, async (req, res) => {
     try {
-      const { token } = req.params;
+      const { token } = req.body;
       const userId = req.user!.id;
       
-      // In a real implementation, you would validate the token and get the team ID
-      // For this implementation, we'll handle it in the frontend
+      if (!token) {
+        return res.status(400).json({ message: "Invite token is required" });
+      }
       
-      res.json({ success: true });
+      // Validate the token (in a real app, retrieve from DB)
+      global.teamInvites = global.teamInvites || new Map();
+      const invite = global.teamInvites.get(token);
+      
+      if (!invite) {
+        return res.status(404).json({ message: "Invalid or expired invitation" });
+      }
+      
+      const { teamId, teamName } = invite;
+      
+      // Check if user is already a member
+      const isAlreadyMember = await storage.isTeamMember(userId, teamId);
+      
+      if (isAlreadyMember) {
+        return res.status(400).json({ message: "You are already a member of this team" });
+      }
+      
+      // Add user to team
+      const member = await storage.addTeamMember({
+        teamId,
+        userId,
+        isLeader: false
+      });
+      
+      console.log(`User ${userId} joined team ${teamId} via invite link`);
+      
+      res.status(200).json({ 
+        success: true,
+        teamId,
+        teamName,
+        memberId: member.id
+      });
     } catch (error) {
       console.error("Error joining team:", error);
       res.status(500).json({ message: "Failed to join team" });

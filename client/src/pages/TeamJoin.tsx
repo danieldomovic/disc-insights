@@ -1,145 +1,123 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useMutation } from "@tanstack/react-query";
 import { Redirect, useLocation, useParams } from "wouter";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Loader2, ChevronLeft, Users, Check, AlertTriangle } from "lucide-react";
+import { Loader2, CheckCircle, AlertCircle, Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function TeamJoin() {
   const { user } = useAuth();
-  const params = useParams<{ token: string }>();
+  const { token } = useParams<{ token: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const { token } = params;
-  const [joining, setJoining] = useState(false);
-  const [joinSuccess, setJoinSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [teamName, setTeamName] = useState<string>("");
   
-  // Add as team member mutation
-  const joinTeamMutation = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest("GET", `/api/teams/join/${token}`);
-      return await res.json();
-    },
-    onSuccess: () => {
-      setJoinSuccess(true);
-      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
-      toast({
-        title: "Success!",
-        description: "You've successfully joined the team.",
-      });
-    },
-    onError: (error: Error) => {
-      setErrorMessage(error.message || "Failed to join team");
-      toast({
-        title: "Failed to join team",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-  
-  // Auto-join when the page loads
   useEffect(() => {
-    if (user && token && !joining && !joinSuccess && !errorMessage) {
-      setJoining(true);
-      joinTeamMutation.mutate();
-    }
-  }, [user, token, joining, joinSuccess, errorMessage]);
-  
+    if (!user || !token) return;
+
+    const joinTeam = async () => {
+      try {
+        const response = await apiRequest("POST", `/api/teams/join`, { token });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to join team");
+        }
+        
+        const data = await response.json();
+        setTeamName(data.teamName);
+        setStatus("success");
+        
+        // Refresh teams data
+        queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+        
+        toast({
+          title: "Success!",
+          description: `You have successfully joined team ${data.teamName}.`,
+        });
+      } catch (error) {
+        console.error("Error joining team:", error);
+        setStatus("error");
+        setErrorMessage((error as Error).message || "Failed to join team. The invite may be invalid or expired.");
+        
+        toast({
+          title: "Failed to join team",
+          description: (error as Error).message || "Failed to join team. The invite may be invalid or expired.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    joinTeam();
+  }, [user, token, toast]);
+
   // Redirect if not logged in
   if (!user) {
-    return <Redirect to={`/auth?redirect=/teams/join/${token}`} />;
+    // Store the join URL to redirect back after login
+    sessionStorage.setItem("redirectAfterAuth", window.location.pathname);
+    return <Redirect to="/auth" />;
+  }
+  
+  // Handle missing token
+  if (!token) {
+    return <Redirect to="/teams" />;
   }
   
   return (
-    <div className="container max-w-md mx-auto py-12 px-4">
-      <Button 
-        variant="ghost" 
-        className="mb-6 pl-0 flex items-center gap-2"
-        onClick={() => navigate("/teams")}
-      >
-        <ChevronLeft className="h-4 w-4" />
-        Back to Teams
-      </Button>
-      
+    <div className="container max-w-lg mx-auto py-20 px-4">
       <Card className="text-center">
         <CardHeader>
-          <CardTitle>Team Invitation</CardTitle>
+          <CardTitle className="text-2xl font-bold">Team Invitation</CardTitle>
           <CardDescription>
-            Join a team with this invite link
+            Joining a team will give you access to team analytics and collaboration features
           </CardDescription>
         </CardHeader>
-        <CardContent className="pb-6">
-          {joinTeamMutation.isPending || joining ? (
-            <div className="flex flex-col items-center justify-center gap-4 py-8">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-              <p className="text-muted-foreground">Joining team...</p>
+        
+        <CardContent className="pt-6">
+          {status === "loading" && (
+            <div className="flex flex-col items-center justify-center py-10">
+              <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
+              <p className="text-muted-foreground">Processing your invitation...</p>
             </div>
-          ) : joinSuccess ? (
-            <div className="flex flex-col items-center justify-center gap-4 py-8">
-              <div className="p-4 rounded-full bg-green-50">
-                <Check className="h-12 w-12 text-green-500" />
+          )}
+          
+          {status === "success" && (
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="bg-green-50 p-3 rounded-full mb-4">
+                <CheckCircle className="h-12 w-12 text-green-500" />
               </div>
-              <h3 className="text-xl font-bold">Successfully Joined Team</h3>
-              <p className="text-muted-foreground max-w-xs mx-auto">
-                You are now a member of the team and can view team information.
+              <h3 className="text-xl font-semibold mb-2">Successfully Joined Team!</h3>
+              <p className="text-muted-foreground mb-6">
+                You are now a member of <span className="font-medium text-foreground">{teamName}</span>
               </p>
             </div>
-          ) : errorMessage ? (
-            <div className="flex flex-col items-center justify-center gap-4 py-8">
-              <div className="p-4 rounded-full bg-red-50">
-                <AlertTriangle className="h-12 w-12 text-red-500" />
+          )}
+          
+          {status === "error" && (
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="bg-red-50 p-3 rounded-full mb-4">
+                <AlertCircle className="h-12 w-12 text-red-500" />
               </div>
-              <h3 className="text-xl font-bold">Failed to Join Team</h3>
-              <p className="text-muted-foreground max-w-xs mx-auto">
+              <h3 className="text-xl font-semibold mb-2">Failed to Join Team</h3>
+              <p className="text-muted-foreground mb-6 max-w-md">
                 {errorMessage}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                This invite link may be invalid or expired.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-4 py-8">
-              <div className="p-4 rounded-full bg-primary/10">
-                <Users className="h-12 w-12 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold">Join Team</h3>
-              <p className="text-muted-foreground max-w-xs mx-auto">
-                You're about to join a team using an invite link.
               </p>
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex justify-center gap-4">
-          {joinSuccess ? (
-            <Button onClick={() => navigate("/teams")}>
-              View Teams
-            </Button>
-          ) : errorMessage ? (
-            <Button variant="outline" onClick={() => navigate("/teams")}>
-              Return to Teams
-            </Button>
-          ) : !joinTeamMutation.isPending && !joining ? (
-            <>
-              <Button variant="outline" onClick={() => navigate("/teams")}>
-                Cancel
-              </Button>
-              <Button onClick={() => joinTeamMutation.mutate()}>
-                Join Team
-              </Button>
-            </>
-          ) : null}
+        
+        <CardFooter className="flex justify-center pb-6">
+          <Button
+            onClick={() => navigate("/teams")}
+            className="mt-2"
+          >
+            <Users className="h-4 w-4 mr-2" />
+            Go to Teams
+          </Button>
         </CardFooter>
       </Card>
     </div>

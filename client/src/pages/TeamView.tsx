@@ -246,14 +246,24 @@ export default function TeamView() {
         Back to Teams
       </Button>
       
-      <div className="mb-4">
+      <div className="mb-4 flex flex-col sm:flex-row gap-3">
         <Button 
           variant="default"
           className="flex items-center gap-2"
           onClick={forceAddMemberButton}
         >
           <UserPlus className="h-4 w-4" />
-          Add Member Manually (Force Enabled)
+          Add Member Manually
+        </Button>
+        
+        <Button 
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={() => generateInviteMutation.mutate()}
+          disabled={generateInviteMutation.isPending}
+        >
+          <LinkIcon className="h-4 w-4" />
+          {generateInviteMutation.isPending ? "Generating..." : "Generate Invite Link"}
         </Button>
       </div>
       
