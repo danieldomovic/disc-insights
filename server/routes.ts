@@ -628,7 +628,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         dominantColor: result.dominantColor,
         secondaryColor: result.secondaryColor,
-        personalityType: result.personalityType
+        personalityType: result.personalityType,
+        createdAt: result.createdAt
       });
     } catch (error) {
       console.error("Error fetching quiz result:", error);
@@ -764,7 +765,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         dominantColor,
         secondaryColor,
-        personalityType
+        personalityType,
+        createdAt: quizResult.createdAt
       });
     } catch (error) {
       console.error("Error processing quiz submission:", error);
