@@ -18,6 +18,7 @@ export type QuizAnswer = {
   questionId: number;
   selectedColor: string;
   rating: string; // L, 1, 2, 3, 4, 5, or M
+  isConsciousResponse: boolean; // true for conscious, false for unconscious
 };
 
 export type ValidationError = {

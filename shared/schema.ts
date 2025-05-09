@@ -160,6 +160,7 @@ export const quizResults = pgTable("quiz_results", {
   teamId: integer("team_id").references(() => teams.id),
   organizationId: integer("organization_id").references(() => organizations.id),
   title: text("title"),
+  // Conscious scores
   fieryRedScore: integer("fiery_red_score").notNull(),
   sunshineYellowScore: integer("sunshine_yellow_score").notNull(),
   earthGreenScore: integer("earth_green_score").notNull(),
@@ -167,6 +168,14 @@ export const quizResults = pgTable("quiz_results", {
   dominantColor: text("dominant_color").notNull(),
   secondaryColor: text("secondary_color").notNull(),
   personalityType: text("personality_type").notNull(),
+  // Unconscious scores
+  fieryRedUnconsciousScore: integer("fiery_red_unconscious_score"),
+  sunshineYellowUnconsciousScore: integer("sunshine_yellow_unconscious_score"),
+  earthGreenUnconsciousScore: integer("earth_green_unconscious_score"),
+  coolBlueUnconsciousScore: integer("cool_blue_unconscious_score"),
+  dominantUnconsciousColor: text("dominant_unconscious_color"),
+  secondaryUnconsciousColor: text("secondary_unconscious_color"),
+  unconsciousPersonalityType: text("unconscious_personality_type"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   isPrivate: boolean("is_private").default(false),
 });
@@ -209,6 +218,8 @@ export const quizAnswers = pgTable("quiz_answers", {
   questionId: integer("question_id").references(() => quizQuestions.id),
   selectedColor: text("selected_color").notNull(),
   rating: text("rating").notNull(),
+  // Whether this answer is for the conscious or unconscious persona
+  isConsciousResponse: boolean("is_conscious_response").default(true).notNull(),
 });
 
 export const insertQuizAnswerSchema = createInsertSchema(quizAnswers).omit({
