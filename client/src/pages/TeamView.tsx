@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Redirect, useLocation, useParams, Link } from "wouter";
@@ -63,8 +63,11 @@ export default function TeamView() {
   const [copied, setCopied] = useState<boolean>(false);
   const [showInviteDialog, setShowInviteDialog] = useState<boolean>(false);
   const [showAddMemberDialog, setShowAddMemberDialog] = useState<boolean>(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState<boolean>(false);
   const [newMemberEmail, setNewMemberEmail] = useState<string>("");
   const [newMemberUsername, setNewMemberUsername] = useState<string>("");
+  const [teamName, setTeamName] = useState<string>("");
+  const [teamDescription, setTeamDescription] = useState<string>("");
   const [addMemberStatus, setAddMemberStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   
   // Fetch team details
@@ -234,6 +237,43 @@ export default function TeamView() {
     console.log("Opening Add Member dialog");
     setShowAddMemberDialog(true);
   };
+  
+  // Initialize team settings when dialog opens
+  useEffect(() => {
+    if (team && showSettingsDialog) {
+      setTeamName(team.name);
+      setTeamDescription(team.description || "");
+    }
+  }, [team, showSettingsDialog]);
+  
+  // Team settings update mutation
+  const updateTeamMutation = useMutation({
+    mutationFn: async (data: { name: string; description: string }) => {
+      const response = await apiRequest("PATCH", `/api/teams/${teamId}`, data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update team settings");
+      }
+      return await response.json();
+    },
+    onSuccess: () => {
+      setShowSettingsDialog(false);
+      toast({
+        title: "Team updated",
+        description: "Team settings have been updated successfully.",
+      });
+      
+      // Refresh team data
+      queryClient.invalidateQueries({ queryKey: [`/api/teams/${teamId}`] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update team",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
 
   return (
     <div className="container max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -246,26 +286,7 @@ export default function TeamView() {
         Back to Teams
       </Button>
       
-      <div className="mb-4 flex flex-col sm:flex-row gap-3">
-        <Button 
-          variant="default"
-          className="flex items-center gap-2"
-          onClick={forceAddMemberButton}
-        >
-          <UserPlus className="h-4 w-4" />
-          Add Member Manually
-        </Button>
-        
-        <Button 
-          variant="outline"
-          className="flex items-center gap-2"
-          onClick={() => generateInviteMutation.mutate()}
-          disabled={generateInviteMutation.isPending}
-        >
-          <LinkIcon className="h-4 w-4" />
-          {generateInviteMutation.isPending ? "Generating..." : "Generate Invite Link"}
-        </Button>
-      </div>
+      {/* Top controls removed per request */}
       
       {isLoading ? (
         <div className="space-y-6">
@@ -305,7 +326,11 @@ export default function TeamView() {
                   <UserPlus className="h-4 w-4" />
                   Add Member Manually
                 </Button>
-                <Button variant="outline" className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  className="flex items-center gap-2"
+                  onClick={() => setShowSettingsDialog(true)}
+                >
                   <Settings className="h-4 w-4" />
                   Team Settings
                 </Button>
@@ -490,6 +515,91 @@ export default function TeamView() {
               onClick={() => setShowInviteDialog(false)}
             >
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Team Settings Dialog */}
+      <Dialog open={showSettingsDialog} onOpenChange={(open) => {
+        setShowSettingsDialog(open);
+        if (!open) {
+          // Reset state when dialog closes without saving
+          if (team) {
+            setTeamName(team.name);
+            setTeamDescription(team.description || "");
+          }
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Team Settings</DialogTitle>
+            <DialogDescription>
+              Update your team information and settings
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="team-name">Team Name</Label>
+              <Input
+                id="team-name"
+                placeholder="Enter team name"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+                disabled={updateTeamMutation.isPending}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="team-description">Description (Optional)</Label>
+              <Input
+                id="team-description"
+                placeholder="Enter team description"
+                value={teamDescription}
+                onChange={(e) => setTeamDescription(e.target.value)}
+                disabled={updateTeamMutation.isPending}
+              />
+              <p className="text-xs text-muted-foreground">
+                Briefly describe the purpose of this team
+              </p>
+            </div>
+            
+            <div className="pt-4">
+              <h4 className="text-sm font-medium mb-3">Danger Zone</h4>
+              <div className="border border-red-200 rounded-md p-4 bg-red-50">
+                <h5 className="text-sm font-medium text-red-800 mb-1">Delete Team</h5>
+                <p className="text-xs text-red-700 mb-3">
+                  Once you delete a team, there is no going back. All members will be removed.
+                </p>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  disabled
+                >
+                  Delete Team
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex items-center justify-between gap-3">
+            <Button 
+              variant="ghost" 
+              onClick={() => setShowSettingsDialog(false)}
+              disabled={updateTeamMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="default"
+              onClick={() => updateTeamMutation.mutate({ 
+                name: teamName,
+                description: teamDescription
+              })}
+              disabled={updateTeamMutation.isPending || !teamName.trim()}
+            >
+              {updateTeamMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
