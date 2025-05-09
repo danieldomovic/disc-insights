@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Redirect, useLocation } from "wouter";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Breadcrumbs } from "@/components/ui/breadcrumb";
 
 const teamSchema = z.object({
   name: z.string().min(2, { message: "Team name must be at least 2 characters" }).max(100),

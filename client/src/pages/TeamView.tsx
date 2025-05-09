@@ -19,7 +19,6 @@ import {
 import { 
   Users, 
   UserPlus, 
-  ChevronLeft, 
   Settings, 
   BarChart2, 
   CircleUserRound,
@@ -28,6 +27,7 @@ import {
   Link as LinkIcon,
   CheckCircle
 } from "lucide-react";
+import { Breadcrumbs } from "@/components/ui/breadcrumb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -229,14 +229,12 @@ export default function TeamView() {
   if (isError) {
     return (
       <div className="container max-w-5xl mx-auto py-10 px-4">
-        <Button 
-          variant="ghost" 
-          className="mb-8 pl-0 flex items-center gap-2"
-          onClick={() => navigate("/teams")}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back to Teams
-        </Button>
+        <Breadcrumbs 
+          items={[
+            { href: "/teams", label: "Teams" },
+            { label: "Error" }
+          ]}
+        />
         
         <Card className="text-center py-12">
           <CardContent>
@@ -349,14 +347,12 @@ export default function TeamView() {
 
   return (
     <div className="container max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <Button 
-        variant="ghost" 
-        className="mb-6 pl-0 flex items-center gap-2"
-        onClick={() => navigate("/teams")}
-      >
-        <ChevronLeft className="h-4 w-4" />
-        Back to Teams
-      </Button>
+      <Breadcrumbs 
+        items={[
+          { href: "/teams", label: "Teams" },
+          { label: team?.name || "Team Details" }
+        ]}
+      />
       
       {/* Top controls removed per request */}
       
