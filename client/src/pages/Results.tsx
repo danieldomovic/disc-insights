@@ -109,7 +109,7 @@ export default function Results() {
   // Get personality profile based on the result
   const profile = personalityProfiles[result.personalityType];
   
-  // Format date
+  // Format date to "Month Day, Year" format
   const formattedDate = result.createdAt 
     ? new Date(result.createdAt).toLocaleDateString('en-US', {
         day: 'numeric',
@@ -122,7 +122,7 @@ export default function Results() {
         year: 'numeric'
       });
       
-  // Create formatted report title
+  // Create formatted report title in "Report #ID - Month Day, Year" format
   const reportTitle = `Report #${result.id} - ${formattedDate}`;
   
   useEffect(() => {
