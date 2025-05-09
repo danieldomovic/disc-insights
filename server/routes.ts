@@ -184,7 +184,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         members: members.map(m => ({
           id: m.id,
           userId: m.userId,
-          isLeader: m.isLeader
+          isLeader: m.isLeader,
+          username: m.username,
+          fullName: m.fullName, 
+          email: m.email
         }))
       });
     } catch (error) {

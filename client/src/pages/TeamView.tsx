@@ -459,7 +459,15 @@ export default function TeamView() {
       </Dialog>
       
       {/* Add Member Dialog */}
-      <Dialog open={showAddMemberDialog} onOpenChange={setShowAddMemberDialog}>
+      <Dialog open={showAddMemberDialog} onOpenChange={(open) => {
+        setShowAddMemberDialog(open);
+        if (!open) {
+          // Reset state when dialog closes
+          setNewMemberEmail("");
+          setNewMemberUsername("");
+          setAddMemberStatus("idle");
+        }
+      }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add Team Member</DialogTitle>
@@ -467,6 +475,23 @@ export default function TeamView() {
               Add a user to your team by email or username.
             </DialogDescription>
           </DialogHeader>
+          
+          {addMemberStatus === "error" && (
+            <div className="bg-red-50 p-3 rounded-md border border-red-200 flex items-start gap-2 mt-2">
+              <div className="text-red-500 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-red-800">Failed to add team member</p>
+                <p className="text-xs text-red-700 mt-1">The user may not exist or is already a member of this team.</p>
+              </div>
+            </div>
+          )}
+          
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="member-email">Email</Label>
@@ -476,26 +501,32 @@ export default function TeamView() {
                 type="email"
                 value={newMemberEmail}
                 onChange={(e) => setNewMemberEmail(e.target.value)}
+                disabled={addMemberStatus === "loading" || addMemberStatus === "success"}
               />
+            </div>
+            <div className="relative mb-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
+              </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="member-username">Username</Label>
-                <span className="text-xs text-muted-foreground">Optional</span>
               </div>
               <Input
                 id="member-username"
-                placeholder="username"
+                placeholder="Enter username"
                 value={newMemberUsername}
                 onChange={(e) => setNewMemberUsername(e.target.value)}
+                disabled={addMemberStatus === "loading" || addMemberStatus === "success"}
               />
             </div>
-            <div className="text-sm text-muted-foreground mt-2">
-              {addMemberStatus === "error" ? (
-                <p className="text-red-500">Failed to add member. The user may not exist or is already in the team.</p>
-              ) : (
-                <p>At least one of email or username must be provided.</p>
-              )}
+            
+            <div className="bg-blue-50 p-3 rounded-md border border-blue-100 text-sm text-blue-700 mt-2">
+              <p>You need to provide either an email address or a username to add a member. The user must already have an account on the platform.</p>
             </div>
           </div>
           <DialogFooter className="flex items-center gap-3">

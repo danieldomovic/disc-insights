@@ -77,7 +77,12 @@ export const insertTeamMemberSchema = createInsertSchema(teamMembers).omit({
 });
 
 export type InsertTeamMember = z.infer<typeof insertTeamMemberSchema>;
-export type TeamMember = typeof teamMembers.$inferSelect;
+export type TeamMember = typeof teamMembers.$inferSelect & {
+  // Extended fields from user relation
+  username?: string;
+  fullName?: string;
+  email?: string;
+};
 
 // Organizations
 export const organizations = pgTable("organizations", {
