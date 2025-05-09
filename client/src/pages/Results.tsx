@@ -500,36 +500,19 @@ export default function Results() {
         colors.warning
       );
       
-      // Add stress management advice card
-      pdf.setDrawColor(colors.bgMedium.r, colors.bgMedium.g, colors.bgMedium.b);
-      pdf.setFillColor(255, 250, 230); // Very light yellow
-      pdf.roundedRect(margin, yPosition, contentWidth, 35, 3, 3, 'FD');
-      
-      // Advice icon
-      pdf.setFillColor(colors.warning.r, colors.warning.g, colors.warning.b);
-      pdf.circle(margin + 10, yPosition + 10, 4, 'F');
-      
-      // Light bulb icon representation
-      pdf.setFillColor(255, 255, 255);
-      pdf.setLineWidth(0.5);
-      pdf.line(margin + 10, yPosition + 8, margin + 10, yPosition + 12);
-      
-      // Title
-      pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("Managing Your Stress", margin + 20, yPosition + 11);
-      
-      // Advice content
+      // Add stress management advice with the consistent card style
       const stressAdvice = "Recognize these patterns when they emerge and create space for self-awareness and regulation. Remember that different color energies require different stress management approaches.";
       
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
-      const splitStressAdvice = pdf.splitTextToSize(stressAdvice, contentWidth - 16);
-      pdf.text(splitStressAdvice, margin + 8, yPosition + 22);
+      // Use the card function for consistency
+      yPosition = addCard(
+        "Managing Your Stress",
+        stressAdvice,
+        yPosition,
+        40,
+        colors.warning
+      );
       
-      yPosition += 45;
+      yPosition += 10;
       
       // Decision-Making section with modern split cards
       yPosition = addSectionTitle("Decision-Making Tendencies", yPosition);
@@ -579,54 +562,18 @@ export default function Results() {
       // Team Roles section
       yPosition = addSectionTitle("Team Role Recommendations", yPosition);
       
-      // Team roles card with modern tag display
-      pdf.setDrawColor(colors.bgMedium.r, colors.bgMedium.g, colors.bgMedium.b);
-      pdf.setFillColor(255, 255, 255);
-      pdf.roundedRect(margin, yPosition, contentWidth, 65, 3, 3, 'FD');
-      
-      // Card heading
-      pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text("Your Natural Team Roles", margin + 6, yPosition + 10);
-      
-      // Explanation text
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
-      pdf.text("Based on your color energy preferences, you naturally excel in these roles:", margin + 6, yPosition + 20);
-      
-      // Role tags in primary color
+      // Convert the team roles to a formatted string with bullet points
       const roles = colorProfiles[result.dominantColor].teamRoles;
-      const roleWidth = contentWidth / 2 - 12;
+      const rolesText = `Based on your color energy preferences, you naturally excel in these roles:\n\n• ${roles.join('\n• ')}\n\nUnderstanding these natural tendencies helps you position yourself effectively in teams.`;
       
-      roles.forEach((role, index) => {
-        const row = Math.floor(index / 2);
-        const col = index % 2;
-        const roleX = margin + 6 + (col * (roleWidth + 10));
-        const roleY = yPosition + 30 + (row * 12);
-        
-        // Tag with primary color
-        pdf.setFillColor(primaryColor.r, primaryColor.g, primaryColor.b);
-        pdf.roundedRect(roleX, roleY, roleWidth, 8, 2, 2, 'F');
-        
-        // Role text in white
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(9);
-        pdf.setFont('helvetica', 'bold');
-        
-        // Center text in tag
-        const roleTextWidth = pdf.getTextWidth(role);
-        const textX = roleX + (roleWidth / 2) - (roleTextWidth / 2);
-        pdf.text(role, textX, roleY + 5.5);
-      });
-      
-      // Add note at bottom
-      pdf.setFontSize(9);
-      pdf.setFont('helvetica', 'italic');
-      pdf.setTextColor(colors.lightText.r, colors.lightText.g, colors.lightText.b);
-      pdf.text("Understanding these natural tendencies helps you position yourself effectively in teams.", 
-              margin + 6, yPosition + 60);
+      // Use the card function for consistency
+      yPosition = addCard(
+        "Your Natural Team Roles",
+        rolesText,
+        yPosition,
+        75,
+        colors.primary
+      );
       
       // Development Suggestions section
       yPosition = addSectionTitle("Development Suggestions", yPosition + 70);
