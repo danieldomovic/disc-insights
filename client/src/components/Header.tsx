@@ -58,16 +58,17 @@ export default function Header() {
         <div className="flex items-center gap-4">
           {/* Always show Dashboard link in the main nav when user is logged in */}
           {user && !showRestartButton && (
-            <Link href="/dashboard?tab=overview">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
-              >
-                <BarChart2 className="h-4 w-4 text-indigo-600" />
-                <span className="text-indigo-700">Dashboard</span>
-              </Button>
-            </Link>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
+              onClick={() => {
+                window.location.href = "/dashboard?tab=overview";
+              }}
+            >
+              <BarChart2 className="h-4 w-4 text-indigo-600" />
+              <span className="text-indigo-700">Dashboard</span>
+            </Button>
           )}
           
           {showRestartButton && (
@@ -83,16 +84,17 @@ export default function Header() {
                 </Button>
               </Link>
               {user && (
-                <Link href="/dashboard?tab=overview">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
-                  >
-                    <BarChart2 className="h-4 w-4 text-indigo-600" />
-                    <span className="text-indigo-700">Dashboard</span>
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex items-center gap-2 rounded-full border-indigo-200 hover:bg-indigo-50"
+                  onClick={() => {
+                    window.location.href = "/dashboard?tab=overview";
+                  }}
+                >
+                  <BarChart2 className="h-4 w-4 text-indigo-600" />
+                  <span className="text-indigo-700">Dashboard</span>
+                </Button>
               )}
             </div>
           )}
@@ -123,37 +125,53 @@ export default function Header() {
                       </div>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard?tab=overview">
-                      <div className="flex items-center w-full">
-                        <BarChart2 className="mr-2 h-4 w-4" />
-                        <span>Dashboard</span>
-                      </div>
-                    </Link>
+                  <DropdownMenuItem>
+                    <div 
+                      className="flex items-center w-full cursor-pointer" 
+                      onClick={() => {
+                        // Force a full page reload to dashboard with the overview tab
+                        window.location.href = "/dashboard?tab=overview";
+                      }}
+                    >
+                      <BarChart2 className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard?tab=reports">
-                      <div className="flex items-center w-full">
-                        <FileText className="mr-2 h-4 w-4" />
-                        <span>My Reports</span>
-                      </div>
-                    </Link>
+                  <DropdownMenuItem>
+                    <div 
+                      className="flex items-center w-full cursor-pointer" 
+                      onClick={() => {
+                        // Force a full page reload to dashboard with the reports tab
+                        window.location.href = "/dashboard?tab=reports";
+                      }}
+                    >
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>My Reports</span>
+                    </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard?tab=teams">
-                      <div className="flex items-center w-full">
-                        <Users className="mr-2 h-4 w-4" />
-                        <span>My Teams</span>
-                      </div>
-                    </Link>
+                  <DropdownMenuItem>
+                    <div 
+                      className="flex items-center w-full cursor-pointer" 
+                      onClick={() => {
+                        // Force a full page reload to dashboard with the teams tab
+                        window.location.href = "/dashboard?tab=teams";
+                      }}
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>My Teams</span>
+                    </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard?tab=comparisons">
-                      <div className="flex items-center w-full">
-                        <BarChart2 className="mr-2 h-4 w-4" />
-                        <span>Comparisons</span>
-                      </div>
-                    </Link>
+                  <DropdownMenuItem>
+                    <div 
+                      className="flex items-center w-full cursor-pointer" 
+                      onClick={() => {
+                        // Force a full page reload to dashboard with the comparisons tab
+                        window.location.href = "/dashboard?tab=comparisons";
+                      }}
+                    >
+                      <BarChart2 className="mr-2 h-4 w-4" />
+                      <span>Comparisons</span>
+                    </div>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
