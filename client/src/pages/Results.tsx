@@ -14,6 +14,7 @@ import { DownloadIcon, PrinterIcon, Trash2, AlertCircle } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { formatReportTitle } from "@/lib/formatters";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -109,21 +110,14 @@ export default function Results() {
   // Get personality profile based on the result
   const profile = personalityProfiles[result.personalityType];
   
-  // Format date to "Month Day, Year" format
-  const formattedDate = result.createdAt 
-    ? new Date(result.createdAt).toLocaleDateString('en-US', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      })
-    : new Date().toLocaleDateString('en-US', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-      
-  // Create formatted report title in "Report #ID - Month Day, Year" format
-  const reportTitle = `Report #${result.id} - ${formattedDate}`;
+  // Ensure createdAt is always defined for the formatter
+  const reportData = {
+    id: result.id,
+    createdAt: result.createdAt || new Date().toISOString()
+  };
+  
+  // Use the shared formatter to create standardized report title
+  const reportTitle = formatReportTitle(reportData);
   
   useEffect(() => {
     // Add Chart.js script

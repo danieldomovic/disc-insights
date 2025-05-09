@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Breadcrumbs } from "@/components/ui/breadcrumb";
+import { formatReportTitle } from "@/lib/formatters";
 import {
   ChevronLeft,
   Loader2,
@@ -216,7 +217,7 @@ export default function ComparisonView() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Report A: {comparison.reportA.title || `Profile ${comparison.reportA.id}`}</CardTitle>
+            <CardTitle className="text-base font-medium">Report A: {comparison.reportA.title || formatReportTitle(comparison.reportA)}</CardTitle>
             <CardDescription>
               {comparison.reportA.personalityType} Type
             </CardDescription>
@@ -288,7 +289,7 @@ export default function ComparisonView() {
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base font-medium">Report B: {comparison.reportB.title || `Profile ${comparison.reportB.id}`}</CardTitle>
+            <CardTitle className="text-base font-medium">Report B: {comparison.reportB.title || formatReportTitle(comparison.reportB)}</CardTitle>
             <CardDescription>
               {comparison.reportB.personalityType} Type
             </CardDescription>
