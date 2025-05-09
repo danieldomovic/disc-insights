@@ -32,10 +32,16 @@ import { Breadcrumbs } from "@/components/ui/breadcrumb";
 
 interface QuizResultData {
   id: number;
+  // Conscious profile
   scores: Record<ColorType, number>;
   dominantColor: ColorType;
   secondaryColor: ColorType;
   personalityType: PersonalityType;
+  // Unconscious profile (optional)
+  unconsciousScores?: Record<ColorType, number>;
+  dominantUnconsciousColor?: ColorType;
+  secondaryUnconsciousColor?: ColorType;
+  unconsciousPersonalityType?: PersonalityType;
   createdAt?: string;
 }
 
@@ -318,6 +324,27 @@ export default function Results() {
       
       yPosition += 50;
       
+      // If we have unconscious data, add a dual profile indicator
+      if (result.unconsciousScores && result.unconsciousPersonalityType) {
+        pdf.setFillColor(colors.bgLight.r, colors.bgLight.g, colors.bgLight.b);
+        pdf.roundedRect(margin, yPosition, contentWidth, 35, 3, 3, 'F');
+        
+        pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text("Comprehensive Profile Assessment", margin + 10, yPosition + 15);
+        
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
+        pdf.text("This report includes both your conscious and unconscious personas,", margin + 10, yPosition + 25);
+        pdf.text("following the authentic Insights Discovery® methodology.", margin + 10, yPosition + 30);
+        
+        yPosition += 45;
+      } else {
+        yPosition += 10;
+      }
+      
       // Color bars visualization - modern and easier to read than pie charts
       yPosition = addSectionTitle("Your Color Energy Distribution", yPosition);
       
@@ -334,49 +361,88 @@ export default function Results() {
           score 
         }));
       
-      // Draw background container
-      pdf.setFillColor(colors.bgLight.r, colors.bgLight.g, colors.bgLight.b);
-      pdf.roundedRect(margin, yPosition, contentWidth, 
-                      colorBars.length * (barHeight + barSpacing) + 10, 3, 3, 'F');
-      
-      // Draw bars
-      colorBars.forEach((item, index) => {
-        const barY = yPosition + 10 + (index * (barHeight + barSpacing));
-        const barWidth = (item.score / 100) * maxBarWidth;
-        const rgb = hexToRgb(colorProfiles[item.color].bgColor);
-        
-        // Label
+      // Function to draw color distribution bars
+      const drawColorBars = (colorData: Array<{color: ColorType, score: number}>, title: string, startY: number, isDashed = false) => {
+        // Draw title
         pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
-        pdf.setFontSize(10);
+        pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(colorProfiles[item.color].name, margin + 5, barY + 4);
+        pdf.text(title, margin, startY - 5);
         
-        // Background bar
-        pdf.setFillColor(240, 240, 240);
-        pdf.roundedRect(margin + 55, barY - 5, maxBarWidth, barHeight, 3, 3, 'F');
+        // Draw background container
+        pdf.setFillColor(colors.bgLight.r, colors.bgLight.g, colors.bgLight.b);
+        pdf.roundedRect(margin, startY, contentWidth, 
+                        colorData.length * (barHeight + barSpacing) + 10, 3, 3, 'F');
         
-        // Colored score bar
-        pdf.setFillColor(rgb.r, rgb.g, rgb.b);
-        if (barWidth > 0) {
-          pdf.roundedRect(margin + 55, barY - 5, barWidth, barHeight, 3, 3, 'F');
-        }
-        
-        // Score label
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(9);
-        
-        // If bar is wide enough, put text inside with white color
-        if (barWidth > 25) {
-          pdf.setTextColor(255, 255, 255);
-          pdf.text(`${item.score}%`, margin + 60, barY + 4);
-        } else {
-          // Otherwise put it after the bar
+        // Draw bars
+        colorData.forEach((item, index) => {
+          const barY = startY + 10 + (index * (barHeight + barSpacing));
+          const barWidth = (item.score / 100) * maxBarWidth;
+          const rgb = hexToRgb(colorProfiles[item.color].bgColor);
+          
+          // Label
           pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
-          pdf.text(`${item.score}%`, margin + 55 + barWidth + 5, barY + 4);
-        }
-      });
+          pdf.setFontSize(10);
+          pdf.setFont('helvetica', 'bold');
+          pdf.text(colorProfiles[item.color].name, margin + 5, barY + 4);
+          
+          // Background bar
+          pdf.setFillColor(240, 240, 240);
+          pdf.roundedRect(margin + 55, barY - 5, maxBarWidth, barHeight, 3, 3, 'F');
+          
+          // Colored score bar
+          pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+          if (barWidth > 0) {
+            if (isDashed) {
+              // For unconscious profile, draw dashed bar
+              for (let x = 0; x < barWidth; x += 5) {
+                const dashWidth = Math.min(3, barWidth - x);
+                pdf.roundedRect(margin + 55 + x, barY - 5, dashWidth, barHeight, 1, 1, 'F');
+              }
+            } else {
+              pdf.roundedRect(margin + 55, barY - 5, barWidth, barHeight, 3, 3, 'F');
+            }
+          }
+          
+          // Score label
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(9);
+          
+          // If bar is wide enough, put text inside with white color
+          if (barWidth > 25) {
+            pdf.setTextColor(255, 255, 255);
+            pdf.text(`${item.score}%`, margin + 60, barY + 4);
+          } else {
+            // Otherwise put it after the bar
+            pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+            pdf.text(`${item.score}%`, margin + 55 + barWidth + 5, barY + 4);
+          }
+        });
+        
+        return startY + (colorData.length * (barHeight + barSpacing)) + 15;
+      };
       
-      yPosition += (colorBars.length * (barHeight + barSpacing)) + 20;
+      // Draw the conscious profile bars
+      yPosition = drawColorBars(colorBars, "Your Conscious Color Energy Distribution", yPosition);
+      
+      // If unconscious data exists, draw those bars too
+      if (result.unconsciousScores) {
+        const unconsciousColorBars = Object.entries(result.unconsciousScores)
+          .sort((a, b) => b[1] - a[1])
+          .map(([colorName, score]) => ({ 
+            color: colorName as ColorType, 
+            score 
+          }));
+        
+        // Draw the unconscious profile bars with dashed style
+        yPosition = drawColorBars(unconsciousColorBars, "Your Unconscious Color Energy Distribution", yPosition, true);
+        
+        // Add explanation of conscious vs unconscious
+        yPosition += 5;
+        const explanation = "Your conscious profile represents how you prefer to be seen by others, while your unconscious profile reflects your instinctive response patterns when not adapting to external expectations. Comparing these two profiles can provide valuable insights into your authentic self and areas where you may be expending energy to adapt.";
+        yPosition += addWrappedText(explanation, margin, yPosition, contentWidth, 10, colors.mediumText, 'italic');
+        yPosition += 10;
+      }
       
       // Overview card with profile summary
       yPosition = addSectionTitle("Profile Overview", yPosition);
@@ -806,7 +872,13 @@ export default function Results() {
             <div className="grid md:grid-cols-2 gap-10">
               <div className="color-chart-section">
                 <h3 className="text-xl font-semibold mb-4">Your Color Energy Preferences</h3>
-                {chartJsLoaded && <ColorChart scores={result.scores} />}
+                {chartJsLoaded && (
+                  <ColorChart 
+                    scores={result.scores} 
+                    unconsciousScores={result.unconsciousScores}
+                    showBothProfiles={!!result.unconsciousScores} 
+                  />
+                )}
                 <div className="grid grid-cols-2 gap-4 mt-4">
                   <div className="flex items-center">
                     <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
@@ -1026,6 +1098,117 @@ export default function Results() {
             </Card>
           </TabsContent>
         </Tabs>
+        
+        {/* Unconscious Persona Section - only displayed if unconscious data exists */}
+        {result.unconsciousScores && result.dominantUnconsciousColor && result.unconsciousPersonalityType && (
+          <>
+            <Card className="mt-8">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold mb-4">Your Unconscious Persona</h3>
+                <p className="text-gray-700 mb-6">
+                  Your unconscious persona represents your instinctive self - how you naturally behave when not adapting
+                  to external circumstances. This provides valuable insight into your core preferences and tendencies.
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-2">Unconscious Profile Type</h4>
+                    <p className="text-gray-700 mb-4">
+                      Your unconscious profile shows you as a{" "}
+                      <span className="font-medium" style={{ color: colorProfiles[result.dominantUnconsciousColor].bgColor }}>
+                        {personalityProfiles[result.unconsciousPersonalityType].name}
+                      </span>{" "}
+                      type, with a primary energy of{" "}
+                      <span style={{ color: colorProfiles[result.dominantUnconsciousColor].bgColor }}>
+                        {colorProfiles[result.dominantUnconsciousColor].name}
+                      </span>{" "}
+                      and secondary energy of{" "}
+                      <span style={{ color: colorProfiles[result.secondaryUnconsciousColor!].bgColor }}>
+                        {colorProfiles[result.secondaryUnconsciousColor!].name}
+                      </span>.
+                    </p>
+                    
+                    <h4 className="font-semibold mb-2">Unconscious Scores</h4>
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
+                        <span className="text-sm">Fiery Red: <span className="font-semibold">{result.unconsciousScores["fiery-red"]}%</span></span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
+                        <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.unconsciousScores["sunshine-yellow"]}%</span></span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
+                        <span className="text-sm">Earth Green: <span className="font-semibold">{result.unconsciousScores["earth-green"]}%</span></span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
+                        <span className="text-sm">Cool Blue: <span className="font-semibold">{result.unconsciousScores["cool-blue"]}%</span></span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold mb-2">Comparing Conscious & Unconscious</h4>
+                    <p className="text-gray-700 mb-4">
+                      When your conscious and unconscious profiles differ significantly, it may indicate you're adapting 
+                      your natural preferences to meet external expectations or situational demands. Insights Discovery 
+                      recognizes that we all have these adaptations, which may sometimes create internal tension.
+                    </p>
+                    
+                    <div className="p-4 bg-gray-50 rounded-md">
+                      <h4 className="font-semibold mb-2">What This Means For You</h4>
+                      <p className="text-gray-700 text-sm">
+                        Understanding the gap between your conscious and unconscious preferences can help you recognize when 
+                        you might be expending extra energy to adapt. This awareness can be valuable for managing stress and 
+                        finding environments where you can authentically express yourself.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Unconscious Color Analysis */}
+            <Tabs defaultValue="dominant-unconscious" className="mt-8">
+              <TabsList className="mb-4">
+                <TabsTrigger value="dominant-unconscious">
+                  {colorProfiles[result.dominantUnconsciousColor].name} Energy (Primary Unconscious)
+                </TabsTrigger>
+                <TabsTrigger value="secondary-unconscious">
+                  {colorProfiles[result.secondaryUnconsciousColor!].name} Energy (Secondary Unconscious)
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="dominant-unconscious">
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold mb-4" style={{ color: colorProfiles[result.dominantUnconsciousColor].bgColor }}>
+                      Your Unconscious {colorProfiles[result.dominantUnconsciousColor].name} Energy
+                    </h3>
+                    <div className="space-y-4">
+                      <ColorProfileDetail color={result.dominantUnconsciousColor} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="secondary-unconscious">
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold mb-4" style={{ color: colorProfiles[result.secondaryUnconsciousColor!].bgColor }}>
+                      Your Unconscious {colorProfiles[result.secondaryUnconsciousColor!].name} Energy
+                    </h3>
+                    <div className="space-y-4">
+                      <ColorProfileDetail color={result.secondaryUnconsciousColor!} />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </>
+        )}
         
         {/* Learning Style */}
         <Card>

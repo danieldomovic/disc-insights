@@ -618,8 +618,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Quiz result not found" });
       }
       
-      // Return the formatted result
-      res.json({
+      // Prepare the response data with conscious scores
+      const responseData = {
         id: result.id,
         scores: {
           "fiery-red": result.fieryRedScore,
@@ -631,7 +631,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         secondaryColor: result.secondaryColor,
         personalityType: result.personalityType,
         createdAt: result.createdAt
-      });
+      };
+      
+      // Add unconscious data if available
+      if (result.fieryRedUnconsciousScore !== null && 
+          result.sunshineYellowUnconsciousScore !== null && 
+          result.earthGreenUnconsciousScore !== null && 
+          result.coolBlueUnconsciousScore !== null) {
+        
+        responseData.unconsciousScores = {
+          "fiery-red": result.fieryRedUnconsciousScore,
+          "sunshine-yellow": result.sunshineYellowUnconsciousScore,
+          "earth-green": result.earthGreenUnconsciousScore,
+          "cool-blue": result.coolBlueUnconsciousScore
+        };
+        responseData.dominantUnconsciousColor = result.dominantUnconsciousColor;
+        responseData.secondaryUnconsciousColor = result.secondaryUnconsciousColor;
+        responseData.unconsciousPersonalityType = result.unconsciousPersonalityType;
+      }
+      
+      // Return the formatted result
+      res.json(responseData);
     } catch (error) {
       console.error("Error fetching quiz result:", error);
       res.status(500).json({ message: "Failed to fetch quiz result" });
