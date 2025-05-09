@@ -210,21 +210,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getTeamMembers(teamId: number): Promise<TeamMember[]> {
-    // Join with users table to get user information
-    const members = await db
-      .select({
-        id: teamMembers.id,
-        userId: teamMembers.userId,
-        teamId: teamMembers.teamId,
-        isLeader: teamMembers.isLeader,
-        joinedAt: teamMembers.joinedAt,
-        username: users.username,
-        fullName: users.fullName,
-        email: users.email
-      })
+    // Get the base team member data
+    const baseMembers = await db
+      .select()
       .from(teamMembers)
-      .leftJoin(users, eq(teamMembers.userId, users.id))
       .where(eq(teamMembers.teamId, teamId));
+    
+    // Fetch user details for each member and cast the result to TeamMember[]
+    const members: TeamMember[] = [];
+    
+    for (const member of baseMembers) {
+      const user = await this.getUser(member.userId);
+      members.push({
+        ...member,
+        username: user?.username,
+        fullName: user?.fullName,
+        email: user?.email
+      } as TeamMember);
+    }
     
     return members;
   }
@@ -242,7 +245,15 @@ export class DatabaseStorage implements IStorage {
       .values(teamMember)
       .returning();
     
-    return newMember;
+    // Fetch the user data to include with the member
+    const user = await this.getUser(teamMember.userId);
+    
+    return {
+      ...newMember,
+      username: user?.username,
+      fullName: user?.fullName,
+      email: user?.email
+    } as TeamMember;
   }
 
   async isTeamLeader(userId: number, teamId: number): Promise<boolean> {
