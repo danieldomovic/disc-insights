@@ -30,6 +30,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { formatReportTitle } from "@/lib/formatters";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -174,14 +175,7 @@ export default function Dashboard() {
     }
   };
   
-  // Format report title with standardized format: "Report #ID - Month Day, Year"
-  const formatReportTitle = (result: { id: number, createdAt: string }): string => {
-    return `Report #${result.id} - ${new Date(result.createdAt).toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    })}`;
-  };
+  // Note: We're using the formatReportTitle function imported from lib/formatters
   
   return (
     <div className="container mx-auto py-8 px-4 sm:px-6 md:px-8 max-w-6xl">
@@ -325,7 +319,7 @@ export default function Dashboard() {
                       <Link href={`/results/${result.id}`}>
                         <div className="flex items-center p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
                           <div className="flex-1">
-                            <h4 className="font-medium">{result.title || `Assessment on ${new Date(result.createdAt).toLocaleDateString()}`}</h4>
+                            <h4 className="font-medium">{result.title || formatReportTitle(result)}</h4>
                             <p className="text-sm text-muted-foreground">
                               {result.personalityType} - Dominant: {result.dominantColor.replace(/-/g, ' ')}
                             </p>
@@ -401,7 +395,7 @@ export default function Dashboard() {
                       <Link href={`/results/${result.id}`}>
                         <div className="flex items-center p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
                           <div className="flex-1">
-                            <h4 className="font-medium">{result.title || `Assessment on ${new Date(result.createdAt).toLocaleDateString()}`}</h4>
+                            <h4 className="font-medium">{result.title || formatReportTitle(result)}</h4>
                             <p className="text-sm text-muted-foreground">
                               {result.personalityType} - Dominant: {result.dominantColor.replace(/-/g, ' ')}
                             </p>

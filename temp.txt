@@ -1,0 +1,1 @@
+<h4 className="font-medium">{result.title || formatReportTitle(result)}</h4>
