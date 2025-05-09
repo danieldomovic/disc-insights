@@ -203,7 +203,11 @@ export default function ComparisonView() {
         <div>
           <h1 className="text-3xl font-bold">{comparison.title}</h1>
           <p className="text-muted-foreground mt-2">
-            Created on {new Date(comparison.createdAt).toLocaleDateString()}
+            Created on {new Date(comparison.createdAt).toLocaleDateString('en-US', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            })}
           </p>
         </div>
         

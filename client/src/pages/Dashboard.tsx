@@ -515,7 +515,11 @@ export default function Dashboard() {
                         <div className="flex-1">
                           <h4 className="font-medium">{comparison.title}</h4>
                           <p className="text-sm text-muted-foreground">
-                            Created on {new Date(comparison.createdAt).toLocaleDateString()}
+                            Created on {new Date(comparison.createdAt).toLocaleDateString('en-US', {
+                              day: 'numeric',
+                              month: 'long',
+                              year: 'numeric'
+                            })}
                           </p>
                         </div>
                         <BarChart2 className="h-5 w-5 text-muted-foreground" />
