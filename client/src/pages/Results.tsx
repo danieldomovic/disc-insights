@@ -318,7 +318,170 @@ export default function Results() {
         margin, yPosition, contentWidth, 10
       ) + 10;
       
-      // Section 7: Development Suggestions
+      // Section 7: Learning Style
+      yPosition = addSectionTitle("Learning Style Preferences", yPosition);
+      
+      yPosition += addWrappedText(
+        colorProfiles[result.dominantColor].learningStyle,
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Section 8: Communication Guidelines
+      yPosition = addSectionTitle("Communication Guidelines", yPosition);
+      
+      yPosition += addWrappedText(
+        "When communicating with you, others are most effective when they:",
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      colorProfiles[result.dominantColor].communicationGuidelines.forEach(guideline => {
+        yPosition += 5;
+        pdf.setFontSize(10);
+        pdf.text(`• ${guideline}`, margin + 5, yPosition);
+      });
+      
+      yPosition += 10;
+      
+      // Add a new page for the remaining content
+      pdf.addPage();
+      addHeader("Insights Discovery Profile", 3);
+      yPosition = 40;
+      
+      // Section 9: Career Alignment
+      yPosition = addSectionTitle("Career Alignment", yPosition);
+      
+      yPosition += addWrappedText(
+        `Your ${colorProfiles[result.dominantColor].name} energy tends to align well with these career paths:`,
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      // List career paths
+      colorProfiles[result.dominantColor].careerAlignment.forEach(career => {
+        yPosition += 5;
+        pdf.setFontSize(10);
+        pdf.text(`• ${career}`, margin + 5, yPosition);
+      });
+      
+      yPosition += 5;
+      yPosition += addWrappedText(
+        "These roles often leverage your natural strengths and preferences, though your unique combination of color energies may make you well-suited for a variety of positions.",
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Section 10: Stress Response
+      yPosition = addSectionTitle("Stress Response Patterns", yPosition);
+      
+      yPosition += addWrappedText(
+        colorProfiles[result.dominantColor].stressResponse,
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      // Add stress management advice
+      pdf.setFillColor(255, 248, 220);
+      pdf.rect(margin, yPosition, contentWidth, 20, 'F');
+      
+      pdf.setTextColor(139, 69, 19);
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Managing Your Stress", margin + 5, yPosition + 5);
+      
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      yPosition += 5;
+      const stressAdvice = "Recognize these patterns when they emerge and create space for self-awareness and regulation. Remember that different color energies require different stress management approaches.";
+      
+      yPosition += addWrappedText(
+        stressAdvice,
+        margin + 5, yPosition + 5, contentWidth - 10, 10
+      ) + 10;
+      
+      // Section 11: Decision-Making
+      yPosition = addSectionTitle("Decision-Making Tendencies", yPosition);
+      
+      yPosition += addWrappedText(
+        colorProfiles[result.dominantColor].decisionMaking,
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Create a 2-column table for strengths and watch-outs
+      const colWidth = (contentWidth - 5) / 2;
+      
+      // Left column title - Strengths
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(margin, yPosition, colWidth, 7, 'F');
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Strengths", margin + 5, yPosition + 5);
+      
+      // Right column title - Watch out for
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(margin + colWidth + 5, yPosition, colWidth, 7, 'F');
+      pdf.text("Watch out for", margin + colWidth + 10, yPosition + 5);
+      
+      // Move down for content
+      yPosition += 10;
+      
+      // Define strength and weakness content based on color
+      let strengths = [];
+      let weaknesses = [];
+      
+      if (colorProfiles[result.dominantColor].name === "Fiery Red") {
+        strengths = ["Quick and efficient", "Action-oriented"];
+        weaknesses = ["Being too impulsive", "Disregarding input from others"];
+      } else if (colorProfiles[result.dominantColor].name === "Sunshine Yellow") {
+        strengths = ["Creative and inclusive", "Enthusiastic"];
+        weaknesses = ["Overlooking details", "Changing course too often"];
+      } else if (colorProfiles[result.dominantColor].name === "Earth Green") {
+        strengths = ["Considerate and harmonious", "Values relationships"];
+        weaknesses = ["Avoiding difficult decisions", "Difficulty saying no"];
+      } else {
+        strengths = ["Thorough and logical", "Detail-oriented"];
+        weaknesses = ["Analysis paralysis", "Being overly critical"];
+      }
+      
+      // Add strengths and weaknesses to columns
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      
+      // Strengths column content
+      let contentY = yPosition;
+      strengths.forEach((strength, index) => {
+        pdf.text(`• ${strength}`, margin + 5, contentY);
+        contentY += 6;
+      });
+      
+      // Weaknesses column content
+      contentY = yPosition;
+      weaknesses.forEach((weakness, index) => {
+        pdf.text(`• ${weakness}`, margin + colWidth + 10, contentY);
+        contentY += 6;
+      });
+      
+      yPosition = contentY + 5;
+      
+      // Section 12: Team Roles
+      yPosition = addSectionTitle("Team Role Recommendations", yPosition);
+      
+      yPosition += addWrappedText(
+        "Based on your color energy preferences, you naturally excel in these team roles:",
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      // List team roles
+      colorProfiles[result.dominantColor].teamRoles.forEach(role => {
+        yPosition += 5;
+        pdf.setFontSize(10);
+        pdf.text(`• ${role}`, margin + 5, yPosition);
+      });
+      
+      yPosition += 5;
+      yPosition += addWrappedText(
+        "Understanding these natural tendencies can help you position yourself effectively within teams and recognize when to adapt your approach to fill other roles when needed.",
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Section 13: Development Suggestions
       yPosition = addSectionTitle("Development Suggestions", yPosition);
       
       yPosition += addWrappedText(
@@ -326,7 +489,12 @@ export default function Results() {
         margin, yPosition, contentWidth, 10
       ) + 10;
       
-      // Section 8: Action Plan
+      // Add a new page for the action plan
+      pdf.addPage();
+      addHeader("Insights Discovery Profile", 4);
+      yPosition = 40;
+      
+      // Section 14: Action Plan
       yPosition = addSectionTitle("Personal Action Plan", yPosition);
       
       // Add blank action plan template
@@ -728,6 +896,140 @@ export default function Results() {
             </Card>
           </TabsContent>
         </Tabs>
+        
+        {/* Learning Style */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Learning Style Preferences</h3>
+            <p className="text-gray-700">
+              {colorProfiles[result.dominantColor].learningStyle}
+            </p>
+          </CardContent>
+        </Card>
+        
+        {/* Communication Guidelines */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Communication Guidelines</h3>
+            <p className="text-gray-700 mb-4">
+              When communicating with you, others are most effective when they:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-gray-700 pl-4">
+              {colorProfiles[result.dominantColor].communicationGuidelines.map((guideline, index) => (
+                <li key={index}>{guideline}</li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+        
+        {/* Career Alignment */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Career Alignment</h3>
+            <p className="text-gray-700 mb-4">
+              Your {colorProfiles[result.dominantColor].name} energy tends to align well with these career paths:
+            </p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {colorProfiles[result.dominantColor].careerAlignment.map((career, index) => (
+                <span 
+                  key={index} 
+                  className="px-3 py-1 rounded-full text-sm"
+                  style={{ 
+                    backgroundColor: `${colorProfiles[result.dominantColor].bgColor}20`,
+                    color: colorProfiles[result.dominantColor].bgColor,
+                    border: `1px solid ${colorProfiles[result.dominantColor].bgColor}40`
+                  }}
+                >
+                  {career}
+                </span>
+              ))}
+            </div>
+            <p className="text-gray-700 mt-4">
+              These roles often leverage your natural strengths and preferences, though your unique combination of color energies may make you well-suited for a variety of positions.
+            </p>
+          </CardContent>
+        </Card>
+        
+        {/* Stress Response Patterns */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Stress Response Patterns</h3>
+            <p className="text-gray-700">
+              {colorProfiles[result.dominantColor].stressResponse}
+            </p>
+            <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-md">
+              <h4 className="font-semibold text-amber-800 mb-2">Managing Your Stress</h4>
+              <p className="text-amber-800">
+                Recognize these patterns when they emerge and create space for self-awareness and regulation. Remember that different color energies require different stress management approaches.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Decision-Making Tendencies */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Decision-Making Tendencies</h3>
+            <p className="text-gray-700 mb-4">
+              {colorProfiles[result.dominantColor].decisionMaking}
+            </p>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="p-4 bg-slate-50 rounded-md">
+                <h4 className="font-semibold mb-2">Strengths</h4>
+                <ul className="list-disc list-inside text-gray-700">
+                  <li>{colorProfiles[result.dominantColor].name === "Fiery Red" ? "Quick and efficient" : 
+                      colorProfiles[result.dominantColor].name === "Sunshine Yellow" ? "Creative and inclusive" :
+                      colorProfiles[result.dominantColor].name === "Earth Green" ? "Considerate and harmonious" :
+                      "Thorough and logical"}</li>
+                  <li>{colorProfiles[result.dominantColor].name === "Fiery Red" ? "Action-oriented" : 
+                      colorProfiles[result.dominantColor].name === "Sunshine Yellow" ? "Enthusiastic" :
+                      colorProfiles[result.dominantColor].name === "Earth Green" ? "Values relationships" :
+                      "Detail-oriented"}</li>
+                </ul>
+              </div>
+              <div className="p-4 bg-slate-50 rounded-md">
+                <h4 className="font-semibold mb-2">Watch out for</h4>
+                <ul className="list-disc list-inside text-gray-700">
+                  <li>{colorProfiles[result.dominantColor].name === "Fiery Red" ? "Being too impulsive" : 
+                      colorProfiles[result.dominantColor].name === "Sunshine Yellow" ? "Overlooking details" :
+                      colorProfiles[result.dominantColor].name === "Earth Green" ? "Avoiding difficult decisions" :
+                      "Analysis paralysis"}</li>
+                  <li>{colorProfiles[result.dominantColor].name === "Fiery Red" ? "Disregarding input from others" : 
+                      colorProfiles[result.dominantColor].name === "Sunshine Yellow" ? "Changing course too often" :
+                      colorProfiles[result.dominantColor].name === "Earth Green" ? "Difficulty saying no" :
+                      "Being overly critical"}</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Team Role Recommendations */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Team Role Recommendations</h3>
+            <p className="text-gray-700 mb-4">
+              Based on your color energy preferences, you naturally excel in these team roles:
+            </p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {colorProfiles[result.dominantColor].teamRoles.map((role, index) => (
+                <span 
+                  key={index} 
+                  className="px-3 py-1 rounded-full text-sm font-medium"
+                  style={{ 
+                    backgroundColor: `${colorProfiles[result.dominantColor].bgColor}`,
+                    color: colorProfiles[result.dominantColor].textColor
+                  }}
+                >
+                  {role}
+                </span>
+              ))}
+            </div>
+            <p className="text-gray-700 mt-4">
+              Understanding these natural tendencies can help you position yourself effectively within teams and recognize when to adapt your approach to fill other roles when needed.
+            </p>
+          </CardContent>
+        </Card>
         
         {/* Personal Action Plan */}
         <Card>

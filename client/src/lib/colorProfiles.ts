@@ -14,6 +14,14 @@ interface ColorProfile {
   decisionsAre: string;
   bgColor: string;
   textColor: string;
+  
+  // Additional profile data
+  learningStyle: string;
+  communicationGuidelines: string[];
+  careerAlignment: string[];
+  stressResponse: string;
+  decisionMaking: string;
+  teamRoles: string[];
 }
 
 interface PersonalityProfile {
@@ -43,7 +51,32 @@ export const colorProfiles: Record<ColorType, ColorProfile> = {
     underPressureMay: "Dictate",
     decisionsAre: "Pragmatic",
     bgColor: "#E23D28",
-    textColor: "white"
+    textColor: "white",
+    
+    // Additional profile data
+    learningStyle: "Action-oriented learning through doing and practical experience. Prefers direct, efficient instruction with clear objectives and meaningful challenges.",
+    communicationGuidelines: [
+      "Be direct and get to the point quickly",
+      "Focus on results and outcomes",
+      "Provide options and opportunities for control",
+      "Respect their time and be efficient"
+    ],
+    careerAlignment: [
+      "Leadership roles",
+      "Executive positions",
+      "Entrepreneurship",
+      "Sales",
+      "Project management",
+      "Emergency services"
+    ],
+    stressResponse: "When stressed, tends to become autocratic, demanding, and impatient. May take control forcefully, dictate to others, and become overly blunt or confrontational.",
+    decisionMaking: "Makes quick, pragmatic decisions based on immediate results and tangible outcomes. Focuses on solutions that will achieve objectives efficiently.",
+    teamRoles: [
+      "Driver", 
+      "Director", 
+      "Results-focused leader", 
+      "Challenger"
+    ]
   },
   "sunshine-yellow": {
     name: "Sunshine Yellow",
@@ -57,7 +90,32 @@ export const colorProfiles: Record<ColorType, ColorProfile> = {
     underPressureMay: "Dramatise or over-react",
     decisionsAre: "Spontaneous",
     bgColor: "#F2CF1D",
-    textColor: "black"
+    textColor: "black",
+    
+    // Additional profile data
+    learningStyle: "Learns through social interaction, group discussion, and creative exploration. Prefers collaborative, engaging, and varied learning experiences with opportunities for personal expression.",
+    communicationGuidelines: [
+      "Be enthusiastic and engaging",
+      "Allow time for relationship building",
+      "Show appreciation for their ideas and input",
+      "Use visuals and stories to illustrate points"
+    ],
+    careerAlignment: [
+      "Marketing and PR",
+      "Human resources",
+      "Event planning",
+      "Entertainment",
+      "Training and development",
+      "Customer experience"
+    ],
+    stressResponse: "When stressed, may become overly emotional, dramatic, or scattered. Can talk excessively, lose focus, and make impulsive decisions based on emotions rather than facts.",
+    decisionMaking: "Makes intuitive, spontaneous decisions based on feelings and relationships. Values excitement, possibilities, and the human element in decision-making.",
+    teamRoles: [
+      "Influencer", 
+      "Motivator", 
+      "Networker", 
+      "Innovator"
+    ]
   },
   "earth-green": {
     name: "Earth Green",
@@ -71,7 +129,32 @@ export const colorProfiles: Record<ColorType, ColorProfile> = {
     underPressureMay: "Feel over-burdened",
     decisionsAre: "Considered",
     bgColor: "#42A640",
-    textColor: "white"
+    textColor: "white",
+    
+    // Additional profile data
+    learningStyle: "Learns best in a supportive, harmonious environment with a steady pace. Values practical application and benefits from personal encouragement and mentoring.",
+    communicationGuidelines: [
+      "Be patient and give them time to process",
+      "Show authentic interest in them as a person",
+      "Be gentle with feedback and criticism",
+      "Ask for their opinion and really listen"
+    ],
+    careerAlignment: [
+      "Counseling and therapy",
+      "Healthcare and nursing",
+      "Social work",
+      "Education",
+      "Non-profit sector",
+      "Human resources"
+    ],
+    stressResponse: "When stressed, may become submissive, indecisive, or stubborn. Can retreat into passivity, avoid conflict at all costs, or silently resist without expressing true feelings.",
+    decisionMaking: "Makes decisions carefully, considering the impact on people and relationships. Seeks consensus and harmony, often prioritizing the needs of others over efficiency.",
+    teamRoles: [
+      "Supporter", 
+      "Mediator", 
+      "Team builder", 
+      "Harmonizer"
+    ]
   },
   "cool-blue": {
     name: "Cool Blue",
@@ -85,7 +168,32 @@ export const colorProfiles: Record<ColorType, ColorProfile> = {
     underPressureMay: "Withdraw",
     decisionsAre: "Logical and deliberate",
     bgColor: "#1C77C3",
-    textColor: "white"
+    textColor: "white",
+    
+    // Additional profile data
+    learningStyle: "Learns through systematic analysis, logical progression, and thorough understanding. Prefers well-structured, detailed content that can be carefully examined and verified.",
+    communicationGuidelines: [
+      "Provide detailed information and be thorough",
+      "Be well-prepared with facts and evidence",
+      "Allow time for questions and analysis",
+      "Respect their need for precision and accuracy"
+    ],
+    careerAlignment: [
+      "Research and analysis",
+      "Engineering",
+      "IT and technology",
+      "Finance and accounting",
+      "Quality assurance",
+      "Legal professions"
+    ],
+    stressResponse: "When stressed, may become withdrawn, overly critical, or paralyzed by analysis. Can get caught in perfectionism, excessive doubting, and have difficulty making decisions without complete information.",
+    decisionMaking: "Makes methodical, analytical decisions based on data, facts, and logic. Considers multiple perspectives and potential risks before committing to action.",
+    teamRoles: [
+      "Analyst", 
+      "Quality controller", 
+      "Strategic planner", 
+      "Process improver"
+    ]
   }
 };
 
