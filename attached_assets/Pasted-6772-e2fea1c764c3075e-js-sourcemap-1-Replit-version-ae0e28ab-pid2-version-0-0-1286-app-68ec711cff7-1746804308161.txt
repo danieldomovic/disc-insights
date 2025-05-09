@@ -1,0 +1,229 @@
+6772-e2fea1c764c3075e.js:sourcemap:1 Replit version ae0e28ab, pid2 version 0.0.1286
+_app-68ec711cff7e7baf.js:sourcemap:13 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+_app-68ec711cff7e7baf.js:sourcemap:13 [LaunchDarkly] LaunchDarkly client initialized
+content-script.9e795743.js:11 initializing port
+framework-320a68b62ab5ba61.js:sourcemap:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'battery'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+framework-320a68b62ab5ba61.js:sourcemap:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-320a68b62ab5ba61.js:sourcemap:1
+workspace_iframe.html:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+workspace_iframe.html:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html:32 Unrecognized feature: 'battery'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at div
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at div
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at div
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: validateDOMNesting(...): <a> cannot appear as a descendant of <a>.
+    at a
+    at _c7 (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:100:50)
+    at a
+    at https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:337:18
+    at li
+    at _c5 (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:79:12)
+    at ol
+    at _c3 (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:54:12)
+    at nav
+    at _c (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:22:11)
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at div
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at div
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at div
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at div
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at section
+    at MotionComponent (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=9941224e:6536:40)
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at section
+    at MotionComponent (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=9941224e:6536:40)
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+Console.js:61 Warning: Invalid prop `data-replit-metadata` supplied to `React.Fragment`. React.Fragment can only have `key` and `children` props.
+    at Breadcrumbs (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/components/ui/breadcrumb.tsx:178:3)
+    at section
+    at MotionComponent (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=9941224e:6536:40)
+    at Results (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/pages/Results.tsx:48:27)
+    at Route (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:323:16)
+    at Switch (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9941224e:379:17)
+    at main
+    at div
+    at AppRoutes (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/App.tsx?t=1746804184534&v=C9UtFKBuQIH0fD_RHVika:41:20)
+    at AuthProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://16f3d4fc-d506-4625-afb7-6cef92ea3ad3-00-12vplxzow2gqd.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9941224e:2805:3)
+    at App
+Mt.forEach.n.<computed> @ Console.js:61
+analytics.tiktok.com/i18n/pixel/events.js?sdkid=D004GE3C77U8PIVDSDJG&lib=ttq:1 
+            
+            
+           Failed to load resource: net::ERR_TIMED_OUT
+InsightsPersonalityQuiz:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.
+
+                
+          
+          
+          
+         Chrome is moving towards a new experience that allows users to choose to browse without third-party cookies.
+content-script.9e795743.js:11 port disconnected, reconnecting
+content-script.9e795743.js:11 initializing port
