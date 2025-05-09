@@ -106,6 +106,7 @@ export default function Quiz() {
         isLastQuestion={currentQuestionIndex === totalQuestions - 1}
         isSubmitting={isSubmitting}
         validationErrors={validationErrors}
+        isConsciousPhase={isConsciousPhase}
       />
     </motion.section>
   );

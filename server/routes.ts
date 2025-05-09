@@ -18,7 +18,8 @@ declare global {
 const answerSchema = z.object({
   questionId: z.number(),
   selectedColor: z.string(),
-  rating: z.string() // L, 1, 2, 3, 4, 5, or M
+  rating: z.string(), // L, 1, 2, 3, 4, 5, or M
+  isConsciousResponse: z.boolean().default(true) // true for conscious, false for unconscious
 });
 
 const submissionSchema = z.object({
@@ -642,14 +643,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const submission = submissionSchema.parse(req.body);
       
-      // Initialize color scores
+      // Separate conscious and unconscious answers
+      const consciousAnswers = submission.answers.filter(answer => answer.isConsciousResponse);
+      const unconsciousAnswers = submission.answers.filter(answer => !answer.isConsciousResponse);
+      
+      // Initialize color scores for conscious persona
       let fieryRedScore = 0;
       let sunshineYellowScore = 0;
       let earthGreenScore = 0;
       let coolBlueScore = 0;
       
-      // Calculate scores using the ratings
-      submission.answers.forEach(answer => {
+      // Calculate conscious scores using the ratings
+      consciousAnswers.forEach(answer => {
         // Convert rating to numeric value
         let ratingValue = 0;
         switch (answer.rating) {
@@ -680,16 +685,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      // Calculate total score
+      // Calculate total score for conscious persona
       const totalScore = fieryRedScore + sunshineYellowScore + earthGreenScore + coolBlueScore;
       
-      // Calculate percentages
+      // Calculate percentages for conscious persona
       const fieryRedPercentage = Math.round((fieryRedScore / totalScore) * 100);
       const sunshineYellowPercentage = Math.round((sunshineYellowScore / totalScore) * 100);
       const earthGreenPercentage = Math.round((earthGreenScore / totalScore) * 100);
       const coolBluePercentage = Math.round((coolBlueScore / totalScore) * 100);
       
-      // Find dominant and secondary colors
+      // Find dominant and secondary colors for conscious persona
       const colorScores = [
         { color: "fiery-red", score: fieryRedPercentage },
         { color: "sunshine-yellow", score: sunshineYellowPercentage },
@@ -702,7 +707,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const dominantColor = colorScores[0].color;
       const secondaryColor = colorScores[1].color;
       
-      // Determine personality type
+      // Determine personality type for conscious persona
       let personalityType = "Unknown";
       
       if (dominantColor === "fiery-red" && secondaryColor === "cool-blue") {
@@ -731,9 +736,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
         personalityType = "Observer";
       }
       
-      // Save the result
+      // Initialize color scores for unconscious persona
+      let fieryRedUnconsciousScore = 0;
+      let sunshineYellowUnconsciousScore = 0;
+      let earthGreenUnconsciousScore = 0;
+      let coolBlueUnconsciousScore = 0;
+      
+      // Calculate unconscious scores if we have unconscious answers
+      let dominantUnconsciousColor = null;
+      let secondaryUnconsciousColor = null;
+      let unconsciousPersonalityType = null;
+      
+      if (unconsciousAnswers.length > 0) {
+        // Calculate unconscious scores using the ratings
+        unconsciousAnswers.forEach(answer => {
+          // Convert rating to numeric value
+          let ratingValue = 0;
+          switch (answer.rating) {
+            case 'L': ratingValue = 1; break;
+            case '1': ratingValue = 2; break;
+            case '2': ratingValue = 3; break;
+            case '3': ratingValue = 4; break;
+            case '4': ratingValue = 5; break;
+            case '5': ratingValue = 6; break;
+            case 'M': ratingValue = 7; break;
+            default: ratingValue = 0;
+          }
+          
+          // Add the weighted score to the appropriate color
+          switch (answer.selectedColor) {
+            case "fiery-red":
+              fieryRedUnconsciousScore += ratingValue;
+              break;
+            case "sunshine-yellow":
+              sunshineYellowUnconsciousScore += ratingValue;
+              break;
+            case "earth-green":
+              earthGreenUnconsciousScore += ratingValue;
+              break;
+            case "cool-blue":
+              coolBlueUnconsciousScore += ratingValue;
+              break;
+          }
+        });
+        
+        // Calculate total score for unconscious persona
+        const totalUnconsciousScore = fieryRedUnconsciousScore + sunshineYellowUnconsciousScore + 
+                                     earthGreenUnconsciousScore + coolBlueUnconsciousScore;
+        
+        // Calculate percentages for unconscious persona
+        const fieryRedUnconsciousPercentage = Math.round((fieryRedUnconsciousScore / totalUnconsciousScore) * 100);
+        const sunshineYellowUnconsciousPercentage = Math.round((sunshineYellowUnconsciousScore / totalUnconsciousScore) * 100);
+        const earthGreenUnconsciousPercentage = Math.round((earthGreenUnconsciousScore / totalUnconsciousScore) * 100);
+        const coolBlueUnconsciousPercentage = Math.round((coolBlueUnconsciousScore / totalUnconsciousScore) * 100);
+        
+        // Find dominant and secondary colors for unconscious persona
+        const unconsciousColorScores = [
+          { color: "fiery-red", score: fieryRedUnconsciousPercentage },
+          { color: "sunshine-yellow", score: sunshineYellowUnconsciousPercentage },
+          { color: "earth-green", score: earthGreenUnconsciousPercentage },
+          { color: "cool-blue", score: coolBlueUnconsciousPercentage }
+        ];
+        
+        unconsciousColorScores.sort((a, b) => b.score - a.score);
+        
+        dominantUnconsciousColor = unconsciousColorScores[0].color;
+        secondaryUnconsciousColor = unconsciousColorScores[1].color;
+        
+        // Determine personality type for unconscious persona using the same rules
+        if (dominantUnconsciousColor === "fiery-red" && secondaryUnconsciousColor === "cool-blue") {
+          unconsciousPersonalityType = "Reformer";
+        } else if (dominantUnconsciousColor === "cool-blue" && secondaryUnconsciousColor === "fiery-red") {
+          unconsciousPersonalityType = "Reformer";
+        } else if (dominantUnconsciousColor === "cool-blue" && secondaryUnconsciousColor === "earth-green") {
+          unconsciousPersonalityType = "Coordinator";
+        } else if (dominantUnconsciousColor === "earth-green" && secondaryUnconsciousColor === "cool-blue") {
+          unconsciousPersonalityType = "Coordinator";
+        } else if (dominantUnconsciousColor === "sunshine-yellow" && secondaryUnconsciousColor === "earth-green") {
+          unconsciousPersonalityType = "Helper";
+        } else if (dominantUnconsciousColor === "earth-green" && secondaryUnconsciousColor === "sunshine-yellow") {
+          unconsciousPersonalityType = "Helper";
+        } else if (dominantUnconsciousColor === "fiery-red" && secondaryUnconsciousColor === "sunshine-yellow") {
+          unconsciousPersonalityType = "Motivator";
+        } else if (dominantUnconsciousColor === "sunshine-yellow" && secondaryUnconsciousColor === "fiery-red") {
+          unconsciousPersonalityType = "Motivator";
+        } else if (dominantUnconsciousColor === "fiery-red") {
+          unconsciousPersonalityType = "Director";
+        } else if (dominantUnconsciousColor === "sunshine-yellow") {
+          unconsciousPersonalityType = "Inspirer";
+        } else if (dominantUnconsciousColor === "earth-green") {
+          unconsciousPersonalityType = "Supporter";
+        } else if (dominantUnconsciousColor === "cool-blue") {
+          unconsciousPersonalityType = "Observer";
+        } else {
+          unconsciousPersonalityType = "Unknown";
+        }
+        
+        // Update unconscious score values
+        fieryRedUnconsciousScore = fieryRedUnconsciousPercentage;
+        sunshineYellowUnconsciousScore = sunshineYellowUnconsciousPercentage;
+        earthGreenUnconsciousScore = earthGreenUnconsciousPercentage;
+        coolBlueUnconsciousScore = coolBlueUnconsciousPercentage;
+      }
+      
+      // Save the result with both conscious and unconscious data
       const quizResult = await storage.createQuizResult({
         userId: req.isAuthenticated() ? req.user.id : null,
+        // Conscious scores
         fieryRedScore: fieryRedPercentage,
         sunshineYellowScore: sunshineYellowPercentage,
         earthGreenScore: earthGreenPercentage,
@@ -741,6 +850,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dominantColor,
         secondaryColor,
         personalityType,
+        // Unconscious scores (if available)
+        fieryRedUnconsciousScore,
+        sunshineYellowUnconsciousScore,
+        earthGreenUnconsciousScore, 
+        coolBlueUnconsciousScore,
+        dominantUnconsciousColor,
+        secondaryUnconsciousColor,
+        unconsciousPersonalityType,
         title: "Latest Quiz Result"
       });
       
@@ -750,12 +867,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           resultId: quizResult.id,
           questionId: answer.questionId,
           selectedColor: answer.selectedColor,
-          rating: answer.rating
+          rating: answer.rating,
+          isConsciousResponse: answer.isConsciousResponse
         });
       }
       
-      // Return the result
-      res.json({
+      // Prepare the response data
+      const responseData = {
         id: quizResult.id,
         scores: {
           "fiery-red": fieryRedPercentage,
@@ -767,7 +885,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         secondaryColor,
         personalityType,
         createdAt: quizResult.createdAt
-      });
+      };
+      
+      // Add unconscious data if available
+      if (unconsciousAnswers.length > 0) {
+        responseData.unconsciousScores = {
+          "fiery-red": fieryRedUnconsciousScore,
+          "sunshine-yellow": sunshineYellowUnconsciousScore,
+          "earth-green": earthGreenUnconsciousScore,
+          "cool-blue": coolBlueUnconsciousScore
+        };
+        responseData.dominantUnconsciousColor = dominantUnconsciousColor;
+        responseData.secondaryUnconsciousColor = secondaryUnconsciousColor;
+        responseData.unconsciousPersonalityType = unconsciousPersonalityType;
+      }
+      
+      // Return the result
+      res.json(responseData);
     } catch (error) {
       console.error("Error processing quiz submission:", error);
       res.status(400).json({ message: "Invalid quiz submission" });
