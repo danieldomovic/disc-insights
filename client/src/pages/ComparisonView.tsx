@@ -49,6 +49,7 @@ interface ColorScore {
 interface Report {
   id: number;
   title?: string;
+  createdAt: string;
   scores: ColorScore;
   dominantColor: string;
   secondaryColor: string;
@@ -385,14 +386,14 @@ export default function ComparisonView() {
                     <PolarAngleAxis dataKey="subject" />
                     <PolarRadiusAxis angle={30} domain={[0, 100]} />
                     <Radar
-                      name={`Report A: ${comparison.reportA.title || `Profile ${comparison.reportA.id}`}`}
+                      name={`Report A: ${comparison.reportA.title || formatReportTitle(comparison.reportA)}`}
                       dataKey="A"
                       stroke="#FF5A5F"
                       fill="#FF5A5F"
                       fillOpacity={0.5}
                     />
                     <Radar
-                      name={`Report B: ${comparison.reportB.title || `Profile ${comparison.reportB.id}`}`}
+                      name={`Report B: ${comparison.reportB.title || formatReportTitle(comparison.reportB)}`}
                       dataKey="B"
                       stroke="#5B86E5"
                       fill="#5B86E5"
@@ -415,12 +416,12 @@ export default function ComparisonView() {
                     <Tooltip />
                     <Legend />
                     <Bar 
-                      name={`Report A: ${comparison.reportA.title || `Profile ${comparison.reportA.id}`}`}
+                      name={`Report A: ${comparison.reportA.title || formatReportTitle(comparison.reportA)}`}
                       dataKey="ReportA" 
                       fill="#FF5A5F" 
                     />
                     <Bar 
-                      name={`Report B: ${comparison.reportB.title || `Profile ${comparison.reportB.id}`}`}
+                      name={`Report B: ${comparison.reportB.title || formatReportTitle(comparison.reportB)}`}
                       dataKey="ReportB" 
                       fill="#5B86E5" 
                     />
