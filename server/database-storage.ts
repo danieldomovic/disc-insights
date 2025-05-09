@@ -296,6 +296,17 @@ export class DatabaseStorage implements IStorage {
     return !!membership;
   }
 
+  async removeTeamMember(teamId: number, userId: number): Promise<void> {
+    await db
+      .delete(teamMembers)
+      .where(
+        and(
+          eq(teamMembers.teamId, teamId),
+          eq(teamMembers.userId, userId)
+        )
+      );
+  }
+
   async isTeamMember(userId: number, teamId: number): Promise<boolean> {
     const [membership] = await db
       .select()

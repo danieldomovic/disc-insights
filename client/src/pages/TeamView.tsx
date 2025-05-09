@@ -81,6 +81,35 @@ export default function TeamView() {
     enabled: !!user && !isNaN(teamId)
   });
   
+  // Remove team member mutation
+  const removeMemberMutation = useMutation({
+    mutationFn: async (userId: number) => {
+      const response = await apiRequest("DELETE", `/api/teams/${teamId}/members/${userId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to remove team member");
+      }
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Team member removed",
+        description: "Member has been removed from the team successfully."
+      });
+      
+      // Refresh team data
+      queryClient.invalidateQueries({ queryKey: [`/api/teams/${teamId}`] });
+    },
+    onError: (error: any) => {
+      console.error("Error removing team member:", error);
+      toast({
+        title: "Failed to remove team member",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive"
+      });
+    }
+  });
+  
   // Generate invite link mutation
   const generateInviteMutation = useMutation({
     mutationFn: async () => {
@@ -446,8 +475,19 @@ export default function TeamView() {
                               </div>
                             </div>
                             {team.isLeader && !member.isLeader && (
-                              <Button variant="ghost" size="sm">
-                                Remove
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => {
+                                  if (window.confirm(`Are you sure you want to remove ${member.username || `Member ${member.userId}`} from the team?`)) {
+                                    removeMemberMutation.mutate(member.userId);
+                                  }
+                                }}
+                                disabled={removeMemberMutation.isPending}
+                              >
+                                {removeMemberMutation.isPending && removeMemberMutation.variables === member.userId 
+                                  ? "Removing..." 
+                                  : "Remove"}
                               </Button>
                             )}
                           </div>

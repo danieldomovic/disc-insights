@@ -388,6 +388,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Remove team member
+  app.delete("/api/teams/:teamId/members/:userId", requireAuth, async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.teamId, 10);
+      const memberUserId = parseInt(req.params.userId, 10);
+      
+      if (isNaN(teamId) || isNaN(memberUserId)) {
+        return res.status(400).json({ message: "Invalid team ID or user ID" });
+      }
+      
+      const currentUserId = req.user!.id;
+      
+      // Check if current user is the team leader
+      const isLeader = await storage.isTeamLeader(currentUserId, teamId);
+      if (!isLeader) {
+        return res.status(403).json({ message: "Only team leaders can remove members" });
+      }
+      
+      // Make sure the user being removed exists in the team
+      const isTeamMember = await storage.isTeamMember(memberUserId, teamId);
+      if (!isTeamMember) {
+        return res.status(404).json({ message: "User is not a member of this team" });
+      }
+      
+      // Prevent removal of team leader by themselves
+      if (memberUserId === currentUserId) {
+        return res.status(400).json({ message: "Team leaders cannot be removed. Transfer leadership or delete the team instead." });
+      }
+      
+      // Remove the member
+      await storage.removeTeamMember(teamId, memberUserId);
+      
+      res.status(200).json({ message: "Team member removed successfully" });
+    } catch (error) {
+      console.error("Error removing team member:", error);
+      res.status(500).json({ message: "Failed to remove team member" });
+    }
+  });
+
   app.post("/api/teams/:id/members", requireAuth, async (req, res) => {
     try {
       console.log("Add team member request:", req.body);
