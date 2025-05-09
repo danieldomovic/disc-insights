@@ -245,13 +245,26 @@ export default function Results() {
         return yPosition + 18; // Return next Y position
       };
       
-      // Function to add a modern card with colored header
-      const addCard = (title: string, content: string, yPosition: number, height: number, 
+      // Function to add a modern card with colored header and adaptive height
+      const addCard = (title: string, content: string, yPosition: number, minHeight: number, 
                        headerColor = primaryColor, bgColor = colors.bgLight) => {
-        // Card background with shadow effect
+        // Split the content text to fit within the card width
+        pdf.setFontSize(10);
+        const contentLines = pdf.splitTextToSize(content, contentWidth - 16);
+        
+        // Calculate actual required height based on content
+        const lineHeight = 4.8; // Increased line height for readability
+        const contentHeight = contentLines.length * lineHeight;
+        const paddingBottom = 12; // Space after content
+        const paddingTop = 16; // Space between header and content start
+        
+        // Calculate total height (ensure it's at least the minHeight specified)
+        const actualHeight = Math.max(minHeight, contentHeight + paddingTop + paddingBottom);
+        
+        // Card background with subtle shadow effect
         pdf.setDrawColor(220, 220, 220);
         pdf.setFillColor(bgColor.r, bgColor.g, bgColor.b);
-        pdf.roundedRect(margin, yPosition, contentWidth, height, 3, 3, 'FD');
+        pdf.roundedRect(margin, yPosition, contentWidth, actualHeight, 3, 3, 'FD');
         
         // Card header
         pdf.setFillColor(headerColor.r, headerColor.g, headerColor.b);
@@ -263,15 +276,15 @@ export default function Results() {
         pdf.setFont('helvetica', 'bold');
         pdf.text(title, margin + 6, yPosition + 6.5);
         
-        // Content
-        const contentY = yPosition + 15;
-        const contentLines = pdf.splitTextToSize(content, contentWidth - 12);
-        pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
+        // Content with optimal spacing
+        const contentY = yPosition + 18; // Increased from 15 for better spacing from header
+        pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b); // Darker text for better readability
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(contentLines, margin + 6, contentY);
+        pdf.text(contentLines, margin + 8, contentY); // Increased left padding for better readability
         
-        return yPosition + height + 6; // Return next Y position with spacing
+        // Return next Y position with optimized spacing (reduced from 6 to 5)
+        return yPosition + actualHeight + 5; 
       };
       
       // Add content to the PDF
@@ -411,9 +424,9 @@ export default function Results() {
       // Communication style section
       yPosition = addSectionTitle("Communication Style", yPosition);
       
-      // Add communication card with content
+      // Add communication card with more elaborate content
       const communicationContent = 
-        `As someone with a preference for ${colorProfiles[result.dominantColor].name} energy, you tend to communicate in a way that is ${colorProfiles[result.dominantColor].appears.toLowerCase()}. You value being ${colorProfiles[result.dominantColor].likesYouToBe.toLowerCase()} in interactions.\n\nWhen communicating with you, others should be aware that you may become irritated by ${colorProfiles[result.dominantColor].canBeIrritatedBy.toLowerCase()}. Under pressure, you may ${colorProfiles[result.dominantColor].underPressureMay.toLowerCase()}.`;
+        `As someone with a preference for ${colorProfiles[result.dominantColor].name} energy, you tend to communicate in a way that is ${colorProfiles[result.dominantColor].appears.toLowerCase()}. This style reflects your natural tendencies and unconscious preferences that have developed throughout your life experiences.\n\nYou value being ${colorProfiles[result.dominantColor].likesYouToBe.toLowerCase()} in interactions. This preference shapes how you perceive and respond to others in both personal and professional settings.\n\nWhen communicating with you, others should be aware that you may become irritated by ${colorProfiles[result.dominantColor].canBeIrritatedBy.toLowerCase()}. These triggers often stem from your core values and the way you process information.\n\nUnder pressure, you may ${colorProfiles[result.dominantColor].underPressureMay.toLowerCase()}. Recognizing these patterns can help you develop strategies to maintain effective communication even in challenging situations.`;
       
       yPosition = addCard(
         "Your Communication Preferences",
@@ -471,8 +484,8 @@ export default function Results() {
       // Career Alignment section
       yPosition = addSectionTitle("Career Alignment", yPosition);
       
-      // Career content text
-      const careerText = `Your ${colorProfiles[result.dominantColor].name} energy tends to align well with these career paths: ${colorProfiles[result.dominantColor].careerAlignment.join(", ")}.\n\nThese roles often leverage your natural strengths and preferences, though your unique combination of color energies may make you well-suited for a variety of positions.`;
+      // Career content text with more elaboration
+      const careerText = `Your ${colorProfiles[result.dominantColor].name} energy tends to align well with these career paths: ${colorProfiles[result.dominantColor].careerAlignment.join(", ")}.\n\nThese career paths naturally complement your inherent strengths and work style preferences. They provide environments where your natural tendencies can be valued and utilized effectively.\n\nPeople with your color preference often excel in these roles because the work demands align with your natural approach to tasks, communication style, and problem-solving methods.\n\nIt's important to note that your unique combination of color energies (particularly your ${colorProfiles[result.secondaryColor].name} secondary energy) creates a distinctive profile that may make you well-suited for many positions beyond these suggestions. Your individual experiences, skills, and interests should also be considered alongside these color-based insights.`;
       
       // Use the card function for consistency
       yPosition = addCard(
@@ -500,8 +513,8 @@ export default function Results() {
         colors.warning
       );
       
-      // Add stress management advice with the consistent card style
-      const stressAdvice = "Recognize these patterns when they emerge and create space for self-awareness and regulation. Remember that different color energies require different stress management approaches.";
+      // Add detailed stress management advice with the consistent card style
+      const stressAdvice = `Recognizing your stress response patterns is the first step toward effective management. When you notice these behaviors emerging, try to pause and create space for self-awareness.\n\nYour ${colorProfiles[result.dominantColor].name} energy has specific stress triggers and response patterns. Under pressure, this energy may become exaggerated or distorted, manifesting as the behaviors described above.\n\nEffective stress management strategies for your color energy might include:\n\n• Taking short breaks to regain perspective\n• Communicating your needs clearly to others\n• Engaging in activities that naturally balance your dominant energy\n• Practicing mindfulness techniques that help you recognize when you're becoming stressed\n\nRemember that different color energies require different stress management approaches, and what works for others may not be effective for you.`;
       
       // Use the card function for consistency
       yPosition = addCard(
@@ -562,9 +575,9 @@ export default function Results() {
       // Team Roles section
       yPosition = addSectionTitle("Team Role Recommendations", yPosition);
       
-      // Convert the team roles to a formatted string with bullet points
+      // Convert the team roles to a formatted string with detailed explanations
       const roles = colorProfiles[result.dominantColor].teamRoles;
-      const rolesText = `Based on your color energy preferences, you naturally excel in these roles:\n\n• ${roles.join('\n• ')}\n\nUnderstanding these natural tendencies helps you position yourself effectively in teams.`;
+      const rolesText = `Based on your color energy preferences, you naturally excel in these team roles:\n\n• ${roles.join('\n• ')}\n\nThese roles align with your ${colorProfiles[result.dominantColor].name} energy's natural strengths and behavioral tendencies. Understanding how your color energy manifests in team dynamics can help you:\n\n• Position yourself in roles where you can contribute most effectively\n• Recognize which responsibilities will come naturally to you\n• Identify areas where you might need to consciously adapt or develop\n• Communicate your strengths and preferences to team members and leaders\n\nThese natural tendencies don't limit you—they simply highlight where your innate preferences lie. With awareness and development, you can excel in other roles as well, especially those that align with your secondary ${colorProfiles[result.secondaryColor].name} energy.`;
       
       // Use the card function for consistency
       yPosition = addCard(
