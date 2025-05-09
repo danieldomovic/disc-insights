@@ -58,6 +58,7 @@ export interface IStorage {
   getTeamMembers(teamId: number): Promise<TeamMember[]>;
   getTeamsByOrganization(organizationId: number): Promise<Team[]>;
   addTeamMember(teamMember: InsertTeamMember): Promise<TeamMember>;
+  updateTeam(id: number, updates: { name: string; description: string }): Promise<Team>;
   isTeamLeader(userId: number, teamId: number): Promise<boolean>;
   isTeamMember(userId: number, teamId: number): Promise<boolean>;
   
@@ -223,6 +224,10 @@ export class MemStorage implements IStorage {
   }
   
   async getTeam(id: number): Promise<Team | undefined> {
+    throw new Error("MemStorage does not implement team functionality");
+  }
+  
+  async updateTeam(id: number, updates: { name: string; description: string }): Promise<Team> {
     throw new Error("MemStorage does not implement team functionality");
   }
   

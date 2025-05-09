@@ -315,6 +315,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update team settings
+  app.patch("/api/teams/:id", requireAuth, async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id, 10);
+      if (isNaN(teamId)) {
+        return res.status(400).json({ message: "Invalid team ID" });
+      }
+      
+      const userId = req.user!.id;
+      
+      // Check if user is the team leader
+      const isLeader = await storage.isTeamLeader(userId, teamId);
+      if (!isLeader) {
+        return res.status(403).json({ message: "Only team leaders can update team settings" });
+      }
+      
+      // Validate update data
+      const { name, description } = req.body;
+      if (!name || name.trim() === "") {
+        return res.status(400).json({ message: "Team name is required" });
+      }
+      
+      // Get current team
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      // Update team in database
+      const updatedTeam = await storage.updateTeam(teamId, {
+        name,
+        description: description || ""
+      });
+      
+      res.json(updatedTeam);
+    } catch (error) {
+      console.error("Error updating team:", error);
+      res.status(500).json({ message: "Failed to update team" });
+    }
+  });
+  
   app.post("/api/teams/:id/members", requireAuth, async (req, res) => {
     try {
       console.log("Add team member request:", req.body);
