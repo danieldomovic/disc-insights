@@ -214,6 +214,154 @@ export default function Results() {
         return yPosition + 10;
       };
       
+      // Add content to the PDF
+      let yPosition = 40;
+      
+      // Section 1: Overview and Introduction
+      yPosition = addSectionTitle("Overview", yPosition);
+      yPosition += addWrappedText(
+        `Your Insights Discovery profile reveals that your dominant energy is ${colorProfiles[result.dominantColor].name} with ${colorProfiles[result.secondaryColor].name} as your secondary energy. This makes you a ${profile.name} type.`,
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      yPosition += addWrappedText(
+        `${profile.description} This report provides insights into your unique personality preferences, strengths, and potential areas for development.`,
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Section 2: Color Energies Summary
+      yPosition = addSectionTitle("Your Color Energy Preferences", yPosition);
+      
+      // Add a brief description of each color energy the person possesses
+      Object.entries(result.scores).sort((a, b) => b[1] - a[1]).forEach(([color, score]) => {
+        const colorKey = color as ColorType;
+        if (score > 0) {
+          yPosition += 5;
+          pdf.setFontSize(10);
+          pdf.setFont('helvetica', 'bold');
+          pdf.setTextColor(0, 0, 0);
+          pdf.text(`${colorProfiles[colorKey].name}: ${score}%`, margin, yPosition);
+          yPosition += 5;
+          
+          pdf.setFont('helvetica', 'normal');
+          yPosition += addWrappedText(
+            colorProfiles[colorKey].description,
+            margin, yPosition, contentWidth, 9
+          ) + 3;
+        }
+      });
+      
+      yPosition += 10;
+      
+      // Section 3: Personal Strengths
+      yPosition = addSectionTitle("Your Key Strengths", yPosition);
+      yPosition += addWrappedText(
+        profile.strengths,
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Start a new page for the rest of the content
+      pdf.addPage();
+      addHeader("Insights Discovery Profile", 2);
+      yPosition = 40;
+      
+      // Section 4: Communication Style
+      yPosition = addSectionTitle("Communication Style", yPosition);
+      
+      // Add communication preferences based on dominant color
+      const dominantColorProfile = colorProfiles[result.dominantColor];
+      
+      yPosition += addWrappedText(
+        `As someone with a preference for ${dominantColorProfile.name} energy, you tend to communicate in a way that is ${dominantColorProfile.appears.toLowerCase()}. You value being ${dominantColorProfile.likesYouToBe.toLowerCase()} in interactions.`,
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      yPosition += addWrappedText(
+        `When communicating with you, others should be aware that you may become irritated by ${dominantColorProfile.canBeIrritatedBy.toLowerCase()}. Under pressure, you may ${dominantColorProfile.underPressureMay.toLowerCase()}.`,
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Section 5: Work Style & Contributions
+      yPosition = addSectionTitle("Work Style & Contributions to Teams", yPosition);
+      
+      // Add work style based on personality type
+      yPosition += addWrappedText(
+        `On your best days, you bring these positive qualities to your work: ${profile.onGoodDay.join(", ")}.`,
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      yPosition += addWrappedText(
+        `You particularly enjoy and excel at work that involves ${profile.likes.join(" and ")}.`,
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      yPosition += addWrappedText(
+        `Your goals often center around ${profile.goals.join(" and ")}.`,
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Section 6: Potential Challenges
+      yPosition = addSectionTitle("Potential Challenges", yPosition);
+      
+      yPosition += addWrappedText(
+        `When under stress or pressure, you may exhibit these less effective behaviors: ${profile.onBadDay.join(", ")}.`,
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      yPosition += addWrappedText(
+        `You may find it challenging to work with people who don't appreciate your approach or who demonstrate opposite preferences to yours.`,
+        margin, yPosition, contentWidth, 10
+      ) + 5;
+      
+      yPosition += addWrappedText(
+        `In difficult situations, be aware that you may fear ${profile.fears.join(" and ")}.`,
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Section 7: Development Suggestions
+      yPosition = addSectionTitle("Development Suggestions", yPosition);
+      
+      yPosition += addWrappedText(
+        profile.development,
+        margin, yPosition, contentWidth, 10
+      ) + 10;
+      
+      // Section 8: Action Plan
+      yPosition = addSectionTitle("Personal Action Plan", yPosition);
+      
+      // Add blank action plan template
+      yPosition += 5;
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Areas I want to develop:", margin, yPosition);
+      yPosition += 5;
+      
+      // Create 3 blank lines for notes
+      for (let i = 0; i < 3; i++) {
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, yPosition + (i * 8), pdfWidth - margin, yPosition + (i * 8));
+      }
+      
+      yPosition += 30;
+      
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text("Specific actions I will take:", margin, yPosition);
+      yPosition += 5;
+      
+      // Create 3 blank lines for notes
+      for (let i = 0; i < 3; i++) {
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, yPosition + (i * 8), pdfWidth - margin, yPosition + (i * 8));
+      }
+      
+      // Add footer
+      yPosition = pdfHeight - 20;
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`This report was generated based on your responses to the Insights Discovery questionnaire.`, margin, yPosition);
+      pdf.text(`© ${new Date().getFullYear()} Insights Discovery Color Profile Assessment Tool`, margin, yPosition + 5);
+      
       // Get final PDF filename
       const filename = `Insights_Discovery_${reportTitle.replace(/[#:,\s]/g, '_')}.pdf`;
       
@@ -439,43 +587,194 @@ export default function Results() {
           </CardContent>
         </Card>
         
-        {/* Color Profile Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold">At Your Best</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 pl-4">
-              {profile.onGoodDay.map((trait, index) => (
-                <li key={index}>{trait}</li>
-              ))}
-            </ul>
-          </div>
-          
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Potential Blind Spots</h3>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 pl-4">
-              {profile.onBadDay.map((trait, index) => (
-                <li key={index}>{trait}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        
-        {/* Dominant Color Analysis */}
+        {/* Overview Section */}
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-xl font-bold mb-4">Your {colorProfiles[result.dominantColor].name} Energy</h3>
-            <div className="space-y-4">
-              <ColorProfileDetail color={result.dominantColor} />
-            </div>
+            <h3 className="text-xl font-semibold mb-4">Overview</h3>
+            <p className="text-gray-700 mb-4">
+              Your Insights Discovery profile reveals that your dominant energy is {colorProfiles[result.dominantColor].name} with {colorProfiles[result.secondaryColor].name} as your secondary energy. This makes you a {profile.name} type.
+            </p>
+            <p className="text-gray-700">
+              {profile.description} This report provides insights into your unique personality preferences, strengths, and potential areas for development.
+            </p>
           </CardContent>
         </Card>
         
-        {/* Secondary Color Analysis */}
+        {/* Key Strengths Section */}
         <Card>
           <CardContent className="p-6">
-            <h3 className="text-xl font-bold mb-4">Your {colorProfiles[result.secondaryColor].name} Energy</h3>
-            <div className="space-y-4">
-              <ColorProfileDetail color={result.secondaryColor} />
+            <h3 className="text-xl font-semibold mb-4">Your Key Strengths</h3>
+            <p className="text-gray-700">
+              {profile.strengths}
+            </p>
+          </CardContent>
+        </Card>
+        
+        {/* Communication Style Section */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Communication Style</h3>
+            <p className="text-gray-700 mb-4">
+              As someone with a preference for {colorProfiles[result.dominantColor].name} energy, you tend to communicate in a way that is {colorProfiles[result.dominantColor].appears.toLowerCase()}. You value being {colorProfiles[result.dominantColor].likesYouToBe.toLowerCase()} in interactions.
+            </p>
+            <p className="text-gray-700">
+              When communicating with you, others should be aware that you may become irritated by {colorProfiles[result.dominantColor].canBeIrritatedBy.toLowerCase()}. Under pressure, you may {colorProfiles[result.dominantColor].underPressureMay.toLowerCase()}.
+            </p>
+          </CardContent>
+        </Card>
+        
+        {/* Work Style & Contributions Section */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Work Style & Contributions to Teams</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold">At Your Best</h4>
+                <ul className="list-disc list-inside space-y-1 text-gray-700 pl-4">
+                  {profile.onGoodDay.map((trait, index) => (
+                    <li key={index}>{trait}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-semibold">You Enjoy</h4>
+                <ul className="list-disc list-inside space-y-1 text-gray-700 pl-4">
+                  {profile.likes.map((like, index) => (
+                    <li key={index}>{like}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            
+            <p className="text-gray-700">
+              Your goals often center around {profile.goals.join(" and ")}.
+            </p>
+          </CardContent>
+        </Card>
+        
+        {/* Potential Challenges Section */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Potential Challenges</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+              <div className="space-y-2">
+                <h4 className="font-semibold">Potential Blind Spots</h4>
+                <ul className="list-disc list-inside space-y-1 text-gray-700 pl-4">
+                  {profile.onBadDay.map((trait, index) => (
+                    <li key={index}>{trait}</li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-semibold">Common Fears</h4>
+                <ul className="list-disc list-inside space-y-1 text-gray-700 pl-4">
+                  {profile.fears.map((fear, index) => (
+                    <li key={index}>{fear}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            
+            <p className="text-gray-700">
+              You may find it challenging to work with people who don't appreciate your approach or who demonstrate opposite preferences to yours.
+            </p>
+          </CardContent>
+        </Card>
+        
+        {/* Development Suggestions Section */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Development Suggestions</h3>
+            <p className="text-gray-700">
+              {profile.development}
+            </p>
+          </CardContent>
+        </Card>
+        
+        {/* Color Analysis */}
+        <Tabs defaultValue="dominant" className="mt-8">
+          <TabsList className="mb-4">
+            <TabsTrigger value="dominant">{colorProfiles[result.dominantColor].name} Energy (Primary)</TabsTrigger>
+            <TabsTrigger value="secondary">{colorProfiles[result.secondaryColor].name} Energy (Secondary)</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="dominant">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-4" style={{ color: colorProfiles[result.dominantColor].bgColor }}>
+                  Your {colorProfiles[result.dominantColor].name} Energy
+                </h3>
+                <div className="space-y-4">
+                  <ColorProfileDetail color={result.dominantColor} />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="secondary">
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-4" style={{ color: colorProfiles[result.secondaryColor].bgColor }}>
+                  Your {colorProfiles[result.secondaryColor].name} Energy
+                </h3>
+                <div className="space-y-4">
+                  <ColorProfileDetail color={result.secondaryColor} />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+        
+        {/* Personal Action Plan */}
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-xl font-semibold mb-4">Personal Action Plan</h3>
+            <p className="text-gray-700 mb-4">
+              Based on your profile, consider these areas for development:
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="p-4 border rounded-md">
+                <h4 className="font-semibold mb-2">Enhance Your Secondary Colors</h4>
+                <p className="text-gray-700 mb-4">
+                  Focus on developing your less dominant color energies to create a more balanced approach:
+                </p>
+                {Object.entries(result.scores)
+                  .sort((a, b) => a[1] - b[1])
+                  .slice(0, 2)
+                  .map(([color, score]) => {
+                    const colorKey = color as ColorType;
+                    return (
+                      <div key={color} className="mb-3">
+                        <div className="flex items-center mb-1">
+                          <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colorProfiles[colorKey].bgColor }}></div>
+                          <span className="font-medium">{colorProfiles[colorKey].name}</span>
+                        </div>
+                        <p className="text-sm text-gray-600 pl-5">
+                          Try to incorporate more {colorProfiles[colorKey].name.toLowerCase()} behaviors like being {colorProfiles[colorKey].description.toLowerCase().split(',')[0]}.
+                        </p>
+                      </div>
+                    );
+                  })
+                }
+              </div>
+              
+              <div className="p-4 border rounded-md">
+                <h4 className="font-semibold mb-2">Adapt Your Communication</h4>
+                <p className="text-gray-700 mb-4">
+                  When working with others who have different preferences:
+                </p>
+                <ul className="list-disc list-inside space-y-2 text-gray-700 pl-4">
+                  <li>With Fiery Red colleagues: Be direct, focus on results, and avoid unnecessary details.</li>
+                  <li>With Sunshine Yellow colleagues: Be enthusiastic, focus on the big picture, and allow time for socializing.</li>
+                  <li>With Earth Green colleagues: Be patient, focus on relationships, and show genuine care.</li>
+                  <li>With Cool Blue colleagues: Be precise, focus on accuracy, and provide detailed information.</li>
+                </ul>
+              </div>
             </div>
           </CardContent>
         </Card>
