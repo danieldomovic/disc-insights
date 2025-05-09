@@ -380,7 +380,11 @@ export default function TeamView() {
                 </p>
               )}
               <p className="text-sm text-muted-foreground mt-2">
-                Created on {new Date(team.createdAt).toLocaleDateString()}
+                Created on {new Date(team.createdAt).toLocaleDateString('en-US', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
               </p>
             </div>
             

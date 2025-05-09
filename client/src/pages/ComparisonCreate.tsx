@@ -22,6 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { formatReportTitle } from "@/lib/formatters";
 import { 
   ChevronLeft, 
   BarChart2, 
@@ -113,14 +114,9 @@ export default function ComparisonCreate() {
     createComparisonMutation.mutate();
   };
   
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
   // Format report title for display
   const getReportLabel = (result: Result) => {
-    return `${result.title || `Report from ${formatDate(result.createdAt)}`} (${result.personalityType})`;
+    return `${result.title || formatReportTitle(result)} (${result.personalityType})`;
   };
   
   // Redirect if not logged in
