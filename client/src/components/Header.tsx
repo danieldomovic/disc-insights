@@ -37,7 +37,7 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link href="/">
+        <Link href={user ? "/dashboard?tab=overview" : "/"}>
           <div className="flex items-center space-x-3 cursor-pointer">
             <div className="flex items-center gap-1">
               {/* Fiery Red - top-right rounded */}
