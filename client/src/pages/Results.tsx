@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import ColorChart from "@/components/ColorChart";
+import InsightsWheel from "@/components/InsightsWheel";
 import { ColorProfileDetail } from "@/components/ColorProfile";
 import { colorProfiles, personalityProfiles, ColorType, PersonalityType } from "@/lib/colorProfiles";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -435,6 +436,23 @@ export default function Results() {
                   </p>
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Insights Discovery Wheel (Bullseye) */}
+        <Card className="mb-6">
+          <CardContent className="p-8">
+            <div className="text-center mb-4">
+              <h3 className="text-xl font-semibold">Insights Discovery Wheel</h3>
+              <p className="text-gray-600 mt-2">
+                Your position on the Insights wheel shows your personality preferences across the four color energies
+              </p>
+            </div>
+            <InsightsWheel scores={result.scores} />
+            <div className="mt-6 text-sm text-gray-500 text-center">
+              <p>The Insights Discovery Wheel shows how your preferences map across the four color energies.</p>
+              <p>Markers further from the center indicate a stronger preference for that color energy.</p>
             </div>
           </CardContent>
         </Card>
