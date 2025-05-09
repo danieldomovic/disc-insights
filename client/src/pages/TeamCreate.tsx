@@ -78,14 +78,14 @@ export default function TeamCreate() {
   
   return (
     <div className="container max-w-2xl mx-auto py-10 px-4 sm:px-6">
-      <Button 
-        variant="ghost" 
-        className="mb-8 pl-0 flex items-center gap-2"
-        onClick={() => window.history.back()}
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back
-      </Button>
+      <Breadcrumbs 
+        items={[
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/teams", label: "Teams" },
+          { label: "Create Team" }
+        ]}
+        className="mb-8"
+      />
       
       <Card className="shadow-md">
         <CardHeader className="text-center pb-6">

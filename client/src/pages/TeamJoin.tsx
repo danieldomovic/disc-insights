@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Loader2, CheckCircle, AlertCircle, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Breadcrumbs } from "@/components/ui/breadcrumb";
 
 export default function TeamJoin() {
   const { user } = useAuth();
@@ -68,7 +69,15 @@ export default function TeamJoin() {
   }
   
   return (
-    <div className="container max-w-lg mx-auto py-20 px-4">
+    <div className="container max-w-lg mx-auto py-10 px-4">
+      <Breadcrumbs 
+        items={[
+          { href: "/dashboard", label: "Dashboard" },
+          { href: "/teams", label: "Teams" },
+          { label: "Join Team" }
+        ]}
+        className="mb-8"
+      />
       <Card className="text-center">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Team Invitation</CardTitle>
