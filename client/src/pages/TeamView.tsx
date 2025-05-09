@@ -246,15 +246,57 @@ export default function TeamView() {
     }
   }, [team, showSettingsDialog]);
   
+  // Team delete mutation
+  const deleteTeamMutation = useMutation({
+    mutationFn: async () => {
+      try {
+        const response = await apiRequest("DELETE", `/api/teams/${teamId}`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to delete team");
+        }
+        return await response.json();
+      } catch (error) {
+        console.error("Delete team error:", error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Team deleted",
+        description: "Team has been deleted successfully.",
+      });
+      
+      // Redirect to teams list
+      navigate("/teams");
+      
+      // Refresh teams list
+      queryClient.invalidateQueries({ queryKey: ["/api/teams"] });
+    },
+    onError: (error: any) => {
+      console.error("Error in delete mutation:", error);
+      toast({
+        title: "Failed to delete team",
+        description: error.message || "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
+  });
+  
   // Team settings update mutation
   const updateTeamMutation = useMutation({
     mutationFn: async (data: { name: string; description: string }) => {
-      const response = await apiRequest("PATCH", `/api/teams/${teamId}`, data);
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update team settings");
+      try {
+        const response = await apiRequest("PATCH", `/api/teams/${teamId}`, data);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to update team settings");
+        }
+        return await response.json();
+      } catch (error) {
+        console.error("Update team error:", error);
+        throw error;
       }
-      return await response.json();
     },
     onSuccess: () => {
       setShowSettingsDialog(false);
@@ -266,10 +308,11 @@ export default function TeamView() {
       // Refresh team data
       queryClient.invalidateQueries({ queryKey: [`/api/teams/${teamId}`] });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
+      console.error("Error in update mutation:", error);
       toast({
         title: "Failed to update team",
-        description: error.message,
+        description: error.message || "An unexpected error occurred",
         variant: "destructive",
       });
     }
@@ -318,14 +361,7 @@ export default function TeamView() {
             
             {team.isLeader && (
               <div className="flex gap-2">
-                <Button 
-                  variant="default" 
-                  className="flex items-center gap-2"
-                  onClick={() => setShowAddMemberDialog(true)}
-                >
-                  <UserPlus className="h-4 w-4" />
-                  Add Member Manually
-                </Button>
+{/* Remove the Add Member Manually button as requested */}
                 <Button 
                   variant="outline" 
                   className="flex items-center gap-2"
@@ -575,9 +611,14 @@ export default function TeamView() {
                 <Button 
                   variant="destructive" 
                   size="sm"
-                  disabled
+                  onClick={() => {
+                    if (confirm("Are you sure you want to delete this team? All members will be removed and this action cannot be undone.")) {
+                      deleteTeamMutation.mutate();
+                    }
+                  }}
+                  disabled={deleteTeamMutation.isPending}
                 >
-                  Delete Team
+                  {deleteTeamMutation.isPending ? "Deleting..." : "Delete Team"}
                 </Button>
               </div>
             </div>

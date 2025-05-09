@@ -315,6 +315,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete a team
+  app.delete("/api/teams/:id", requireAuth, async (req, res) => {
+    try {
+      const teamId = parseInt(req.params.id, 10);
+      if (isNaN(teamId)) {
+        return res.status(400).json({ message: "Invalid team ID" });
+      }
+      
+      const userId = req.user!.id;
+      
+      // Check if user is the team leader
+      const isLeader = await storage.isTeamLeader(userId, teamId);
+      if (!isLeader) {
+        return res.status(403).json({ message: "Only team leaders can delete teams" });
+      }
+      
+      // Get team to validate it exists
+      const team = await storage.getTeam(teamId);
+      if (!team) {
+        return res.status(404).json({ message: "Team not found" });
+      }
+      
+      // Delete team
+      await storage.deleteTeam(teamId);
+      
+      res.status(200).json({ message: "Team deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting team:", error);
+      res.status(500).json({ message: "Failed to delete team" });
+    }
+  });
+
   // Update team settings
   app.patch("/api/teams/:id", requireAuth, async (req, res) => {
     try {
