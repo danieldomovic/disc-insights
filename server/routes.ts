@@ -244,19 +244,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/teams/:id/members", requireAuth, async (req, res) => {
     try {
+      console.log("Add team member request:", req.body);
+      
       const teamId = parseInt(req.params.id, 10);
       if (isNaN(teamId)) {
         return res.status(400).json({ message: "Invalid team ID" });
       }
       
       const userId = req.user!.id;
+      console.log("Current user ID:", userId);
+      
       const isLeader = await storage.isTeamLeader(userId, teamId);
+      console.log("Is team leader:", isLeader);
       
       if (!isLeader) {
         return res.status(403).json({ message: "Only team leaders can add members" });
       }
       
       const { email, username } = req.body;
+      console.log("Looking for user with email:", email, "or username:", username);
       
       if (!email && !username) {
         return res.status(400).json({ message: "Either email or username is required" });
@@ -266,18 +272,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let userToAdd;
       if (email) {
         userToAdd = await storage.getUserByEmail(email);
+        console.log("Found by email:", !!userToAdd);
       } 
       
       if (!userToAdd && username) {
         userToAdd = await storage.getUserByUsername(username);
+        console.log("Found by username:", !!userToAdd);
       }
       
       if (!userToAdd) {
         return res.status(404).json({ message: "User not found" });
       }
       
+      console.log("User to add:", userToAdd.id, userToAdd.username);
+      
       // Check if user is already a member
       const isAlreadyMember = await storage.isTeamMember(userToAdd.id, teamId);
+      console.log("Is already member:", isAlreadyMember);
+      
       if (isAlreadyMember) {
         return res.status(400).json({ message: "User is already a member of this team" });
       }
@@ -288,6 +300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isLeader: false
       });
       
+      console.log("Member added successfully:", member);
       res.status(201).json(member);
     } catch (error) {
       console.error("Error adding team member:", error);
