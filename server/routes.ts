@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { insertQuizResultSchema } from "@shared/schema";
+import { insertQuizResultSchema, QuizResultResponse } from "@shared/schema";
 import { setupAuth, requireAuth } from "./auth";
 import { log } from "./vite";
 
@@ -619,7 +619,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Prepare the response data with conscious scores
-      const responseData = {
+      const responseData: QuizResultResponse = {
         id: result.id,
         scores: {
           "fiery-red": result.fieryRedScore,
@@ -645,9 +645,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "earth-green": result.earthGreenUnconsciousScore,
           "cool-blue": result.coolBlueUnconsciousScore
         };
-        responseData.dominantUnconsciousColor = result.dominantUnconsciousColor;
-        responseData.secondaryUnconsciousColor = result.secondaryUnconsciousColor;
-        responseData.unconsciousPersonalityType = result.unconsciousPersonalityType;
+        responseData.dominantUnconsciousColor = result.dominantUnconsciousColor || undefined;
+        responseData.secondaryUnconsciousColor = result.secondaryUnconsciousColor || undefined;
+        responseData.unconsciousPersonalityType = result.unconsciousPersonalityType || undefined;
       }
       
       // Return the formatted result

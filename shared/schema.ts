@@ -190,6 +190,30 @@ export const insertQuizResultSchema = createInsertSchema(quizResults).omit({
 export type InsertQuizResult = z.infer<typeof insertQuizResultSchema>;
 export type QuizResult = typeof quizResults.$inferSelect;
 
+// Define custom type for quiz result response data (including unconscious scores)
+export type QuizResultResponse = {
+  id: number;
+  scores: {
+    "fiery-red": number;
+    "sunshine-yellow": number;
+    "earth-green": number;
+    "cool-blue": number;
+  };
+  dominantColor: string;
+  secondaryColor: string;
+  personalityType: string;
+  createdAt: Date;
+  unconsciousScores?: {
+    "fiery-red": number;
+    "sunshine-yellow": number;
+    "earth-green": number;
+    "cool-blue": number;
+  };
+  dominantUnconsciousColor?: string;
+  secondaryUnconsciousColor?: string;
+  unconsciousPersonalityType?: string;
+};
+
 // Report Comparisons
 export const reportComparisons = pgTable("report_comparisons", {
   id: serial("id").primaryKey(),
