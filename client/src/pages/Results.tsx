@@ -873,30 +873,93 @@ export default function Results() {
               <div className="color-chart-section">
                 <h3 className="text-xl font-semibold mb-4">Your Color Energy Preferences</h3>
                 {chartJsLoaded && (
-                  <ColorChart 
-                    scores={result.scores} 
-                    unconsciousScores={result.unconsciousScores}
-                    showBothProfiles={!!result.unconsciousScores} 
-                  />
+                  <>
+                    {result.unconsciousScores ? (
+                      <Tabs defaultValue="conscious" className="w-full">
+                        <TabsList className="mb-4 grid grid-cols-2">
+                          <TabsTrigger value="conscious">Conscious Profile</TabsTrigger>
+                          <TabsTrigger value="unconscious">Unconscious Profile</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="conscious">
+                          <div className="aspect-square w-full max-w-xs mx-auto mb-2">
+                            <ColorChart scores={result.scores} />
+                          </div>
+                          <p className="text-sm text-center text-gray-600 mb-4">
+                            How you consciously adapt to your environment and present yourself to others
+                          </p>
+                          <div className="grid grid-cols-2 gap-4 mt-4">
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
+                              <span className="text-sm">Fiery Red: <span className="font-semibold">{result.scores["fiery-red"]}%</span></span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
+                              <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.scores["sunshine-yellow"]}%</span></span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
+                              <span className="text-sm">Earth Green: <span className="font-semibold">{result.scores["earth-green"]}%</span></span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
+                              <span className="text-sm">Cool Blue: <span className="font-semibold">{result.scores["cool-blue"]}%</span></span>
+                            </div>
+                          </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="unconscious">
+                          <div className="aspect-square w-full max-w-xs mx-auto mb-2">
+                            <ColorChart scores={result.unconsciousScores} />
+                          </div>
+                          <p className="text-sm text-center text-gray-600 mb-4">
+                            Your instinctive self - how you behave when not adapting to external circumstances
+                          </p>
+                          <div className="grid grid-cols-2 gap-4 mt-4">
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
+                              <span className="text-sm">Fiery Red: <span className="font-semibold">{result.unconsciousScores["fiery-red"]}%</span></span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
+                              <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.unconsciousScores["sunshine-yellow"]}%</span></span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
+                              <span className="text-sm">Earth Green: <span className="font-semibold">{result.unconsciousScores["earth-green"]}%</span></span>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
+                              <span className="text-sm">Cool Blue: <span className="font-semibold">{result.unconsciousScores["cool-blue"]}%</span></span>
+                            </div>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                    ) : (
+                      <>
+                        <ColorChart scores={result.scores} />
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <div className="flex items-center">
+                            <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
+                            <span className="text-sm">Fiery Red: <span className="font-semibold">{result.scores["fiery-red"]}%</span></span>
+                          </div>
+                          <div className="flex items-center">
+                            <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
+                            <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.scores["sunshine-yellow"]}%</span></span>
+                          </div>
+                          <div className="flex items-center">
+                            <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
+                            <span className="text-sm">Earth Green: <span className="font-semibold">{result.scores["earth-green"]}%</span></span>
+                          </div>
+                          <div className="flex items-center">
+                            <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
+                            <span className="text-sm">Cool Blue: <span className="font-semibold">{result.scores["cool-blue"]}%</span></span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </>
                 )}
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
-                    <span className="text-sm">Fiery Red: <span className="font-semibold">{result.scores["fiery-red"]}%</span></span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
-                    <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.scores["sunshine-yellow"]}%</span></span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
-                    <span className="text-sm">Earth Green: <span className="font-semibold">{result.scores["earth-green"]}%</span></span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
-                    <span className="text-sm">Cool Blue: <span className="font-semibold">{result.scores["cool-blue"]}%</span></span>
-                  </div>
-                </div>
               </div>
               
               <div className="personality-type-section">

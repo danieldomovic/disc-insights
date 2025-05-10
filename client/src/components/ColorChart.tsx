@@ -1,20 +1,24 @@
 import { useEffect, useRef } from "react";
 import { ColorType } from "@/lib/colorProfiles";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ColorChartProps {
   scores: Record<ColorType, number>;
-  unconsciousScores?: Record<ColorType, number>;
-  showBothProfiles?: boolean;
+  title?: string;
+  isDashed?: boolean;
 }
 
-export default function ColorChart({ scores, unconsciousScores, showBothProfiles = false }: ColorChartProps) {
-  const consciousChartRef = useRef<HTMLCanvasElement>(null);
-  const unconsciousChartRef = useRef<HTMLCanvasElement>(null);
+export default function ColorChart({ 
+  scores, 
+  title = "Color Energy Distribution", 
+  isDashed = false 
+}: ColorChartProps) {
+  const chartRef = useRef<HTMLCanvasElement>(null);
   
-  // Helper function to create a chart
-  const createChart = (canvas: HTMLCanvasElement, data: Record<ColorType, number>, title: string, isDashed = false) => {
-    const ctx = canvas.getContext('2d');
+  // Create chart on mount or when scores change
+  useEffect(() => {
+    if (!chartRef.current) return;
+    
+    const ctx = chartRef.current.getContext('2d');
     if (!ctx) return;
     
     // Use the Chart.js global object
@@ -26,7 +30,7 @@ export default function ColorChart({ scores, unconsciousScores, showBothProfiles
     }
     
     // Destroy any existing chart
-    const chartInstance = Chart.getChart(canvas);
+    const chartInstance = Chart.getChart(chartRef.current);
     if (chartInstance) {
       chartInstance.destroy();
     }
@@ -38,10 +42,10 @@ export default function ColorChart({ scores, unconsciousScores, showBothProfiles
         labels: ['Fiery Red', 'Sunshine Yellow', 'Earth Green', 'Cool Blue'],
         datasets: [{
           data: [
-            data["fiery-red"],
-            data["sunshine-yellow"],
-            data["earth-green"],
-            data["cool-blue"]
+            scores["fiery-red"],
+            scores["sunshine-yellow"],
+            scores["earth-green"],
+            scores["cool-blue"]
           ],
           backgroundColor: ['#E23D28', '#F2CF1D', '#42A640', '#1C77C3'],
           borderWidth: isDashed ? 2 : 0,
@@ -54,7 +58,7 @@ export default function ColorChart({ scores, unconsciousScores, showBothProfiles
         maintainAspectRatio: true,
         plugins: {
           title: {
-            display: true,
+            display: title ? true : false,
             text: title,
             padding: {
               top: 10,
@@ -78,54 +82,19 @@ export default function ColorChart({ scores, unconsciousScores, showBothProfiles
         }
       }
     });
-  };
+    
+    // Cleanup function to destroy chart on unmount
+    return () => {
+      const chartInstance = Chart.getChart(chartRef.current);
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+    };
+  }, [scores, title, isDashed]);
   
-  // Create conscious persona chart
-  useEffect(() => {
-    if (!consciousChartRef.current) return;
-    createChart(consciousChartRef.current, scores, 'Conscious Persona');
-  }, [scores]);
-  
-  // Create unconscious persona chart if data is provided
-  useEffect(() => {
-    if (!unconsciousChartRef.current || !unconsciousScores) return;
-    createChart(unconsciousChartRef.current, unconsciousScores, 'Unconscious Persona', true);
-  }, [unconsciousScores]);
-  
-  // If we don't want to show both profiles or don't have unconscious data, just show the conscious chart
-  if (!showBothProfiles || !unconsciousScores) {
-    return (
-      <div className="aspect-square w-full max-w-xs mx-auto mb-6">
-        <canvas ref={consciousChartRef}></canvas>
-      </div>
-    );
-  }
-  
-  // Show both profiles as tabs
   return (
-    <Tabs defaultValue="conscious" className="w-full">
-      <TabsList className="mb-4 grid grid-cols-2">
-        <TabsTrigger value="conscious">Conscious Profile</TabsTrigger>
-        <TabsTrigger value="unconscious">Unconscious Profile</TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="conscious">
-        <div className="aspect-square w-full max-w-xs mx-auto mb-2">
-          <canvas ref={consciousChartRef}></canvas>
-        </div>
-        <p className="text-sm text-center text-gray-600 mb-4">
-          How you consciously adapt to your environment and present yourself to others
-        </p>
-      </TabsContent>
-      
-      <TabsContent value="unconscious">
-        <div className="aspect-square w-full max-w-xs mx-auto mb-2">
-          <canvas ref={unconsciousChartRef}></canvas>
-        </div>
-        <p className="text-sm text-center text-gray-600 mb-4">
-          Your instinctive self - how you behave when not adapting to external circumstances
-        </p>
-      </TabsContent>
-    </Tabs>
+    <div className="aspect-square w-full max-w-xs mx-auto">
+      <canvas ref={chartRef}></canvas>
+    </div>
   );
 }
