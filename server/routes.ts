@@ -663,9 +663,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const submission = submissionSchema.parse(req.body);
       
-      // Separate conscious and unconscious answers
-      const consciousAnswers = submission.answers.filter(answer => answer.isConsciousResponse);
-      const unconsciousAnswers = submission.answers.filter(answer => !answer.isConsciousResponse);
+      // Use all answers to calculate both conscious and unconscious profiles
+      const answers = submission.answers;
+      
+      // The conscious profile comes from the explicit M and L choices
+      const consciousAnswers = answers;
+      
+      // The unconscious profile is derived from the pattern of numeric ratings
+      const unconsciousAnswers = answers;
       
       // Initialize color scores for conscious persona
       let fieryRedScore = 0;
