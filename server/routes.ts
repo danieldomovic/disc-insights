@@ -898,7 +898,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Prepare the response data
-      const responseData = {
+      const responseData: QuizResultResponse = {
         id: quizResult.id,
         scores: {
           "fiery-red": fieryRedPercentage,
