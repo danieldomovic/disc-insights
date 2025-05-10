@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import ColorChart from "@/components/ColorChart";
 import { ColorProfileDetail } from "@/components/ColorProfile";
+import PreferenceFlowGraph from "@/components/PreferenceFlowGraph";
 import { colorProfiles, personalityProfiles, ColorType, PersonalityType } from "@/lib/colorProfiles";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
