@@ -82,15 +82,19 @@ export default function ColorChart({ scores, unconsciousScores, showBothProfiles
   
   // Create conscious persona chart
   useEffect(() => {
-    if (!consciousChartRef.current) return;
-    createChart(consciousChartRef.current, scores, 'Conscious Persona');
-  }, [scores]);
-  
-  // Create unconscious persona chart if data is provided
-  useEffect(() => {
-    if (!unconsciousChartRef.current || !unconsciousScores) return;
-    createChart(unconsciousChartRef.current, unconsciousScores, 'Unconscious Persona', true);
-  }, [unconsciousScores]);
+    const loadCharts = () => {
+      if (consciousChartRef.current) {
+        createChart(consciousChartRef.current, scores, 'Conscious Persona');
+      }
+      
+      if (showBothProfiles && unconsciousScores && unconsciousChartRef.current) {
+        createChart(unconsciousChartRef.current, unconsciousScores, 'Unconscious Persona', true);
+      }
+    };
+    
+    // Small delay to ensure DOM is ready
+    setTimeout(loadCharts, 100);
+  }, [scores, unconsciousScores, showBothProfiles]);
   
   // If we don't want to show both profiles or don't have unconscious data, just show the conscious chart
   if (!showBothProfiles || !unconsciousScores) {
