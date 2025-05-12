@@ -569,8 +569,8 @@ export default function Dashboard() {
               ) : userComparisons && userComparisons.length > 0 ? (
                 <div className="space-y-4">
                   {userComparisons.map((comparison: any) => (
-                    <Link key={comparison.id} href={`/comparisons/${comparison.id}`}>
-                      <div className="flex items-center p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
+                    <div key={comparison.id} className="flex items-center p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors">
+                      <Link href={`/comparisons/${comparison.id}`} className="flex-1 flex items-center">
                         <div className="flex-1">
                           <h4 className="font-medium">{comparison.title}</h4>
                           <p className="text-sm text-muted-foreground">
@@ -581,9 +581,26 @@ export default function Dashboard() {
                             })}
                           </p>
                         </div>
-                        <BarChart2 className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                    </Link>
+                        <BarChart2 className="h-5 w-5 text-muted-foreground mr-2" />
+                      </Link>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem 
+                            className="text-destructive focus:text-destructive cursor-pointer"
+                            onClick={(e) => openComparisonDeleteDialog(comparison.id, e as any)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -655,6 +672,62 @@ export default function Dashboard() {
                 <>
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete Report
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Comparison Confirmation Dialog */}
+      <Dialog open={isComparisonDeleteDialogOpen} onOpenChange={setIsComparisonDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Comparison</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this comparison? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {comparisonDeleteStatus === 'error' && (
+              <div className="flex items-center gap-2 text-red-600 mb-4 p-3 rounded bg-red-50">
+                <AlertTriangle className="h-4 w-4" />
+                <p className="text-sm">Failed to delete the comparison. Please try again.</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsComparisonDeleteDialogOpen(false);
+                setComparisonToDelete(null);
+                setComparisonDeleteStatus('idle');
+              }}
+              disabled={comparisonDeleteStatus === 'loading'}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteComparison}
+              disabled={comparisonDeleteStatus === 'loading' || comparisonDeleteStatus === 'success'}
+              className="relative"
+            >
+              {comparisonDeleteStatus === 'loading' ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : comparisonDeleteStatus === 'success' ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Deleted
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Comparison
                 </>
               )}
             </Button>
