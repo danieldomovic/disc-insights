@@ -25,151 +25,105 @@ const PreferenceFlowGraph: React.FC<PreferenceFlowGraphProps> = ({
     'cool-blue': '#1C77C3'
   };
 
-  // Color labels for better readability
-  const colorLabels = {
-    'fiery-red': 'Fiery Red',
-    'sunshine-yellow': 'Sunshine Yellow',
-    'earth-green': 'Earth Green',
-    'cool-blue': 'Cool Blue'
+  // Standard order for Insights Discovery (from left to right in chart)
+  const standardOrder = ['cool-blue', 'earth-green', 'sunshine-yellow', 'fiery-red'];
+
+  // Calculate total flow - the overall movement between conscious and unconscious profiles
+  const calculateTotalFlow = () => {
+    let totalFlow = 0;
+    for (const color of Object.keys(consciousScores) as Array<keyof ColorScore>) {
+      const diff = Math.abs(consciousScores[color] - unconsciousScores[color]);
+      totalFlow += diff;
+    }
+    return (totalFlow / 2).toFixed(1); // Divide by 2 as per Insights Discovery methodology
   };
 
-  // Standard order for Insights Discovery (clockwise from top-right)
-  const standardOrder = ['fiery-red', 'sunshine-yellow', 'earth-green', 'cool-blue'];
-
-  // Format the flow data for rendering
-  const getFlowData = () => {
-    return standardOrder.map(color => {
-      const key = color as keyof ColorScore;
-      const conscValue = consciousScores[key];
-      const uncValue = unconsciousScores[key];
-      const flowValue = uncValue - conscValue;
-      
-      return {
-        color: key,
-        label: colorLabels[key],
-        colorHex: colors[key],
-        conscious: conscValue,
-        unconscious: uncValue,
-        flow: flowValue,
-        absFlow: Math.abs(flowValue)
-      };
-    });
+  // Calculate the midpoint line position (where 0 should be on the chart)
+  const calculateMidpoint = () => {
+    // For this visualization, midpoint is at 0 in a -100 to 100 scale
+    // where -100 represents complete unconscious dominance
+    // and 100 represents complete conscious dominance
+    return 100; // Scale reference point (100% on the midpoint line)
   };
 
-  const flowData = getFlowData();
-  const maxValue = 100; // Max value for scale (percentages)
-  const barHeight = 20;
-  const barGap = 8;
-
+  const totalFlowValue = calculateTotalFlow();
+  const chartHeight = 240; // Height of the chart in pixels
+  const chartWidth = 180; // Width of the chart in pixels
+  const columnWidth = chartWidth / 4; // Width of each color column
+  
   return (
-    <div className="preference-flow-graph mt-8 p-6 bg-white rounded-lg shadow-md">
-      <h3 className="text-xl font-semibold mb-3">Preference Flow</h3>
-      <p className="text-sm text-muted-foreground mb-6">
-        This graph shows the relationships between your conscious self (how you adapt) and your less conscious self (your instinctive behaviors).
-      </p>
+    <div className="preference-flow-graph mt-8 p-6 bg-white rounded-lg shadow-md flex flex-col items-center">
+      <h3 className="text-2xl font-bold mb-3 italic">Preference Flow</h3>
       
-      <div className="flex justify-between mb-2 px-1">
-        <div className="w-1/3 text-center font-medium text-sm">Conscious Self</div>
-        <div className="w-1/3 text-center font-medium text-sm">Flow</div>
-        <div className="w-1/3 text-center font-medium text-sm">Less Conscious Self</div>
+      {/* Main chart container */}
+      <div className="relative mt-4" style={{ height: `${chartHeight}px`, width: `${chartWidth}px` }}>
+        {/* Chart grid */}
+        <div className="absolute inset-0 border-2 border-black">
+          {/* Horizontal grid lines (0, 50, 100 marks) */}
+          <div className="absolute w-full h-[1px] bg-black" style={{ top: '0%' }}></div>
+          <div className="absolute w-full h-[1px] bg-black" style={{ top: '50%' }}></div>
+          <div className="absolute w-full h-[1px] bg-black" style={{ top: '100%' }}></div>
+          
+          {/* Y-axis labels */}
+          <div className="absolute -left-8 text-xs" style={{ top: '0%', transform: 'translateY(-50%)' }}>100</div>
+          <div className="absolute -left-6 text-xs" style={{ top: '50%', transform: 'translateY(-50%)' }}>0</div>
+          <div className="absolute -left-8 text-xs" style={{ top: '100%', transform: 'translateY(-50%)' }}>100</div>
+          
+          {/* Vertical grid lines (dividing the four color columns) */}
+          {standardOrder.map((_, index) => (
+            <div 
+              key={`grid-${index}`} 
+              className="absolute h-full w-[1px] bg-black" 
+              style={{ left: `${(index+1) * 25}%` }}
+            ></div>
+          ))}
+        </div>
+        
+        {/* Color columns */}
+        {standardOrder.map((color, index) => {
+          const key = color as keyof ColorScore;
+          const conscValue = consciousScores[key];
+          const uncValue = unconsciousScores[key];
+          const diff = conscValue - uncValue;
+          
+          // For positive diff (conscious > unconscious), draw above the center line
+          // For negative diff (unconscious > conscious), draw below the center line
+          const isPositive = diff > 0;
+          const absValue = Math.abs(diff);
+          const barHeight = (absValue / 100) * (chartHeight / 2); // Half of chart height for each direction
+          
+          return (
+            <motion.div
+              key={`column-${color}`}
+              initial={{ height: 0 }}
+              animate={{ height: barHeight }}
+              transition={{ duration: 0.7, delay: 0.2 * index }}
+              className="absolute"
+              style={{
+                backgroundColor: colors[key],
+                width: columnWidth,
+                left: `${index * 25}%`,
+                bottom: isPositive ? '50%' : `calc(50% - ${barHeight}px)`,
+                top: isPositive ? `calc(50% - ${barHeight}px)` : 'auto',
+              }}
+            />
+          );
+        })}
       </div>
       
-      <div className="border-t border-b border-gray-200 py-4">
-        {flowData.map((item, index) => (
-          <div key={item.color} className="mb-8">
-            <div className="flex items-center mb-1">
-              <div className="w-4 h-4 rounded-full mr-2" style={{ backgroundColor: item.colorHex }}></div>
-              <span className="font-medium">{item.label}</span>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              {/* Conscious bar (left) */}
-              <div className="relative h-10">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(item.conscious / maxValue) * 100}%` }}
-                  transition={{ duration: 0.6, delay: 0.1 * index }}
-                  className="absolute top-0 h-8 rounded-sm flex items-center justify-end pr-1"
-                  style={{ 
-                    backgroundColor: item.colorHex,
-                    right: 0
-                  }}
-                >
-                  <span className="text-white text-xs font-bold drop-shadow-sm">
-                    {item.conscious}%
-                  </span>
-                </motion.div>
-              </div>
-              
-              {/* Flow indicator (middle) */}
-              <div className="flex justify-center items-center h-10">
-                <div className="text-center">
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.3 * index }}
-                    className="flex flex-col items-center"
-                  >
-                    <span className="font-bold" style={{ color: item.colorHex }}>
-                      {item.flow > 0 ? `+${item.flow}` : item.flow}%
-                    </span>
-                    <div className="flex items-center justify-center mt-1">
-                      {item.flow !== 0 && (
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: '40px' }}
-                          transition={{ duration: 0.5, delay: 0.4 * index }}
-                          className="h-[2px]"
-                          style={{ backgroundColor: item.colorHex }}
-                        >
-                          <div 
-                            className="absolute"
-                            style={{ 
-                              right: item.flow > 0 ? '-6px' : 'auto',
-                              left: item.flow < 0 ? '-6px' : 'auto',
-                              top: '-3px',
-                              borderTop: '4px solid transparent',
-                              borderBottom: '4px solid transparent',
-                              borderLeft: item.flow > 0 ? `6px solid ${item.colorHex}` : 'none',
-                              borderRight: item.flow < 0 ? `6px solid ${item.colorHex}` : 'none'
-                            }}
-                          />
-                        </motion.div>
-                      )}
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-              
-              {/* Unconscious bar (right) */}
-              <div className="relative h-10">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(item.unconscious / maxValue) * 100}%` }}
-                  transition={{ duration: 0.6, delay: 0.1 * index }}
-                  className="absolute top-0 h-8 rounded-sm flex items-center pl-1"
-                  style={{ backgroundColor: item.colorHex }}
-                >
-                  <span className="text-white text-xs font-bold drop-shadow-sm">
-                    {item.unconscious}%
-                  </span>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* Total flow value */}
+      <div className="mt-2 border-2 border-black w-[180px] py-2 text-center">
+        <span className="font-medium">{totalFlowValue}%</span>
       </div>
       
-      <div className="mt-6 p-4 bg-slate-50 rounded border border-slate-200">
-        <h4 className="text-sm font-semibold mb-2">Understanding Preference Flow</h4>
-        <p className="text-sm text-muted-foreground">
-          The Preference Flow shows the relationship between your Conscious Self (how you adapt to your environment) 
-          and your Less Conscious Self (your instinctive behaviors under pressure). The arrows indicate the 
-          direction and magnitude of change between these two aspects of your personality.
+      <div className="mt-6 text-sm max-w-[400px] text-center">
+        <p className="mb-2">
+          This chart shows your preference flow - the direction and magnitude of difference 
+          between your conscious and less conscious personas.
         </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Significant differences between your conscious and less conscious preferences may indicate 
-          areas where you're adapting your natural style to meet external demands or expectations.
+        <p className="mt-2">
+          Bars above the center line indicate where your conscious score is higher.
+          Bars below the center line show where your less conscious score is higher.
         </p>
       </div>
     </div>
