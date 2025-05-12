@@ -24,7 +24,7 @@ interface ColorProfile {
   teamRoles: string[];
 }
 
-export interface PersonalityProfile {
+interface PersonalityProfile {
   name: PersonalityType;
   color: ColorType;
   dominantColors: [ColorType, ColorType?];
@@ -36,12 +36,6 @@ export interface PersonalityProfile {
   fears: string[];
   strengths: string;
   development: string;
-  
-  // Additional properties for PDF
-  keyCharacteristics?: string[];
-  valueProposition?: string;
-  communicationStyle?: string;
-  growthAreas?: string[];
 }
 
 export const colorProfiles: Record<ColorType, ColorProfile> = {
