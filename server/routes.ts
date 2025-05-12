@@ -755,24 +755,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      // Convert raw scores to percentages for storage
-      // Get totals for each set of scores
-      const consciousTotalRaw = Object.values(consciousScores).reduce((a, b) => a + b, 0);
-      const unconsciousTotalRaw = Object.values(unconsciousScores).reduce((a, b) => a + b, 0);
-      
-      // Convert to percentages
+      // Convert raw scores to percentages based on the 0-6 scale
+      // For conscious persona: percentage = (mean score / 6) * 100
       const consciousPercentages = {
-        'fiery-red': Math.round((consciousScores['fiery-red'] / consciousTotalRaw) * 100),
-        'sunshine-yellow': Math.round((consciousScores['sunshine-yellow'] / consciousTotalRaw) * 100),
-        'earth-green': Math.round((consciousScores['earth-green'] / consciousTotalRaw) * 100),
-        'cool-blue': Math.round((consciousScores['cool-blue'] / consciousTotalRaw) * 100)
+        'fiery-red': Math.round((consciousScores['fiery-red'] / 6) * 100),
+        'sunshine-yellow': Math.round((consciousScores['sunshine-yellow'] / 6) * 100),
+        'earth-green': Math.round((consciousScores['earth-green'] / 6) * 100),
+        'cool-blue': Math.round((consciousScores['cool-blue'] / 6) * 100)
       };
       
+      // For unconscious persona: percentage = (mean score / 6) * 100
       const unconsciousPercentages = {
-        'fiery-red': Math.round((unconsciousScores['fiery-red'] / unconsciousTotalRaw) * 100),
-        'sunshine-yellow': Math.round((unconsciousScores['sunshine-yellow'] / unconsciousTotalRaw) * 100),
-        'earth-green': Math.round((unconsciousScores['earth-green'] / unconsciousTotalRaw) * 100),
-        'cool-blue': Math.round((unconsciousScores['cool-blue'] / unconsciousTotalRaw) * 100)
+        'fiery-red': Math.round((unconsciousScores['fiery-red'] / 6) * 100),
+        'sunshine-yellow': Math.round((unconsciousScores['sunshine-yellow'] / 6) * 100),
+        'earth-green': Math.round((unconsciousScores['earth-green'] / 6) * 100),
+        'cool-blue': Math.round((unconsciousScores['cool-blue'] / 6) * 100)
       };
       
       console.log("Conscious scores:", consciousPercentages);
@@ -907,7 +904,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dominantColor,
         secondaryColor,
         personalityType,
-        title: quizResult.title,
+        title: quizResult.title || "Insights Discovery Profile",
         unconsciousScores: {
           "fiery-red": unconsciousPercentages["fiery-red"],
           "sunshine-yellow": unconsciousPercentages["sunshine-yellow"],
