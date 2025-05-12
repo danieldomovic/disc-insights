@@ -128,12 +128,16 @@ export default function Results() {
   // Fetch result from API if resultId is provided
   const { data: apiResult, isLoading, error } = useQuery({
     queryKey: ["/api/quiz/results", params?.resultId],
-    queryFn: params?.resultId ? 
-      () => fetch(`/api/quiz/results/${params.resultId}`).then(res => {
-        if (!res.ok) throw new Error("Failed to load quiz result");
-        return res.json();
-      }) : 
-      () => mockResult,
+    queryFn: async () => {
+      if (!params?.resultId) return mockResult;
+      
+      const response = await fetch(`/api/quiz/results/${params.resultId}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to load quiz result");
+      }
+      return response.json();
+    },
     enabled: true
   });
   
