@@ -55,19 +55,18 @@ const PreferenceFlowGraph: React.FC<PreferenceFlowGraphProps> = ({
   };
 
   const totalFlowValue = calculateTotalFlow();
-  const chartHeight = 240; // Height of the chart in pixels
-  const chartWidth = 180; // Width of the chart in pixels
+  const chartHeight = 200; // Height of the chart in pixels 
+  const chartWidth = 160; // Width of the chart in pixels
   const columnWidth = chartWidth / 4; // Width of each color column
   
   return (
     <div className="preference-flow-graph p-4 bg-white rounded-lg shadow-md flex flex-col items-center">
       {/* Color headers - showing above the chart */}
-      <div className="flex w-[180px] mb-1 text-xs font-bold">
+      <div className="flex mb-1 text-xs font-bold" style={{ width: `${chartWidth}px` }}>
         {standardOrder.map((color, index) => (
           <div 
             key={`header-${color}`} 
             className="flex-1 text-center"
-            style={{ color: index % 2 === 0 ? '#000' : '#000' }}
           >
             {colorHeaders[color as keyof typeof colorHeaders]}
           </div>
@@ -135,7 +134,7 @@ const PreferenceFlowGraph: React.FC<PreferenceFlowGraphProps> = ({
       </div>
       
       {/* Total flow value */}
-      <div className="mt-1 border border-black w-[180px] py-1 text-center">
+      <div className="mt-1 border border-black py-1 text-center" style={{ width: `${chartWidth}px` }}>
         <span className="text-sm">{totalFlowValue}%</span>
       </div>
     </div>

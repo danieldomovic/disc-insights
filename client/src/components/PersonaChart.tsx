@@ -37,9 +37,9 @@ const PersonaChart: React.FC<PersonaChartProps> = ({
   // Calculate maximum value (for scale)
   const maxHeight = 6; // As shown in the reference image
   
-  // Chart dimensions
-  const chartWidth = 300;
-  const chartHeight = 240;
+  // Chart dimensions - reduced for better fit
+  const chartWidth = 220;
+  const chartHeight = 200;
   const columnWidth = chartWidth / 4;
   
   // Calculate bar heights as a proportion of the maximum
@@ -112,7 +112,7 @@ const PersonaChart: React.FC<PersonaChartProps> = ({
       </div>
       
       {/* Values row - raw scores and percentages */}
-      <div className="flex w-[300px] mt-1">
+      <div className="flex" style={{ width: `${chartWidth}px` }}>
         {colorOrder.map((color, index) => {
           const percentage = scores[color];
           const raw = rawScores ? rawScores[color].toFixed(2) : '0.00';
@@ -121,7 +121,6 @@ const PersonaChart: React.FC<PersonaChartProps> = ({
             <div 
               key={`value-${color}`} 
               className="flex-1 text-center border border-black"
-              style={{ width: `${100/4}%` }}
             >
               <div className="text-xs font-bold">{raw}</div>
               <div className="text-xs">{percentage}%</div>

@@ -888,9 +888,9 @@ export default function Results() {
                   <>
                     {result.unconsciousScores ? (
                       <>
-                        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+                        <div className="flex flex-col md:flex-row justify-center gap-6 mb-12 overflow-x-auto py-4">
                           {/* Conscious Persona */}
-                          <div className="flex flex-col items-center">
+                          <div className="flex flex-col items-center min-w-[240px]">
                             <h3 className="text-base font-bold text-center mb-2">
                               Persona<br/>(Conscious)
                             </h3>
@@ -902,7 +902,7 @@ export default function Results() {
                           </div>
                           
                           {/* Preference Flow */}
-                          <div className="flex flex-col items-center">
+                          <div className="flex flex-col items-center min-w-[200px]">
                             <h3 className="text-base font-bold text-center mb-2">
                               Preference<br/>Flow
                             </h3>
@@ -913,7 +913,7 @@ export default function Results() {
                           </div>
                           
                           {/* Unconscious Persona */}
-                          <div className="flex flex-col items-center">
+                          <div className="flex flex-col items-center min-w-[240px]">
                             <h3 className="text-base font-bold text-center mb-2">
                               Persona<br/>(Less Conscious)
                             </h3>
