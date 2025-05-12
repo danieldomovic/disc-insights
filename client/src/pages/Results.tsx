@@ -888,10 +888,10 @@ export default function Results() {
                   <>
                     {result.unconsciousScores ? (
                       <>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
                           {/* Conscious Persona */}
                           <div className="flex flex-col items-center">
-                            <h3 className="text-xl font-semibold text-center mb-4">
+                            <h3 className="text-base font-bold text-center mb-2">
                               Persona<br/>(Conscious)
                             </h3>
                             <PersonaChart 
@@ -899,14 +899,11 @@ export default function Results() {
                               isConscious={true}
                               rawScores={calculateRawScores(result.scores)}
                             />
-                            <p className="text-sm text-center text-gray-600 mt-2">
-                              How you consciously adapt to your environment
-                            </p>
                           </div>
                           
                           {/* Preference Flow */}
                           <div className="flex flex-col items-center">
-                            <h3 className="text-xl font-semibold text-center mb-4">
+                            <h3 className="text-base font-bold text-center mb-2">
                               Preference<br/>Flow
                             </h3>
                             <PreferenceFlowGraph 
@@ -917,7 +914,7 @@ export default function Results() {
                           
                           {/* Unconscious Persona */}
                           <div className="flex flex-col items-center">
-                            <h3 className="text-xl font-semibold text-center mb-4">
+                            <h3 className="text-base font-bold text-center mb-2">
                               Persona<br/>(Less Conscious)
                             </h3>
                             <PersonaChart 
@@ -925,9 +922,6 @@ export default function Results() {
                               isConscious={false}
                               rawScores={calculateRawScores(result.unconsciousScores)}
                             />
-                            <p className="text-sm text-center text-gray-600 mt-2">
-                              Your instinctive self without adaptation
-                            </p>
                           </div>
                         </div>
                         

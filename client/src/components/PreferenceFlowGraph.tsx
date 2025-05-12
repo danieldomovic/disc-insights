@@ -135,19 +135,8 @@ const PreferenceFlowGraph: React.FC<PreferenceFlowGraphProps> = ({
       </div>
       
       {/* Total flow value */}
-      <div className="mt-2 border-2 border-black w-[180px] py-2 text-center">
-        <span className="font-medium">{totalFlowValue}%</span>
-      </div>
-      
-      <div className="mt-6 text-sm max-w-[400px] text-center">
-        <p className="mb-2">
-          This chart shows your preference flow - the direction and magnitude of difference 
-          between your conscious and less conscious personas.
-        </p>
-        <p className="mt-2">
-          Bars above the center line indicate where your conscious score is higher.
-          Bars below the center line show where your less conscious score is higher.
-        </p>
+      <div className="mt-1 border border-black w-[180px] py-1 text-center">
+        <span className="text-sm">{totalFlowValue}%</span>
       </div>
     </div>
   );

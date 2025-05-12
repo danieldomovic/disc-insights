@@ -50,17 +50,11 @@ const PersonaChart: React.FC<PersonaChartProps> = ({
   };
   
   return (
-    <div className="persona-chart mt-4 p-4 bg-white rounded-lg shadow-md flex flex-col items-center">
-      <h3 className="text-2xl font-bold mb-3 italic text-center">
-        Persona
-        <br />
-        ({isConscious ? 'Conscious' : 'Less Conscious'})
-      </h3>
-      
+    <div className="persona-chart p-4 bg-white rounded-lg shadow-md flex flex-col items-center">
       {/* Color labels row */}
-      <div className="flex w-full justify-between mb-2 px-2">
+      <div className="flex w-full justify-between mb-1 px-2">
         {colorOrder.map(color => (
-          <div key={`label-${color}`} className="text-center font-medium">
+          <div key={`label-${color}`} className="text-center text-xs font-bold">
             {colorLabels[color]}
           </div>
         ))}
@@ -69,16 +63,18 @@ const PersonaChart: React.FC<PersonaChartProps> = ({
       {/* Main chart container */}
       <div className="relative" style={{ height: `${chartHeight}px`, width: `${chartWidth}px` }}>
         {/* Chart grid */}
-        <div className="absolute inset-0 border-2 border-black">
+        <div className="absolute inset-0 border border-black">
           {/* Horizontal grid lines */}
           <div className="absolute w-full h-[1px] bg-black" style={{ top: '0%' }}>
-            <span className="absolute -left-6 text-sm font-medium">6</span>
+            <span className="absolute -left-6 text-xs">6</span>
           </div>
+          <div className="absolute w-full h-[1px] bg-gray-300" style={{ top: '25%' }}></div>
           <div className="absolute w-full h-[1px] bg-black" style={{ top: '50%' }}>
-            <span className="absolute -left-6 text-sm font-medium">3</span>
+            <span className="absolute -left-6 text-xs">3</span>
           </div>
+          <div className="absolute w-full h-[1px] bg-gray-300" style={{ top: '75%' }}></div>
           <div className="absolute w-full h-[1px] bg-black" style={{ bottom: '0%' }}>
-            <span className="absolute -left-6 text-sm font-medium">0</span>
+            <span className="absolute -left-6 text-xs">0</span>
           </div>
           
           {/* Vertical grid lines */}
@@ -115,20 +111,20 @@ const PersonaChart: React.FC<PersonaChartProps> = ({
         })}
       </div>
       
-      {/* Values row */}
-      <div className="flex w-full mt-0">
+      {/* Values row - raw scores and percentages */}
+      <div className="flex w-[300px] mt-1">
         {colorOrder.map((color, index) => {
           const percentage = scores[color];
-          const raw = rawScores ? rawScores[color].toFixed(2) : '';
+          const raw = rawScores ? rawScores[color].toFixed(2) : '0.00';
           
           return (
             <div 
               key={`value-${color}`} 
-              className="text-center border-2 border-black py-1 text-sm"
+              className="flex-1 text-center border border-black"
               style={{ width: `${100/4}%` }}
             >
-              {raw && <div className="font-bold">{raw}</div>}
-              <div className="text-gray-700">{percentage}%</div>
+              <div className="text-xs font-bold">{raw}</div>
+              <div className="text-xs">{percentage}%</div>
             </div>
           );
         })}
