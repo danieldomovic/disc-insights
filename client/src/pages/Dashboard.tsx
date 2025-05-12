@@ -46,6 +46,11 @@ export default function Dashboard() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [deleteStatus, setDeleteStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   
+  // For comparison deletion
+  const [comparisonToDelete, setComparisonToDelete] = useState<number | null>(null);
+  const [isComparisonDeleteDialogOpen, setIsComparisonDeleteDialogOpen] = useState<boolean>(false);
+  const [comparisonDeleteStatus, setComparisonDeleteStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  
   // Get tab from URL search params
   const getTabFromURL = () => {
     if (typeof window !== "undefined") {
@@ -157,6 +162,60 @@ export default function Dashboard() {
     e.stopPropagation();
     setReportToDelete(reportId);
     setIsDeleteDialogOpen(true);
+  };
+  
+  // Delete comparison mutation
+  const deleteComparisonMutation = useMutation({
+    mutationFn: async (comparisonId: number) => {
+      setComparisonDeleteStatus('loading');
+      const response = await apiRequest("DELETE", `/api/comparisons/${comparisonId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete comparison");
+      }
+      return true;
+    },
+    onSuccess: () => {
+      setComparisonDeleteStatus('success');
+      
+      toast({
+        title: "Comparison deleted",
+        description: "The comparison has been successfully deleted",
+      });
+      
+      // Invalidate queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["/api/comparisons"] });
+      
+      // Reset state after a timeout
+      setTimeout(() => {
+        setIsComparisonDeleteDialogOpen(false);
+        setComparisonToDelete(null);
+        setComparisonDeleteStatus('idle');
+      }, 1000);
+    },
+    onError: (error: Error) => {
+      setComparisonDeleteStatus('error');
+      toast({
+        title: "Failed to delete comparison",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Function to handle comparison delete confirmation
+  const handleDeleteComparison = () => {
+    if (comparisonToDelete) {
+      deleteComparisonMutation.mutate(comparisonToDelete);
+    }
+  };
+  
+  // Function to open comparison delete dialog
+  const openComparisonDeleteDialog = (comparisonId: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setComparisonToDelete(comparisonId);
+    setIsComparisonDeleteDialogOpen(true);
   };
   
   // Helper function to get color hex value from color name
