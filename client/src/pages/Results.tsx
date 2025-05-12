@@ -939,22 +939,28 @@ export default function Results() {
                         </Tabs>
                         
                         <div className="mt-8">
-                          <PreferenceFlowGraph 
-                            consciousScores={result.scores} 
-                            unconsciousScores={result.unconsciousScores}
-                          />
+                          <Card>
+                            <CardContent className="p-0">
+                              <PreferenceFlowGraph 
+                                consciousScores={result.scores} 
+                                unconsciousScores={result.unconsciousScores}
+                              />
+                            </CardContent>
+                          </Card>
                           
-                          <div className="mt-6 p-6 bg-white rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold mb-4">Understanding Conscious vs. Unconscious Scores</h3>
-                            <p className="text-gray-700 mb-4">
-                              Your conscious profile (how you choose to adapt) is derived from your "Most like me" and "Least like me" choices, 
-                              while your unconscious profile (your instinctive self) is calculated from your numeric ratings (1-5).
-                            </p>
-                            <p className="text-gray-700">
-                              Each rating is weighted (L=1, 1=2, 2=3, 3=4, 4=5, 5=6, M=7), and percentages are calculated for each color.
-                              The differences between profiles can reveal where you're adapting to external expectations versus your natural preferences.
-                            </p>
-                          </div>
+                          <Card className="mt-6">
+                            <CardContent className="p-6">
+                              <h3 className="text-xl font-semibold mb-4">Understanding Conscious vs. Unconscious Scores</h3>
+                              <p className="text-gray-700 mb-4">
+                                Your conscious profile (how you choose to adapt) is derived from your "Most like me" and "Least like me" choices, 
+                                while your unconscious profile (your instinctive self) is calculated from your numeric ratings (1-5).
+                              </p>
+                              <p className="text-gray-700">
+                                Each rating is weighted (L=1, 1=2, 2=3, 3=4, 4=5, 5=6, M=7), and percentages are calculated for each color.
+                                The differences between profiles can reveal where you're adapting to external expectations versus your natural preferences.
+                              </p>
+                            </CardContent>
+                          </Card>
                         </div>
                       </>
                     ) : (
