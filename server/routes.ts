@@ -732,8 +732,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         consciousScores[color] = colorTotal / frames.length;
       });
       
-      // Calculate less-conscious (unconscious) scores
-      // Use indirect-response aggregation - only using intermediate scores (1-5)
+      // Calculate less-conscious (unconscious) scores based on opposites
+      // Define color opposites according to Insights Discovery methodology
+      const opposites: Record<string, string> = {
+        'fiery-red': 'earth-green',
+        'earth-green': 'fiery-red',
+        'sunshine-yellow': 'cool-blue',
+        'cool-blue': 'sunshine-yellow'
+      };
+      
+      // Calculate unconscious scores as the complement of the opposite color's conscious score
       const unconsciousScores: Record<string, number> = {
         'fiery-red': 0,
         'sunshine-yellow': 0,
@@ -742,17 +750,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       Object.keys(unconsciousScores).forEach(color => {
-        // For each color, gather all the intermediate scores (1-5) across all frames
-        const intermediateScores = frames
-          .map(frame => frame[color])
-          .filter(score => score > 0 && score < 6); // Only include scores between 1-5
-          
-        // Calculate the average, but if no intermediate scores, use original conscious score
-        if (intermediateScores.length > 0) {
-          unconsciousScores[color] = intermediateScores.reduce((sum, score) => sum + score, 0) / frames.length;
-        } else {
-          unconsciousScores[color] = consciousScores[color];
-        }
+        // For each color, use the formula: less_conscious[color] = 6 - conscious[opposites[color]]
+        const oppositeColor = opposites[color];
+        unconsciousScores[color] = 6 - consciousScores[oppositeColor];
       });
       
       // Convert raw scores to percentages based on the 0-6 scale
