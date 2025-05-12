@@ -193,6 +193,7 @@ export type QuizResult = typeof quizResults.$inferSelect;
 // Define custom type for quiz result response data (including unconscious scores)
 export type QuizResultResponse = {
   id: number;
+  title?: string;
   scores: {
     "fiery-red": number;
     "sunshine-yellow": number;

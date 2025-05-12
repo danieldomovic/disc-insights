@@ -15,6 +15,7 @@ import TeamJoin from "@/pages/TeamJoin";
 import ComparisonCreate from "@/pages/ComparisonCreate";
 import ComparisonView from "@/pages/ComparisonView";
 import Profile from "@/pages/Profile";
+import TestScoring from "@/pages/test-scoring";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -34,6 +35,7 @@ function AppRoutes() {
           <Route path="/auth" component={AuthPage} />
           <Route path="/quiz" component={Quiz} />
           <Route path="/results/:resultId?" component={Results} />
+          <Route path="/test-scoring" component={TestScoring} />
           
           {/* Protected routes */}
           <ProtectedRoute path="/teams/create" component={TeamCreate} />
