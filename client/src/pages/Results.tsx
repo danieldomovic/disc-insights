@@ -881,91 +881,109 @@ export default function Results() {
           </div>
           
           <CardContent className="p-8">
-            <div className="grid md:grid-cols-2 gap-10">
+            {/* Center charts section - full width */}
+            <h3 className="text-2xl font-semibold mb-6 text-center">Your Color Energy Profile</h3>
+            
+            {/* All charts in the center */}
+            {chartJsLoaded && (
+              <>
+                {result.unconsciousScores ? (
+                  <div className="w-full flex flex-col items-center mb-12">
+                    {/* Charts section - centered */}
+                    <div className="flex flex-col md:flex-row justify-center gap-8 py-6 overflow-x-auto w-full">
+                      {/* Conscious Persona */}
+                      <div className="flex flex-col items-center min-w-[240px]">
+                        <h3 className="text-base font-bold text-center mb-2">
+                          Persona<br/>(Conscious)
+                        </h3>
+                        <PersonaChart 
+                          scores={result.scores} 
+                          isConscious={true}
+                          rawScores={calculateRawScores(result.scores)}
+                        />
+                      </div>
+                      
+                      {/* Preference Flow */}
+                      <div className="flex flex-col items-center min-w-[200px]">
+                        <h3 className="text-base font-bold text-center mb-2">
+                          Preference<br/>Flow
+                        </h3>
+                        <PreferenceFlowGraph 
+                          consciousScores={result.scores} 
+                          unconsciousScores={result.unconsciousScores}
+                        />
+                      </div>
+                      
+                      {/* Unconscious Persona */}
+                      <div className="flex flex-col items-center min-w-[240px]">
+                        <h3 className="text-base font-bold text-center mb-2">
+                          Persona<br/>(Less Conscious)
+                        </h3>
+                        <PersonaChart 
+                          scores={result.unconsciousScores} 
+                          isConscious={false}
+                          rawScores={calculateRawScores(result.unconsciousScores)}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Understanding scores card - full width below charts */}
+                    <Card className="w-full">
+                      <CardContent className="p-6">
+                        <h3 className="text-xl font-semibold mb-4">Understanding Conscious vs. Unconscious Scores</h3>
+                        <p className="text-gray-700 mb-4">
+                          Your conscious profile (how you choose to adapt) is derived from your "Most like me" and "Least like me" choices, 
+                          while your unconscious profile (your instinctive self) is calculated from your numeric ratings (1-5).
+                        </p>
+                        <p className="text-gray-700">
+                          Each rating is weighted (L=0, M=6), and percentages are calculated for each color.
+                          The differences between profiles can reveal where you're adapting to external expectations versus your natural preferences.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                ) : (
+                  <div className="w-full flex flex-col items-center mb-10">
+                    <ColorChart scores={result.scores} />
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
+                        <span className="text-sm">Fiery Red: <span className="font-semibold">{result.scores["fiery-red"]}%</span></span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
+                        <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.scores["sunshine-yellow"]}%</span></span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
+                        <span className="text-sm">Earth Green: <span className="font-semibold">{result.scores["earth-green"]}%</span></span>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
+                        <span className="text-sm">Cool Blue: <span className="font-semibold">{result.scores["cool-blue"]}%</span></span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+            
+            {/* Content sections below charts - using grid for two columns on larger screens */}
+            <div className="grid md:grid-cols-2 gap-10 mt-8">
+              {/* First column */}
               <div className="color-chart-section">
                 <h3 className="text-xl font-semibold mb-4">Your Color Energy Preferences</h3>
-                {chartJsLoaded && (
-                  <>
-                    {result.unconsciousScores ? (
-                      <>
-                        <div className="flex flex-col md:flex-row justify-center gap-6 mb-12 overflow-x-auto py-4">
-                          {/* Conscious Persona */}
-                          <div className="flex flex-col items-center min-w-[240px]">
-                            <h3 className="text-base font-bold text-center mb-2">
-                              Persona<br/>(Conscious)
-                            </h3>
-                            <PersonaChart 
-                              scores={result.scores} 
-                              isConscious={true}
-                              rawScores={calculateRawScores(result.scores)}
-                            />
-                          </div>
-                          
-                          {/* Preference Flow */}
-                          <div className="flex flex-col items-center min-w-[200px]">
-                            <h3 className="text-base font-bold text-center mb-2">
-                              Preference<br/>Flow
-                            </h3>
-                            <PreferenceFlowGraph 
-                              consciousScores={result.scores} 
-                              unconsciousScores={result.unconsciousScores}
-                            />
-                          </div>
-                          
-                          {/* Unconscious Persona */}
-                          <div className="flex flex-col items-center min-w-[240px]">
-                            <h3 className="text-base font-bold text-center mb-2">
-                              Persona<br/>(Less Conscious)
-                            </h3>
-                            <PersonaChart 
-                              scores={result.unconsciousScores} 
-                              isConscious={false}
-                              rawScores={calculateRawScores(result.unconsciousScores)}
-                            />
-                          </div>
-                        </div>
-                        
-                        <Card className="mt-8">
-                          <CardContent className="p-6">
-                            <h3 className="text-xl font-semibold mb-4">Understanding Conscious vs. Unconscious Scores</h3>
-                            <p className="text-gray-700 mb-4">
-                              Your conscious profile (how you choose to adapt) is derived from your "Most like me" and "Least like me" choices, 
-                              while your unconscious profile (your instinctive self) is calculated from your numeric ratings (1-5).
-                            </p>
-                            <p className="text-gray-700">
-                              Each rating is weighted (L=0, M=6), and percentages are calculated for each color.
-                              The differences between profiles can reveal where you're adapting to external expectations versus your natural preferences.
-                            </p>
-                          </CardContent>
-                        </Card>
-                      </>
-                    ) : (
-                      <>
-                        <ColorChart scores={result.scores} />
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                          <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
-                            <span className="text-sm">Fiery Red: <span className="font-semibold">{result.scores["fiery-red"]}%</span></span>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
-                            <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.scores["sunshine-yellow"]}%</span></span>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
-                            <span className="text-sm">Earth Green: <span className="font-semibold">{result.scores["earth-green"]}%</span></span>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
-                            <span className="text-sm">Cool Blue: <span className="font-semibold">{result.scores["cool-blue"]}%</span></span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </>
-                )}
+                <p className="text-gray-700 mb-4">
+                  The charts above show your color energy distribution according to the Insights Discovery® methodology.
+                  These scores reflect your natural preferences and behavioral tendencies in different situations.
+                </p>
+                <p className="text-gray-700">
+                  Each color represents different qualities and approaches to work, communication, and relationships.
+                  Your unique combination of colors creates your personal profile type.
+                </p>
               </div>
               
+              {/* Second column */}
               <div className="personality-type-section">
                 <h3 className="text-xl font-semibold mb-4">
                   Your Dominant Type: <span style={{ color: colorProfiles[profile.color].bgColor }}>{profile.name}</span>
