@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import ColorChart from "@/components/ColorChart";
+import PersonaChart from "@/components/PersonaChart";
 import { ColorProfileDetail } from "@/components/ColorProfile";
 import PreferenceFlowGraph from "@/components/PreferenceFlowGraph";
 import { colorProfiles, personalityProfiles, ColorType, PersonalityType } from "@/lib/colorProfiles";
