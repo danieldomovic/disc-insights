@@ -932,12 +932,13 @@ export default function Results() {
                       <CardContent className="p-6">
                         <h3 className="text-xl font-semibold mb-4">Understanding Conscious vs. Unconscious Scores</h3>
                         <p className="text-gray-700 mb-4">
-                          Your conscious profile (how you choose to adapt) is derived from your "Most like me" and "Least like me" choices, 
-                          while your unconscious profile (your instinctive self) is calculated from your numeric ratings (1-5).
+                          Your conscious profile (how you choose to adapt) is calculated as the arithmetic mean of each color's 25 scores divided by 6 to determine the percentage. 
+                          Your unconscious (less conscious) profile is calculated using the formula: less_conscious[color] = 6 - conscious[opposite_color].
                         </p>
                         <p className="text-gray-700">
-                          Each rating is weighted (L=0, M=6), and percentages are calculated for each color.
-                          The differences between profiles can reveal where you're adapting to external expectations versus your natural preferences.
+                          On the 0-6 scale, "Most like me" (M) ratings are scored as 6 and "Least like me" (L) ratings are scored as 0, 
+                          with numeric values (1-5) scored accordingly. The differences between profiles reveal where your conscious 
+                          adaptations differ from your natural instinctive preferences.
                         </p>
                       </CardContent>
                     </Card>
