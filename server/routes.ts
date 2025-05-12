@@ -609,6 +609,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch comparison" });
     }
   });
+  
+  // Delete a comparison
+  app.delete("/api/comparisons/:id", requireAuth, async (req, res) => {
+    try {
+      const comparisonId = parseInt(req.params.id, 10);
+      if (isNaN(comparisonId)) {
+        return res.status(400).json({ message: "Invalid comparison ID" });
+      }
+      
+      const userId = req.user!.id;
+      const comparison = await storage.getReportComparison(comparisonId);
+      
+      if (!comparison) {
+        return res.status(404).json({ message: "Comparison not found" });
+      }
+      
+      // Check if the comparison belongs to the current user
+      if (comparison.userId !== userId) {
+        return res.status(403).json({ message: "You do not have permission to delete this comparison" });
+      }
+      
+      await storage.deleteReportComparison(comparisonId);
+      
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Error deleting comparison:", error);
+      res.status(500).json({ message: "Failed to delete comparison" });
+    }
+  });
+  
   // Get all quiz questions
   app.get("/api/quiz/questions", async (req, res) => {
     try {

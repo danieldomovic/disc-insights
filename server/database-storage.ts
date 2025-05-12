@@ -495,6 +495,12 @@ export class DatabaseStorage implements IStorage {
     return comparison;
   }
   
+  async deleteReportComparison(id: number): Promise<void> {
+    await db
+      .delete(reportComparisons)
+      .where(eq(reportComparisons.id, id));
+  }
+  
   // Get quiz questions data
   private getQuestionsData() {
     return [

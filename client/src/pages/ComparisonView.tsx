@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Redirect, useLocation, useParams, Link } from "wouter";
 import { 
   Card, 
@@ -15,14 +15,27 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Breadcrumbs } from "@/components/ui/breadcrumb";
 import { formatReportTitle } from "@/lib/formatters";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import {
   ChevronLeft,
   Loader2,
   FileBarChart,
   AlertTriangle,
   ArrowLeftRight,
-  Download
+  Download,
+  Trash2
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { 
   RadarChart, 
   PolarGrid, 
@@ -70,6 +83,39 @@ export default function ComparisonView() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const comparisonId = parseInt(params.id, 10);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  
+  // Delete comparison mutation
+  const deleteComparisonMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", `/api/comparisons/${comparisonId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete comparison");
+      }
+      return true;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Comparison deleted",
+        description: "The comparison has been successfully deleted",
+      });
+      
+      // Invalidate the comparisons list query to refresh dashboard data
+      queryClient.invalidateQueries({ queryKey: ["/api/comparisons"] });
+      
+      // Navigate back to the dashboard comparisons tab
+      navigate("/dashboard?tab=comparisons");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to delete comparison",
+        description: error.message,
+        variant: "destructive"
+      });
+      setIsDeleteDialogOpen(false);
+    }
+  });
   
   // Fetch comparison data
   const {
