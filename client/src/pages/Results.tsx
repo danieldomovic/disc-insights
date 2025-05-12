@@ -759,22 +759,37 @@ export default function Results() {
       // Add Next Steps section
       yPosition = addSectionTitle("Next Steps", yPosition);
       
-      // Create a combined content card
+      // Add behavior patterns section
+      // Create a combined content card for behavior patterns
       const behaviorContent = `On Your Best Days:\n• ${profile.onGoodDay.join('\n• ')}\n\nOn Your Challenging Days:\n• ${profile.onBadDay.join('\n• ')}`;
       
-      // Use a single card for consistency
       yPosition = addCard(
         "Your Behavior Patterns",
         behaviorContent,
         yPosition,
-        90,
-        colors.primary
+        60
       );
       
-      yPosition += 10;
+      // Final summary card with action steps
+      const nextStepsText = "This profile provides a foundation for understanding your natural preferences, strengths, and potential development areas. Consider how you can leverage your dominant color energies while developing your less preferred energies for specific situations.\n\nSharing these insights with your team can improve collaboration and communication. Remember that each color energy brings valuable perspective, and the most effective teams leverage all four colors.";
       
-      // Communication style section
-      yPosition = addSectionTitle("Communication Style", yPosition);
+      yPosition = addCard(
+        "Moving Forward with Insights",
+        nextStepsText,
+        yPosition,
+        60
+      );
+      
+      // Generate the PDF
+      const pdfOutput = pdf.output('datauristring');
+      
+      // Create a download link
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pdfOutput;
+      downloadLink.download = `${profile.name}_Profile_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      // Trigger download
+      downloadLink.click();
       
       // Add communication card with more elaborate content
       const communicationContent = 
