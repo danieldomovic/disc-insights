@@ -83,6 +83,7 @@ export interface IStorage {
   createReportComparison(comparison: InsertReportComparison): Promise<ReportComparison>;
   getUserReportComparisons(userId: number): Promise<ReportComparison[]>;
   getReportComparison(id: number): Promise<ReportComparison | undefined>;
+  deleteReportComparison(id: number): Promise<void>;
   
   // Session store for authentication
   sessionStore: Store;
@@ -313,6 +314,10 @@ export class MemStorage implements IStorage {
   }
   
   async getReportComparison(id: number): Promise<ReportComparison | undefined> {
+    throw new Error("MemStorage does not implement comparison functionality");
+  }
+  
+  async deleteReportComparison(id: number): Promise<void> {
     throw new Error("MemStorage does not implement comparison functionality");
   }
   
