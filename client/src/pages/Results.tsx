@@ -128,8 +128,13 @@ export default function Results() {
   // Fetch result from API if resultId is provided
   const { data: apiResult, isLoading, error } = useQuery({
     queryKey: ["/api/quiz/results", params?.resultId],
-    queryFn: params?.resultId ? undefined : () => mockResult,
-    enabled: !!params?.resultId
+    queryFn: params?.resultId ? 
+      () => fetch(`/api/quiz/results/${params.resultId}`).then(res => {
+        if (!res.ok) throw new Error("Failed to load quiz result");
+        return res.json();
+      }) : 
+      () => mockResult,
+    enabled: true
   });
   
   // Use either the API result or the mock result
@@ -261,17 +266,17 @@ export default function Results() {
 
   return (
     <section className="container max-w-5xl mx-auto pt-8 pb-16">
-      <Breadcrumbs>
-        <Breadcrumbs.Item>
-          <Link to="/">Home</Link>
-        </Breadcrumbs.Item>
+      <div className="flex mb-4">
+        <Link to="/" className="text-sm hover:underline mr-2">Home</Link>
+        <span className="mx-1">›</span>
         {user && (
-          <Breadcrumbs.Item>
-            <Link to="/dashboard">Dashboard</Link>
-          </Breadcrumbs.Item>
+          <>
+            <Link to="/dashboard" className="text-sm hover:underline mr-2">Dashboard</Link>
+            <span className="mx-1">›</span>
+          </>
         )}
-        <Breadcrumbs.Item isCurrentPage>Results</Breadcrumbs.Item>
-      </Breadcrumbs>
+        <span className="text-sm text-muted-foreground">Results</span>
+      </div>
       
       <div ref={reportRef}>
         <Card className="mt-6 overflow-hidden">
@@ -308,8 +313,6 @@ export default function Results() {
                         </h3>
                         <PersonaChart 
                           scores={result.scores} 
-                          height={240}
-                          width={240}
                         />
                       </div>
                       
@@ -321,8 +324,6 @@ export default function Results() {
                         <PreferenceFlowGraph 
                           consciousScores={result.scores} 
                           unconsciousScores={result.unconsciousScores}
-                          height={240}
-                          width={240}
                         />
                       </div>
                       
@@ -332,9 +333,7 @@ export default function Results() {
                           Persona (Less Conscious)
                         </h3>
                         <PersonaChart 
-                          scores={result.unconsciousScores} 
-                          height={240}
-                          width={240}
+                          scores={result.unconsciousScores}
                           isDashed
                         />
                       </div>
@@ -355,9 +354,7 @@ export default function Results() {
                 ) : (
                   <div className="flex justify-center py-8">
                     <ColorChart 
-                      scores={result.scores} 
-                      height={300}
-                      width={300}
+                      scores={result.scores}
                     />
                   </div>
                 )}
@@ -444,13 +441,13 @@ export default function Results() {
             {/* Dominant color profile detail - full width */}
             <div className="mt-12">
               <h3 className="text-2xl font-semibold mb-6">Your Dominant Color Energy</h3>
-              <ColorProfileDetail colorType={result.dominantColor} />
+              <ColorProfileDetail color={result.dominantColor} />
             </div>
             
             {/* Secondary color profile - full width */}
             <div className="mt-12">
               <h3 className="text-2xl font-semibold mb-6">Your Secondary Color Energy</h3>
-              <ColorProfileDetail colorType={result.secondaryColor} />
+              <ColorProfileDetail color={result.secondaryColor} />
             </div>
             
             {/* Action buttons */}

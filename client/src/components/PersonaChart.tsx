@@ -7,13 +7,15 @@ interface PersonaChartProps {
   title?: string;
   isConscious?: boolean;
   rawScores?: Record<ColorType, number>; // For displaying the raw values
+  isDashed?: boolean; // For showing the unconscious profile with dashed border
 }
 
 const PersonaChart: React.FC<PersonaChartProps> = ({
   scores,
   title,
   isConscious = true,
-  rawScores
+  rawScores,
+  isDashed = false
 }) => {
   // Standard order for Insights Discovery (BLUE, GREEN, YELLOW, RED)
   const colorOrder: ColorType[] = ['cool-blue', 'earth-green', 'sunshine-yellow', 'fiery-red'];
@@ -63,7 +65,9 @@ const PersonaChart: React.FC<PersonaChartProps> = ({
       {/* Main chart container */}
       <div className="relative" style={{ height: `${chartHeight}px`, width: `${chartWidth}px` }}>
         {/* Chart grid */}
-        <div className="absolute inset-0 border border-black">
+        <div className="absolute inset-0" style={{ 
+          border: isDashed ? '2px dashed #555' : '1px solid black'
+        }}>
           {/* Horizontal grid lines */}
           <div className="absolute w-full h-[1px] bg-black" style={{ top: '0%' }}>
             <span className="absolute -left-6 text-xs">6</span>
