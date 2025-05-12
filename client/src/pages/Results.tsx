@@ -53,6 +53,16 @@ export default function Results() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [chartJsLoaded, setChartJsLoaded] = useState(false);
+  
+  // Calculate raw scores - converting percentages to 0-6 scale for Insights Discovery format
+  const calculateRawScores = (percentages: Record<ColorType, number>) => {
+    const rawScores: Record<ColorType, number> = {} as Record<ColorType, number>;
+    for (const [color, percentage] of Object.entries(percentages) as [ColorType, number][]) {
+      // Convert percentage (0-100) to the 0-6 scale
+      rawScores[color] = (percentage / 100) * 6;
+    }
+    return rawScores;
+  };
   const reportRef = useRef<HTMLDivElement>(null);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -885,57 +895,29 @@ export default function Results() {
                           </TabsList>
                           
                           <TabsContent value="conscious">
-                            <div className="aspect-square w-full max-w-xs mx-auto mb-2">
-                              <ColorChart scores={result.scores} />
+                            <div className="mx-auto mb-2">
+                              <PersonaChart 
+                                scores={result.scores} 
+                                isConscious={true}
+                                rawScores={calculateRawScores(result.scores)}
+                              />
                             </div>
                             <p className="text-sm text-center text-gray-600 mb-4">
                               How you consciously adapt to your environment and present yourself to others
                             </p>
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
-                                <span className="text-sm">Fiery Red: <span className="font-semibold">{result.scores["fiery-red"]}%</span></span>
-                              </div>
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
-                                <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.scores["sunshine-yellow"]}%</span></span>
-                              </div>
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
-                                <span className="text-sm">Earth Green: <span className="font-semibold">{result.scores["earth-green"]}%</span></span>
-                              </div>
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
-                                <span className="text-sm">Cool Blue: <span className="font-semibold">{result.scores["cool-blue"]}%</span></span>
-                              </div>
-                            </div>
                           </TabsContent>
                           
                           <TabsContent value="unconscious">
-                            <div className="aspect-square w-full max-w-xs mx-auto mb-2">
-                              <ColorChart scores={result.unconsciousScores} />
+                            <div className="mx-auto mb-2">
+                              <PersonaChart 
+                                scores={result.unconsciousScores} 
+                                isConscious={false}
+                                rawScores={calculateRawScores(result.unconsciousScores)}
+                              />
                             </div>
                             <p className="text-sm text-center text-gray-600 mb-4">
                               Your instinctive self - how you behave when not adapting to external circumstances
                             </p>
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full bg-[#E23D28] mr-2"></div>
-                                <span className="text-sm">Fiery Red: <span className="font-semibold">{result.unconsciousScores["fiery-red"]}%</span></span>
-                              </div>
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full bg-[#F2CF1D] mr-2"></div>
-                                <span className="text-sm">Sunshine Yellow: <span className="font-semibold">{result.unconsciousScores["sunshine-yellow"]}%</span></span>
-                              </div>
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full bg-[#42A640] mr-2"></div>
-                                <span className="text-sm">Earth Green: <span className="font-semibold">{result.unconsciousScores["earth-green"]}%</span></span>
-                              </div>
-                              <div className="flex items-center">
-                                <div className="w-4 h-4 rounded-full bg-[#1C77C3] mr-2"></div>
-                                <span className="text-sm">Cool Blue: <span className="font-semibold">{result.unconsciousScores["cool-blue"]}%</span></span>
-                              </div>
-                            </div>
                           </TabsContent>
                         </Tabs>
                         
