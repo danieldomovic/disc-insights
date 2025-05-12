@@ -249,26 +249,27 @@ export default function Results() {
       };
       
       // Function to add a modern section title with accent bar
-      const addSectionTitle = (title: string, yPosition: number) => {
+      const addSectionTitle = (title: string, yPosition: number, xPosition = margin, sectionWidth = contentWidth) => {
         // Accent bar
         pdf.setFillColor(primaryColor.r, primaryColor.g, primaryColor.b);
-        pdf.rect(margin, yPosition, 5, 12, 'F');
+        pdf.rect(xPosition, yPosition, 5, 12, 'F');
         
         // Title text
         pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
         pdf.setFontSize(14);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(title, margin + 8, yPosition + 9);
+        pdf.text(title, xPosition + 8, yPosition + 9);
         
         return yPosition + 18; // Return next Y position
       };
       
       // Function to add a modern card with colored header and adaptive height
       const addCard = (title: string, content: string, yPosition: number, minHeight: number, 
+                       cardWidth = contentWidth, xPosition = margin,
                        headerColor = primaryColor, bgColor = colors.bgLight) => {
         // Split the content text to fit within the card width
         pdf.setFontSize(10);
-        const contentLines = pdf.splitTextToSize(content, contentWidth - 16);
+        const contentLines = pdf.splitTextToSize(content, cardWidth - 16);
         
         // Calculate actual required height based on content
         const lineHeight = 4.8; // Increased line height for readability
@@ -282,27 +283,129 @@ export default function Results() {
         // Card background with subtle shadow effect
         pdf.setDrawColor(220, 220, 220);
         pdf.setFillColor(bgColor.r, bgColor.g, bgColor.b);
-        pdf.roundedRect(margin, yPosition, contentWidth, actualHeight, 3, 3, 'FD');
+        pdf.roundedRect(xPosition, yPosition, cardWidth, actualHeight, 3, 3, 'FD');
         
         // Card header
         pdf.setFillColor(headerColor.r, headerColor.g, headerColor.b);
-        pdf.roundedRect(margin, yPosition, contentWidth, 10, 3, 3, 'F');
+        pdf.roundedRect(xPosition, yPosition, cardWidth, 10, 3, 3, 'F');
         
         // Title
         pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(12);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(title, margin + 6, yPosition + 6.5);
+        pdf.text(title, xPosition + 6, yPosition + 6.5);
         
         // Content with optimal spacing
         const contentY = yPosition + 18; // Increased from 15 for better spacing from header
         pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b); // Darker text for better readability
         pdf.setFontSize(10);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(contentLines, margin + 8, contentY); // Increased left padding for better readability
+        pdf.text(contentLines, xPosition + 8, contentY); // Increased left padding for better readability
         
         // Return next Y position with optimized spacing (reduced from 6 to 5)
         return yPosition + actualHeight + 5; 
+      };
+      
+      // Function to create a pie chart in PDF
+      const addColorPieChart = (scores: Record<ColorType, number>, yPosition: number, xPosition = margin) => {
+        const centerX = xPosition + 25;
+        const centerY = yPosition + 25;
+        const radius = 20;
+        let startAngle = 0;
+        
+        // Draw pie slices for each color
+        const colorOrder: ColorType[] = ['fiery-red', 'sunshine-yellow', 'earth-green', 'cool-blue'];
+        const totalScore = colorOrder.reduce((acc, color) => acc + scores[color], 0);
+        
+        // Title for the pie chart
+        pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text("Color Energy Distribution", xPosition, yPosition - 5);
+        
+        // Draw background for the pie chart
+        pdf.setFillColor(colors.bgLight.r, colors.bgLight.g, colors.bgLight.b);
+        pdf.roundedRect(xPosition - 5, yPosition, 60, 50, 3, 3, 'F');
+        
+        colorOrder.forEach(color => {
+          const angle = (scores[color] / totalScore) * 360;
+          const endAngle = startAngle + angle;
+          
+          const rgb = hexToRgb(colorProfiles[color].bgColor);
+          pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+          
+          // Draw arc for this slice
+          // Using a workaround for the ellipse with angle parameters
+          pdf.circle(centerX, centerY, radius, 'F');
+          pdf.setFillColor(255, 255, 255);
+          pdf.circle(centerX, centerY, radius - 5, 'F');
+          
+          // Draw colored arc
+          pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+          // For simple visualization, using filled circle segments
+          const segmentAngle = (Math.PI / 180) * angle;
+          const segmentX = centerX + Math.cos(startAngle + segmentAngle/2) * (radius/2);
+          const segmentY = centerY + Math.sin(startAngle + segmentAngle/2) * (radius/2);
+          pdf.circle(segmentX, segmentY, 5, 'F');
+          
+          startAngle = endAngle;
+        });
+        
+        // Add color legend below the pie chart
+        let legendY = yPosition + 40;
+        colorOrder.forEach((color, index) => {
+          const rgb = hexToRgb(colorProfiles[color].bgColor);
+          pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+          pdf.rect(xPosition, legendY, 8, 8, 'F');
+          
+          pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+          pdf.setFontSize(8);
+          pdf.setFont('helvetica', 'normal');
+          pdf.text(`${colorProfiles[color].name}: ${scores[color]}%`, xPosition + 12, legendY + 6);
+          
+          legendY += 10;
+        });
+        
+        return yPosition + 55;
+      };
+      
+      // Function to add bar chart visualization for persona chart
+      const addPersonaBarChart = (scores: Record<ColorType, number>, yPosition: number, xPosition = margin, title = "Persona Chart") => {
+        const chartWidth = 60;
+        const chartHeight = 60;
+        const barSpacing = 12;
+        const barWidth = 10;
+        
+        // Draw title
+        pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title, xPosition, yPosition);
+        
+        yPosition += 10;
+        
+        // Draw background
+        pdf.setFillColor(colors.bgLight.r, colors.bgLight.g, colors.bgLight.b);
+        pdf.roundedRect(xPosition, yPosition, chartWidth, chartHeight, 2, 2, 'F');
+        
+        // Draw bars
+        const colorOrder: ColorType[] = ['fiery-red', 'sunshine-yellow', 'earth-green', 'cool-blue'];
+        colorOrder.forEach((color, index) => {
+          const x = xPosition + 10 + (index * barSpacing);
+          const barHeight = (scores[color] / 100) * 50; // 50 is max bar height
+          const y = yPosition + chartHeight - 5 - barHeight;
+          
+          const rgb = hexToRgb(colorProfiles[color].bgColor);
+          pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+          pdf.rect(x, y, barWidth, barHeight, 'F');
+          
+          // Add value below the bar
+          pdf.setFontSize(7);
+          pdf.setTextColor(colors.mediumText.r, colors.mediumText.g, colors.mediumText.b);
+          pdf.text(`${scores[color]}%`, x, yPosition + chartHeight + 5, {align: 'center'});
+        });
+        
+        return yPosition + chartHeight + 10;
       };
       
       // Add content to the PDF
@@ -357,10 +460,82 @@ export default function Results() {
         yPosition += 10;
       }
       
-      // Color bars visualization - modern and easier to read than pie charts
-      yPosition = addSectionTitle("Your Color Energy Distribution", yPosition);
+      // Two-column layout settings
+      const colWidth = (contentWidth - 10) / 2; // 10px spacing between columns
+      const col2X = margin + colWidth + 10;
       
-      // Modern horizontal bar chart
+      // ===== COLOR ENERGY CHARTS SECTION =====
+      yPosition = addSectionTitle("Your Color Energy Profile", yPosition);
+      
+      // Display the three charts in a row if unconscious data is available
+      if (result.unconsciousScores) {
+        // Create a containing box for all charts
+        pdf.setFillColor(colors.bgLight.r, colors.bgLight.g, colors.bgLight.b);
+        pdf.roundedRect(margin, yPosition, contentWidth, 90, 3, 3, 'F');
+        
+        const chartsY = yPosition + 10;
+        
+        // Section for Conscious Persona chart (left)
+        pdf.setTextColor(colors.darkText.r, colors.darkText.g, colors.darkText.b);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text("Persona (Conscious)", margin + 20, chartsY);
+        addPersonaBarChart(result.scores, chartsY + 10, margin + 10, "");
+        
+        // Section for Preference Flow (center)
+        pdf.setFontSize(10);
+        pdf.text("Preference Flow", margin + colWidth - 10, chartsY);
+        
+        // Add preference flow percentage
+        const calculateFlow = () => {
+          if (!result.unconsciousScores) return 0;
+          
+          // Sum the absolute differences between conscious and unconscious scores and divide by 2
+          const totalDiff = Object.keys(result.scores).reduce((sum, color) => {
+            return sum + Math.abs(result.scores[color as ColorType] - result.unconsciousScores![color as ColorType]);
+          }, 0);
+          
+          return Math.round(totalDiff / 2);
+        };
+        
+        // Draw flow value
+        pdf.setFillColor(245, 245, 245);
+        pdf.roundedRect(margin + colWidth - 15, chartsY + 40, 30, 20, 2, 2, 'F');
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`${calculateFlow()}%`, margin + colWidth, chartsY + 50, {align: 'center'});
+        pdf.setFontSize(8);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text("Flow", margin + colWidth, chartsY + 60, {align: 'center'});
+        
+        // Section for Unconscious Persona chart (right)
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text("Persona (Less Conscious)", col2X + 20, chartsY);
+        addPersonaBarChart(result.unconsciousScores, chartsY + 10, col2X + 10, "");
+        
+        yPosition += 100;
+      } else {
+        // Just add a single colored pie chart
+        addColorPieChart(result.scores, yPosition);
+        yPosition += 60;
+      }
+      
+      // ===== MODERN TWO-COLUMN LAYOUT STARTS HERE =====
+      // Add Understanding Your Scores section (full width)
+      yPosition = addSectionTitle("Understanding Your Scores", yPosition);
+      
+      let scoringExplanation = "";
+      if (result.unconsciousScores) {
+        scoringExplanation = "Your conscious profile (how you choose to adapt) is calculated as the arithmetic mean of each color's 25 scores divided by 6 to determine the percentage. Your unconscious (less conscious) profile is calculated using the formula: less_conscious[color] = 6 - conscious[opposite_color].\n\nOn the 0-6 scale, \"Most like me\" (M) ratings are scored as 6 and \"Least like me\" (L) ratings are scored as 0, with numeric values (1-5) scored accordingly. The differences between profiles reveal where your conscious adaptations differ from your natural instinctive preferences.";
+      } else {
+        scoringExplanation = "Your color energy profile represents your relative preferences across the four Insights Discovery® color energies. Each color represents different qualities and approaches to work, communication, and relationships. Your unique combination creates your personal profile type.";
+      }
+      
+      yPosition = addCard("Scoring Methodology", scoringExplanation, yPosition, 50);
+      yPosition += 10;
+      
+      // Modern horizontal bar chart for the detailed color distribution
       const barHeight = 16;
       const barSpacing = 8;
       const maxBarWidth = contentWidth - 60;
@@ -434,56 +609,155 @@ export default function Results() {
         return startY + (colorData.length * (barHeight + barSpacing)) + 15;
       };
       
-      // Draw the conscious profile bars
-      yPosition = drawColorBars(colorBars, "Your Conscious Color Energy Distribution", yPosition);
+      // Draw the conscious profile bars in full width
+      yPosition = drawColorBars(colorBars, "Color Energy Distribution", yPosition);
       
-      // If unconscious data exists, draw those bars too
-      if (result.unconsciousScores) {
-        const unconsciousColorBars = Object.entries(result.unconsciousScores)
-          .sort((a, b) => b[1] - a[1])
-          .map(([colorName, score]) => ({ 
-            color: colorName as ColorType, 
-            score 
-          }));
-        
-        // Draw the unconscious profile bars with dashed style
-        yPosition = drawColorBars(unconsciousColorBars, "Your Unconscious Color Energy Distribution", yPosition, true);
-        
-        // Add explanation of conscious vs unconscious
-        yPosition += 5;
-        const explanation = "Your conscious profile represents how you prefer to be seen by others, while your unconscious profile reflects your instinctive response patterns when not adapting to external expectations. Comparing these two profiles can provide valuable insights into your authentic self and areas where you may be expending energy to adapt.";
-        yPosition += addWrappedText(explanation, margin, yPosition, contentWidth, 10, colors.mediumText, 'italic');
-        yPosition += 10;
+      // Setup two-column layout after the bar charts
+      // Start tracking both column positions separately
+      let leftColY = yPosition + 10;
+      let rightColY = yPosition + 10;
+      
+      // ===== LEFT COLUMN: PERSONALITY PROFILE =====
+      leftColY = addSectionTitle("Your Personality Type", leftColY, margin, colWidth);
+      
+      // Personality type description (in the left column)
+      const typeDescription = profile.description || 
+        `As a ${profile.name} type, you are characterized by your preference for ${colorProfiles[result.dominantColor].name} energy combined with ${colorProfiles[result.secondaryColor].name} energy.`;
+      
+      leftColY = addCard(
+        profile.name + " Profile",
+        typeDescription,
+        leftColY,
+        70, // Approximate height
+        colWidth,
+        margin
+      );
+      
+      // Primary Strengths (in the left column)
+      if (profile.keyCharacteristics && profile.keyCharacteristics.length > 0) {
+        const strengthsText = profile.keyCharacteristics.join("\n• ");
+        leftColY = addCard(
+          "Key Strengths",
+          "• " + strengthsText,
+          leftColY,
+          50,
+          colWidth,
+          margin
+        );
       }
       
-      // Overview card with profile summary
-      yPosition = addSectionTitle("Profile Overview", yPosition);
+      // ===== RIGHT COLUMN: COMMUNICATION & BEHAVIOR =====
+      rightColY = addSectionTitle("Communication Style", rightColY, col2X, colWidth);
       
-      // Add profile description in a modern card
-      yPosition = addCard(
-        "About Your Personality Type",
-        profile.description,
-        yPosition,
-        60, // Approximate height
-        colors.primary
-      );
+      // Communication style (in the right column)
+      if (profile.communicationStyle) {
+        rightColY = addCard(
+          "How You Communicate",
+          profile.communicationStyle,
+          rightColY,
+          60,
+          colWidth,
+          col2X
+        );
+      }
       
-      // Key strengths card
-      yPosition = addCard(
-        "Key Strengths",
-        profile.strengths,
-        yPosition,
-        60, // Approximate height
-        colors.success
-      );
+      // Value to teams (in the right column)
+      if (profile.valueProposition) {
+        rightColY = addCard(
+          "Your Value to Teams",
+          profile.valueProposition,
+          rightColY,
+          50,
+          colWidth,
+          col2X
+        );
+      }
       
-      // Add a new page
-      pdf.addPage();
-      addHeader("Insights Discovery Profile", 2);
-      yPosition = 30;
+      // Check which column is longer and continue from there
+      yPosition = Math.max(leftColY, rightColY) + 10;
       
-      // Behavior patterns with modern cards
-      yPosition = addSectionTitle("Behavior Patterns", yPosition);
+      // If we have unconscious data, add a comparison section
+      if (result.unconsciousScores && result.unconsciousPersonalityType) {
+        yPosition = addSectionTitle("Conscious vs. Less Conscious", yPosition);
+        
+        // Get the unconscious profile
+        const unconsciousProfile = personalityProfiles[result.unconsciousPersonalityType];
+        
+        // Content for the comparison card
+        const comparisonText = `Your conscious persona (${profile.name} type) is dominated by ${colorProfiles[result.dominantColor].name} energy, while your less conscious persona (${unconsciousProfile?.name || "Unknown"} type) is dominated by ${colorProfiles[result.dominantUnconsciousColor || "cool-blue"].name} energy.\n\nThis difference suggests you may be adapting your natural preferences in your conscious behavior. Areas of adaptation can sometimes represent both strengths and potential sources of stress when the adaptation requires significant energy over extended periods.\n\nUnderstanding this dynamic can help you leverage both sets of strengths and recognize when you might need to rebalance your energies.`;
+        
+        yPosition = addCard(
+          "Persona Comparison",
+          comparisonText,
+          yPosition,
+          60
+        );
+        
+        // Reset two-column layout after comparison card
+        leftColY = yPosition + 10;
+        rightColY = yPosition + 10;
+        
+        // Development areas in left column
+        if (profile.growthAreas && profile.growthAreas.length > 0) {
+          const growthText = profile.growthAreas.join("\n• ");
+          leftColY = addCard(
+            "Development Areas",
+            "• " + growthText,
+            leftColY,
+            50,
+            colWidth,
+            margin
+          );
+        }
+        
+        // Work preferences in right column
+        rightColY = addSectionTitle("Work Preferences", rightColY, col2X, colWidth);
+        
+        // Combined work preferences
+        const workContent = profile.likes && profile.likes.length > 0 ? 
+          `You particularly excel at work that involves:\n• ${profile.likes.join("\n• ")}\n\nYour professional goals often center around:\n• ${profile.goals?.join("\n• ") || "Achievement and quality results"}` :
+          "Your work preferences align with your personality type's natural tendencies toward structure, relationships, results, and quality depending on your dominant color energies.";
+        
+        rightColY = addCard(
+          "How You Work Best",
+          workContent,
+          rightColY,
+          60,
+          colWidth,
+          col2X
+        );
+      } else {
+        // If no unconscious data, continue with one column approach
+        // Add profile strengths and development areas
+        yPosition = addSectionTitle("Strengths & Development Areas", yPosition);
+        
+        if (profile.growthAreas && profile.growthAreas.length > 0) {
+          const growthText = profile.growthAreas.join("\n• ");
+          yPosition = addCard(
+            "Development Opportunities",
+            "• " + growthText,
+            yPosition,
+            50
+          );
+        }
+        
+        // Work preferences
+        if (profile.likes && profile.likes.length > 0) {
+          const workText = `You particularly excel at work that involves:\n• ${profile.likes.join("\n• ")}`;
+          yPosition = addCard(
+            "Work Preferences",
+            workText,
+            yPosition,
+            50
+          );
+        }
+      }
+      
+      // Final section - complete the page
+      yPosition = Math.max(leftColY, rightColY) + 10;
+      
+      // Add Next Steps section
+      yPosition = addSectionTitle("Next Steps", yPosition);
       
       // Create a combined content card
       const behaviorContent = `On Your Best Days:\n• ${profile.onGoodDay.join('\n• ')}\n\nOn Your Challenging Days:\n• ${profile.onBadDay.join('\n• ')}`;
