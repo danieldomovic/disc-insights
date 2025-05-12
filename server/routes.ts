@@ -904,7 +904,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dominantColor,
         secondaryColor,
         personalityType,
-        title: quizResult.title || "Insights Discovery Profile",
+        title: quizResult.title ?? "Insights Discovery Profile",
+        createdAt: quizResult.createdAt,
         unconsciousScores: {
           "fiery-red": unconsciousPercentages["fiery-red"],
           "sunshine-yellow": unconsciousPercentages["sunshine-yellow"],
