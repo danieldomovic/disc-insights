@@ -24,6 +24,14 @@ const PreferenceFlowGraph: React.FC<PreferenceFlowGraphProps> = ({
     'earth-green': '#42A640',
     'cool-blue': '#1C77C3'
   };
+  
+  // Colors for the graph headers
+  const colorHeaders = {
+    'cool-blue': 'BLUE',
+    'earth-green': 'GREEN',
+    'sunshine-yellow': 'YELLOW',
+    'fiery-red': 'RED'
+  };
 
   // Standard order for Insights Discovery (from left to right in chart)
   const standardOrder = ['cool-blue', 'earth-green', 'sunshine-yellow', 'fiery-red'];
@@ -52,21 +60,36 @@ const PreferenceFlowGraph: React.FC<PreferenceFlowGraphProps> = ({
   const columnWidth = chartWidth / 4; // Width of each color column
   
   return (
-    <div className="preference-flow-graph mt-8 p-6 bg-white rounded-lg shadow-md flex flex-col items-center">
-      <h3 className="text-2xl font-bold mb-3 italic">Preference Flow</h3>
+    <div className="preference-flow-graph p-4 bg-white rounded-lg shadow-md flex flex-col items-center">
+      {/* Color headers - showing above the chart */}
+      <div className="flex w-[180px] mb-1 text-xs font-bold">
+        {standardOrder.map((color, index) => (
+          <div 
+            key={`header-${color}`} 
+            className="flex-1 text-center"
+            style={{ color: index % 2 === 0 ? '#000' : '#000' }}
+          >
+            {colorHeaders[color as keyof typeof colorHeaders]}
+          </div>
+        ))}
+      </div>
       
       {/* Main chart container */}
-      <div className="relative mt-4" style={{ height: `${chartHeight}px`, width: `${chartWidth}px` }}>
+      <div className="relative" style={{ height: `${chartHeight}px`, width: `${chartWidth}px` }}>
         {/* Chart grid */}
-        <div className="absolute inset-0 border-2 border-black">
-          {/* Horizontal grid lines (0, 50, 100 marks) */}
+        <div className="absolute inset-0 border border-black">
+          {/* Horizontal grid lines (0, 50, 100 marks) and 3 horizontal grid lines */}
           <div className="absolute w-full h-[1px] bg-black" style={{ top: '0%' }}></div>
+          <div className="absolute w-full h-[1px] bg-gray-300" style={{ top: '25%' }}></div>
           <div className="absolute w-full h-[1px] bg-black" style={{ top: '50%' }}></div>
+          <div className="absolute w-full h-[1px] bg-gray-300" style={{ top: '75%' }}></div>
           <div className="absolute w-full h-[1px] bg-black" style={{ top: '100%' }}></div>
           
           {/* Y-axis labels */}
           <div className="absolute -left-8 text-xs" style={{ top: '0%', transform: 'translateY(-50%)' }}>100</div>
+          <div className="absolute -left-6 text-xs" style={{ top: '25%', transform: 'translateY(-50%)' }}>50</div>
           <div className="absolute -left-6 text-xs" style={{ top: '50%', transform: 'translateY(-50%)' }}>0</div>
+          <div className="absolute -left-6 text-xs" style={{ top: '75%', transform: 'translateY(-50%)' }}>50</div>
           <div className="absolute -left-8 text-xs" style={{ top: '100%', transform: 'translateY(-50%)' }}>100</div>
           
           {/* Vertical grid lines (dividing the four color columns) */}

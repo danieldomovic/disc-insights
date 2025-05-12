@@ -888,63 +888,62 @@ export default function Results() {
                   <>
                     {result.unconsciousScores ? (
                       <>
-                        <Tabs defaultValue="conscious" className="w-full">
-                          <TabsList className="mb-4 grid grid-cols-2">
-                            <TabsTrigger value="conscious">Conscious Profile</TabsTrigger>
-                            <TabsTrigger value="unconscious">Unconscious Profile</TabsTrigger>
-                          </TabsList>
-                          
-                          <TabsContent value="conscious">
-                            <div className="mx-auto mb-2">
-                              <PersonaChart 
-                                scores={result.scores} 
-                                isConscious={true}
-                                rawScores={calculateRawScores(result.scores)}
-                              />
-                            </div>
-                            <p className="text-sm text-center text-gray-600 mb-4">
-                              How you consciously adapt to your environment and present yourself to others
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                          {/* Conscious Persona */}
+                          <div className="flex flex-col items-center">
+                            <h3 className="text-xl font-semibold text-center mb-4">
+                              Persona<br/>(Conscious)
+                            </h3>
+                            <PersonaChart 
+                              scores={result.scores} 
+                              isConscious={true}
+                              rawScores={calculateRawScores(result.scores)}
+                            />
+                            <p className="text-sm text-center text-gray-600 mt-2">
+                              How you consciously adapt to your environment
                             </p>
-                          </TabsContent>
+                          </div>
                           
-                          <TabsContent value="unconscious">
-                            <div className="mx-auto mb-2">
-                              <PersonaChart 
-                                scores={result.unconsciousScores} 
-                                isConscious={false}
-                                rawScores={calculateRawScores(result.unconsciousScores)}
-                              />
-                            </div>
-                            <p className="text-sm text-center text-gray-600 mb-4">
-                              Your instinctive self - how you behave when not adapting to external circumstances
+                          {/* Preference Flow */}
+                          <div className="flex flex-col items-center">
+                            <h3 className="text-xl font-semibold text-center mb-4">
+                              Preference<br/>Flow
+                            </h3>
+                            <PreferenceFlowGraph 
+                              consciousScores={result.scores} 
+                              unconsciousScores={result.unconsciousScores}
+                            />
+                          </div>
+                          
+                          {/* Unconscious Persona */}
+                          <div className="flex flex-col items-center">
+                            <h3 className="text-xl font-semibold text-center mb-4">
+                              Persona<br/>(Less Conscious)
+                            </h3>
+                            <PersonaChart 
+                              scores={result.unconsciousScores} 
+                              isConscious={false}
+                              rawScores={calculateRawScores(result.unconsciousScores)}
+                            />
+                            <p className="text-sm text-center text-gray-600 mt-2">
+                              Your instinctive self without adaptation
                             </p>
-                          </TabsContent>
-                        </Tabs>
-                        
-                        <div className="mt-8">
-                          <Card>
-                            <CardContent className="p-0">
-                              <PreferenceFlowGraph 
-                                consciousScores={result.scores} 
-                                unconsciousScores={result.unconsciousScores}
-                              />
-                            </CardContent>
-                          </Card>
-                          
-                          <Card className="mt-6">
-                            <CardContent className="p-6">
-                              <h3 className="text-xl font-semibold mb-4">Understanding Conscious vs. Unconscious Scores</h3>
-                              <p className="text-gray-700 mb-4">
-                                Your conscious profile (how you choose to adapt) is derived from your "Most like me" and "Least like me" choices, 
-                                while your unconscious profile (your instinctive self) is calculated from your numeric ratings (1-5).
-                              </p>
-                              <p className="text-gray-700">
-                                Each rating is weighted (L=1, 1=2, 2=3, 3=4, 4=5, 5=6, M=7), and percentages are calculated for each color.
-                                The differences between profiles can reveal where you're adapting to external expectations versus your natural preferences.
-                              </p>
-                            </CardContent>
-                          </Card>
+                          </div>
                         </div>
+                        
+                        <Card className="mt-8">
+                          <CardContent className="p-6">
+                            <h3 className="text-xl font-semibold mb-4">Understanding Conscious vs. Unconscious Scores</h3>
+                            <p className="text-gray-700 mb-4">
+                              Your conscious profile (how you choose to adapt) is derived from your "Most like me" and "Least like me" choices, 
+                              while your unconscious profile (your instinctive self) is calculated from your numeric ratings (1-5).
+                            </p>
+                            <p className="text-gray-700">
+                              Each rating is weighted (L=0, M=6), and percentages are calculated for each color.
+                              The differences between profiles can reveal where you're adapting to external expectations versus your natural preferences.
+                            </p>
+                          </CardContent>
+                        </Card>
                       </>
                     ) : (
                       <>
