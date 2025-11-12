@@ -43,9 +43,9 @@ export function setupAuth(app: Express) {
       tableName: 'sessions'
     }),
     cookie: {
-      secure: false, // Replit handles HTTPS at the proxy level
+      secure: true, // Required for sameSite: 'none'
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'none', // Required for iframe context on Replit
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     }
   };
