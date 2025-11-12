@@ -23,7 +23,7 @@ export default function WelcomePage() {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Discover Your Color Profile
+            Discover Your DISC Profile
           </h1>
           <p className="text-xl text-gray-600 mb-8">
             Uncover insights about your personality and work style with our Insights Discovery-based assessment.
