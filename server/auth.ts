@@ -46,6 +46,7 @@ export function setupAuth(app: Express) {
       secure: true, // Required for sameSite: 'none'
       httpOnly: true,
       sameSite: 'none', // Required for iframe context on Replit
+      partitioned: true, // Required for Chrome's third-party cookie blocking (CHIPS)
       maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
     }
   };
